@@ -1,13 +1,9 @@
 "use client";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
 import mangoImg from "../../public/mango.png";
 
 export function Navigation() {
-  const router = useRouter();
-
   return (
     <header className="relative flex h-[80px] min-h-[80px] items-center justify-between px-3">
       {/* Left */}
@@ -31,9 +27,6 @@ export function Navigation() {
         <div className="mx-1 h-5 w-px bg-gray-200 transition dark:bg-gray-800" />
 
         <div className="flex items-center gap-2">
-          <Button size="sm" onClick={() => router.push("/login")}>
-            Sign In
-          </Button>
           <a
             href="https://github.com/tapasomlabs/mangosqueezy"
             className="actionable flex h-8 w-8 items-center justify-center gap-2 rounded-md hover:bg-black/5 dark:hover:bg-white/10"
