@@ -24,8 +24,9 @@ import {
 } from "@/components/ui/table";
 import { createClient } from "@/lib/supabase/server";
 import { getUserById } from "@/models/business";
+import { Orders } from "@prisma/client";
 
-export default async function Orders() {
+export default async function OrdersPage() {
   const supabase = createClient();
   const { data } = await supabase.auth.getUser();
   const userId = data?.user?.id as string;
@@ -54,7 +55,7 @@ export default async function Orders() {
             </TableHeader>
             <TableBody>
               {user &&
-                user?.orders.map((order, index) => (
+                user?.orders.map((order: Orders, index: number) => (
                   <TableRow key={`table-row-${index}`}>
                     <TableCell className="font-medium">
                       {order.customer_name}
