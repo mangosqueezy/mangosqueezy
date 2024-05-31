@@ -63,7 +63,7 @@ export default function Feature() {
       <div className="relative overflow-hidden pt-16">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <Image
-            src="/images/dashboard.png"
+            src="/dashboard.png"
             alt="App screenshot"
             className="mb-[-12%] rounded-xl shadow-2xl ring-1 ring-white/10"
             width={2432}
