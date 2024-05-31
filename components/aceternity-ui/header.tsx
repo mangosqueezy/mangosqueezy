@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import mangoImg from "../../public/mango.png";
 
 export function Navigation() {
   const router = useRouter();
@@ -13,7 +14,7 @@ export function Navigation() {
       <Link href="/" className="actionable flex h-8 items-center gap-1">
         <span className="text-base font-medium text-gray-600 dark:text-gray-400">
           <Avatar className="h-12 w-12">
-            <AvatarImage src="/mango.png" alt="@mangosqueezy" />
+            <AvatarImage src={mangoImg.src} alt="@mangosqueezy" />
             <AvatarFallback>MS</AvatarFallback>
           </Avatar>
         </span>

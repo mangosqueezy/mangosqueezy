@@ -7,6 +7,7 @@ import {
   CurrencyDollarIcon,
 } from "@heroicons/react/20/solid";
 import Image from "next/image";
+import dashboardImg from "../../public/dashboard.png";
 
 const featuresList = [
   {
@@ -63,7 +64,7 @@ export default function Feature() {
       <div className="relative overflow-hidden pt-16">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <Image
-            src="/dashboard.png"
+            src={dashboardImg}
             alt="App screenshot"
             className="mb-[-12%] rounded-xl shadow-2xl ring-1 ring-white/10"
             width={2432}
