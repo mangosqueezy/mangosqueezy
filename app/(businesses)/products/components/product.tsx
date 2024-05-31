@@ -96,15 +96,15 @@ export default function Product({
   const [open, setOpen] = useState(false);
   const [state, productAction] = useFormState(
     createProductAction,
-    initialState,
+    initialState
   );
   const [updateFormState, updateAction] = useFormState(
     updateProductAction,
-    initialState,
+    initialState
   );
   const [deleteFormState, deleteAction] = useFormState(
     deleteProductAction,
-    initialState,
+    initialState
   );
   const [editProductInfo, setEditProductInfo] = useState({
     id: 0,
@@ -167,7 +167,6 @@ export default function Product({
           This binary data is then translated to a text representation (base64) and transferred as text. */
 
       // base64 is an algorithm for encoding and decoding an object to ASCII format.
-      /* eslint-disable  @typescript-eslint/no-explicit-any */
       const base64String: any = reader?.result;
 
       setProfilePhotoInfo({
@@ -176,7 +175,7 @@ export default function Product({
         url: base64String,
       });
       const fileInput: any = document.getElementById(
-        "image-reference-file-name",
+        "image-reference-file-name"
       );
       fileInput.value = ""; // Reset the file input element
     };
@@ -230,7 +229,7 @@ export default function Product({
                 <SheetHeader>
                   <SheetTitle>Product details</SheetTitle>
                   <SheetDescription>
-                    Add product details. Click save when you're done.
+                    {`Add product details. Click save when you're done.`}
                   </SheetDescription>
                 </SheetHeader>
                 <div className="grid gap-4 py-4">
@@ -373,7 +372,7 @@ export default function Product({
                                 const formData = new FormData();
                                 formData.append(
                                   "product-id",
-                                  product.id.toString(),
+                                  product.id.toString()
                                 );
                                 deleteAction(formData);
                               }}
@@ -399,7 +398,7 @@ export default function Product({
           <DialogHeader>
             <DialogTitle>Edit profile</DialogTitle>
             <DialogDescription>
-              Make changes to your profile here. Click save when you're done.
+              {`Make changes to your profile here. Click save when you're done.`}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -476,7 +475,7 @@ export default function Product({
                 formData.append("product-name", editProductInfo.name);
                 formData.append(
                   "product-description",
-                  editProductInfo.description,
+                  editProductInfo.description
                 );
                 formData.append("product-price", editProductInfo.price);
                 formData.append("product-image-url", editProductInfo.imageUrl);

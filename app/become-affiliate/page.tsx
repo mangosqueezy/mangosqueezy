@@ -70,7 +70,7 @@ export default function Affiliates() {
       formData.append("query", query);
       formData.append("text", form.getValues("description"));
 
-      const response = await fetch("http://localhost:3000/api/llm", {
+      const response = await fetch("https://mangosqueezy.com/api/llm", {
         method: "POST",
         body: formData,
       });

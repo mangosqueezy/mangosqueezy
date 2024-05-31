@@ -16,7 +16,7 @@ export async function auth(_: null | string, formData: FormData) {
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
-      emailRedirectTo: "http://localhost:3000/api/login",
+      emailRedirectTo: "https://mangosqueezy.com/api/login",
       data: {
         slug: "slug.toLowerCase()",
       },
