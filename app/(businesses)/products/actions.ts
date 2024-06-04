@@ -1,6 +1,5 @@
 "use server";
 
-import isEmpty from "lodash/isEmpty";
 import { createClient } from "@supabase/supabase-js";
 import { decode } from "base64-arraybuffer";
 import { uuid } from "uuidv4";
@@ -12,68 +11,16 @@ import {
 import type { TFormInitialState } from "./components/product";
 import { revalidatePath } from "next/cache";
 
-export async function createProductAction(
-  _: TFormInitialState,
-  formData: FormData,
-) {
+export async function createProductAction(formData: FormData) {
   try {
-    const name: any = formData.get("name");
-    const price: any = formData.get("price");
-    const description: any = formData.get("description");
-    const imageReferenceFile: any = formData.get("image-reference-file");
-    const imageReferenceFileName: any = formData.get(
+    const name = formData.get("name") as string;
+    const price = formData.get("price") as string;
+    const description = formData.get("description") as string;
+    const imageReferenceFile = formData.get("image-reference-file") as string;
+    const imageReferenceFileName = formData.get(
       "image-reference-file-name",
-    );
-    const businessId: any = formData.get("business-id");
-
-    if (isEmpty(name)) {
-      return {
-        success: "",
-        errors: {
-          message: "something went wrong",
-          name: "Product name is empty",
-          price: null,
-          description: null,
-          productImage: null,
-        },
-      };
-    }
-    if (isEmpty(price)) {
-      return {
-        success: "",
-        errors: {
-          message: "something went wrong",
-          name: null,
-          price: "Product price is empty",
-          description: null,
-          productImage: null,
-        },
-      };
-    }
-    if (isEmpty(description)) {
-      return {
-        success: "",
-        errors: {
-          message: "something went wrong",
-          name: null,
-          price: null,
-          description: "Product description is empty",
-          productImage: null,
-        },
-      };
-    }
-    if (isEmpty(imageReferenceFile)) {
-      return {
-        success: "",
-        errors: {
-          message: "something went wrong",
-          name: null,
-          price: null,
-          description: null,
-          productImage: "Product image is empty",
-        },
-      };
-    }
+    ) as string;
+    const businessId = formData.get("business-id") as string;
 
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL as string,
@@ -97,27 +44,9 @@ export async function createProductAction(
 
     revalidatePath("/products");
 
-    return {
-      success: "updated successfully",
-      errors: {
-        message: null,
-        name: null,
-        price: null,
-        description: null,
-        productImage: null,
-      },
-    };
+    return "success";
   } catch (error) {
-    return {
-      success: "",
-      errors: {
-        message: "something went wrong",
-        name: null,
-        price: null,
-        description: null,
-        productImage: null,
-      },
-    };
+    return "error";
   }
 }
 

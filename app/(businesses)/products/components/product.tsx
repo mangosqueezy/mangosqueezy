@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { useFormState } from "react-dom";
 import type { Products, Business } from "@prisma/client";
 import { Badge } from "@/components/ui/badge";
@@ -56,7 +56,44 @@ import {
   updateProductAction,
   deleteProductAction,
 } from "../actions";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
+import {
+  Form,
+  FormLabel,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+
+const FormSchema = z.object({
+  name: z.string().min(1, {
+    message: "Please enter the name.",
+  }),
+  price: z.string().min(1, {
+    message: "Please enter the price.",
+  }),
+  description: z.string().min(1, {
+    message: "Please enter the description.",
+  }),
+  picture: z
+    .object({
+      name: z.string().min(1, {
+        message: "Please upload the photo.",
+      }),
+      fileDetails: z.string().min(1, {
+        message: "Please upload the photo.",
+      }),
+      url: z.string().min(1, {
+        message: "Please upload the photo.",
+      }),
+    })
+    .refine((data) => !!data.name && !!data.fileDetails && !!data.url, {
+      message: "Please upload the picture.",
+    }),
+});
 
 export type TBusiness = Pick<Business, "id"> & {
   products: Array<Products>;
@@ -94,17 +131,13 @@ export default function Product({
   user: TBusiness | null | undefined;
 }) {
   const [open, setOpen] = useState(false);
-  const [state, productAction] = useFormState(
-    createProductAction,
-    initialState
-  );
   const [updateFormState, updateAction] = useFormState(
     updateProductAction,
-    initialState
+    initialState,
   );
   const [deleteFormState, deleteAction] = useFormState(
     deleteProductAction,
-    initialState
+    initialState,
   );
   const [editProductInfo, setEditProductInfo] = useState({
     id: 0,
@@ -114,21 +147,40 @@ export default function Product({
     imageUrl: "",
   });
   const [openEditProductDialog, setOpenEditProductDialog] = useState(false);
-  const [profilePhotoInfo, setProfilePhotoInfo] = useState({
-    name: "",
-    fileDetails: "",
-    url: "",
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      name: "",
+      price: "",
+      description: "",
+      picture: {
+        name: "",
+        fileDetails: "",
+        url: "",
+      },
+    },
   });
 
-  if (state?.success === "updated successfully") {
-    toast.custom((t) => (
-      <CustomToast
-        t={t}
-        message="Information updated successfully!"
-        variant="success"
-      />
-    ));
-  } else if (updateFormState?.success === "updated successfully") {
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("price", data.price);
+    formData.append("description", data.description);
+    formData.append("image-reference-file", data.picture.fileDetails);
+    formData.append("image-reference-file-name", data.picture.name);
+    formData.append("business-id", user?.id as string);
+
+    const result = await createProductAction(formData);
+    if (result === "success") {
+      toast.success(
+        "Successfully added to waitlist. We'll notify when a spot opens up.",
+      );
+    } else if (result === "error") {
+      toast.error("Something went wrong please try again later");
+    }
+  }
+
+  if (updateFormState?.success === "updated successfully") {
     toast.custom((t) => (
       <CustomToast
         t={t}
@@ -145,7 +197,6 @@ export default function Product({
       />
     ));
   } else if (
-    state?.errors?.message ||
     updateFormState?.errors?.message ||
     deleteFormState?.errors?.message
   ) {
@@ -158,7 +209,7 @@ export default function Product({
     ));
   }
 
-  const uploadProflePhoto = (event: any) => {
+  const uploadProductPhoto = (event: any) => {
     const reader = new FileReader();
     reader.onload = async function () {
       /* Base64 is a binary-to-text encoding scheme used to
@@ -169,15 +220,14 @@ export default function Product({
       // base64 is an algorithm for encoding and decoding an object to ASCII format.
       const base64String: any = reader?.result;
 
-      setProfilePhotoInfo({
+      const pictureInfo = {
         name: event.target.files[0].name,
         fileDetails: base64String.split(",")[1],
         url: base64String,
-      });
-      const fileInput: any = document.getElementById(
-        "image-reference-file-name"
-      );
-      fileInput.value = ""; // Reset the file input element
+      };
+
+      form.clearErrors("picture");
+      form.setValue("picture", pictureInfo);
     };
 
     reader.readAsDataURL(event.target.files[0]);
@@ -199,94 +249,110 @@ export default function Product({
               </Button>
             </SheetTrigger>
             <SheetContent>
-              <form method="POST" action={productAction}>
-                <input
-                  type="text"
-                  name="business-id"
-                  id="business-id"
-                  readOnly
-                  value={user?.id}
-                  className="hidden"
-                />
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)}>
+                  <SheetHeader>
+                    <SheetTitle>Product details</SheetTitle>
+                    <SheetDescription>
+                      {`Add product details. Click save when you're done.`}
+                    </SheetDescription>
+                  </SheetHeader>
+                  <div className="grid gap-4 py-4">
+                    <div>
+                      <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <>
+                            <FormItem>
+                              <FormLabel className="truncate text-black">
+                                Name
+                              </FormLabel>
+                              <FormControl>
+                                <Input placeholder="mango squeezy" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          </>
+                        )}
+                      />
+                    </div>
+                    <div>
+                      <FormField
+                        control={form.control}
+                        name="price"
+                        render={({ field }) => (
+                          <>
+                            <FormItem>
+                              <FormLabel className="truncate text-black">
+                                Price
+                              </FormLabel>
+                              <FormControl>
+                                <Input placeholder="0.00" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          </>
+                        )}
+                      />
+                    </div>
+                    <div>
+                      <FormField
+                        control={form.control}
+                        name="description"
+                        render={({ field }) => (
+                          <>
+                            <FormItem>
+                              <FormLabel className="truncate text-black">
+                                Description
+                              </FormLabel>
+                              <FormControl>
+                                <Textarea
+                                  placeholder="open source affiliate marketing platform"
+                                  className="min-h-32"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          </>
+                        )}
+                      />
+                    </div>
+                    <div>
+                      <FormField
+                        control={form.control}
+                        name="picture"
+                        render={() => (
+                          <>
+                            <FormItem>
+                              <FormLabel className="truncate text-black">
+                                Front Picture
+                              </FormLabel>
 
-                <input
-                  type="text"
-                  name="image-reference-file"
-                  id="image-reference-file"
-                  readOnly
-                  value={profilePhotoInfo.fileDetails}
-                  className="hidden"
-                />
-
-                <input
-                  type="text"
-                  name="image-reference-file-name"
-                  id="image-reference-file-name"
-                  readOnly
-                  value={profilePhotoInfo.name}
-                  className="hidden"
-                />
-                <SheetHeader>
-                  <SheetTitle>Product details</SheetTitle>
-                  <SheetDescription>
-                    {`Add product details. Click save when you're done.`}
-                  </SheetDescription>
-                </SheetHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="name" className="text-right">
-                      Name
-                    </Label>
-                    <Input
-                      id="name"
-                      name="name"
-                      placeholder="Product name"
-                      className="col-span-3"
-                    />
+                              <FormControl>
+                                <Input
+                                  id="picture"
+                                  type="file"
+                                  onChange={(event) => {
+                                    uploadProductPhoto(event);
+                                  }}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          </>
+                        )}
+                      />
+                    </div>
                   </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="price" className="text-right">
-                      Price
-                    </Label>
-                    <Input
-                      type="number"
-                      id="price"
-                      name="price"
-                      placeholder="Product price"
-                      className="col-span-3"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="description" className="text-right">
-                      Description
-                    </Label>
-                    <Textarea
-                      id="description"
-                      name="description"
-                      placeholder="Enter your product description."
-                      className="min-h-32 col-span-3"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="picture" className="text-right">
-                      Picture
-                    </Label>
-                    <Input
-                      id="picture"
-                      type="file"
-                      className="col-span-3"
-                      onChange={(event) => {
-                        uploadProflePhoto(event);
-                      }}
-                    />
-                  </div>
-                </div>
-                <SheetFooter>
-                  <SheetClose asChild>
-                    <Button type="submit">Save changes</Button>
-                  </SheetClose>
-                </SheetFooter>
-              </form>
+                  <SheetFooter>
+                    <SheetClose asChild>
+                      <Button type="submit">Save changes</Button>
+                    </SheetClose>
+                  </SheetFooter>
+                </form>
+              </Form>
             </SheetContent>
           </Sheet>
         </div>
@@ -372,7 +438,7 @@ export default function Product({
                                 const formData = new FormData();
                                 formData.append(
                                   "product-id",
-                                  product.id.toString()
+                                  product.id.toString(),
                                 );
                                 deleteAction(formData);
                               }}
@@ -461,7 +527,7 @@ export default function Product({
                 type="file"
                 className="col-span-3"
                 onChange={(event) => {
-                  uploadProflePhoto(event);
+                  uploadProductPhoto(event);
                 }}
               />
             </div>
@@ -475,7 +541,7 @@ export default function Product({
                 formData.append("product-name", editProductInfo.name);
                 formData.append(
                   "product-description",
-                  editProductInfo.description
+                  editProductInfo.description,
                 );
                 formData.append("product-price", editProductInfo.price);
                 formData.append("product-image-url", editProductInfo.imageUrl);

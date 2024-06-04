@@ -78,15 +78,29 @@ export default function Index() {
                 duration: 0.5,
                 ease: [0.4, 0.0, 0.2, 1],
               }}
-              className="text-2xl px-4 md:text-4xl lg:text-5xl font-bold text-neutral-700 dark:text-white max-w-5xl leading-relaxed lg:leading-snug text-center mx-auto "
+              className="text-3xl px-4 md:text-4xl lg:text-6xl font-bold text-neutral-700 dark:text-white max-w-7xl leading-relaxed lg:leading-snug text-center mx-auto "
             >
+              <div className="hidden sm:mb-8 sm:flex sm:justify-center">
+                <div className="relative rounded-full px-3 py-1 text-sm leading-6 text-gray-600 dark:text-white ring-1 ring-gray-900/10 hover:ring-gray-900/20">
+                  OSS affiliate marketing platform.{" "}
+                  <a
+                    href="https://github.com/mangosqueezy/mangosqueezy"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-semibold text-orange-600"
+                  >
+                    <span className="absolute inset-0" aria-hidden="true" />
+                    Read more <span aria-hidden="true">&rarr;</span>
+                  </a>
+                </div>
+              </div>
               Empower your dedicated community with our{" "}
               <Highlight className="text-black dark:text-white">
                 valuable crypto affiliate tools.
               </Highlight>
             </motion.h1>
 
-            <div className="mt-40 flex justify-center items-center text-center">
+            <div className="mt-20 flex justify-center items-center text-center">
               <Form {...form}>
                 <form
                   onSubmit={form.handleSubmit(onSubmit)}
@@ -101,7 +115,7 @@ export default function Index() {
                           <FormControl>
                             <LabelInputContainer className="mb-4 w-[260px]">
                               <Input
-                                placeholder="partner@tapasom.com"
+                                placeholder="partner@mangosqueezy.com"
                                 {...field}
                               />
                             </LabelInputContainer>

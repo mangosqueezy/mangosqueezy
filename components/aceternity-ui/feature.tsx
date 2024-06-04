@@ -53,7 +53,7 @@ export default function Feature() {
     <div className="py-24">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl sm:text-center">
-          <h2 className="text-base font-semibold leading-7 text-orange-500">
+          <h2 className="text-2xl font-bold leading-7 dark:text-white">
             AFFILIATES
           </h2>
           <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-300">
@@ -78,7 +78,7 @@ export default function Feature() {
             <div key={feature.name} className="relative pl-9">
               <dt className="inline font-semibold text-black dark:text-white">
                 <feature.icon
-                  className="absolute left-1 top-1 h-5 w-5 text-blue-500"
+                  className="absolute left-1 top-1 h-5 w-5 text-gray-950 dark:text-white"
                   aria-hidden="true"
                 />
                 {feature.name}

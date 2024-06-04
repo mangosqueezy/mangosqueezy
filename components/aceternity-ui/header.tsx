@@ -17,9 +17,6 @@ export function Navigation() {
         <span className="text-base font-medium text-gray-600 dark:text-gray-400">
           Mangosqueezy
         </span>
-        <span className="hidden sm:inline-flex items-center justify-center rounded-md border border-yellow-200 px-1.5 py-0.5 text-xs font-semibold text-yellow-600 transition dark:border-violet-900 dark:text-violet-400">
-          Tapasom Tool
-        </span>
       </Link>
 
       {/* Right */}
