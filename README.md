@@ -12,7 +12,7 @@
 
 # Under active development
 
-> Currently, the project is currently under development and is not ready to use yet.
+> The project is currently under development and is not ready to use yet.
 
 # Get started
 

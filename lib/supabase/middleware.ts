@@ -62,5 +62,13 @@ export async function updateSession(request: NextRequest) {
     });
   }
 
+  let { data } = await supabase.from("Business").select("status");
+
+  if (data && data[0]?.status === "Inactive") {
+    return NextResponse.redirect(new URL("/login", request.url), {
+      headers: request.headers,
+    });
+  }
+
   return response;
 }
