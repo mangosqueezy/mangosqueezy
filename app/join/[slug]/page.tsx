@@ -3,7 +3,7 @@ import * as React from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Loader } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,6 +27,7 @@ import {
 import toast, { Toaster } from "react-hot-toast";
 import { createAffiliateAction } from "./actions";
 import { Navigation } from "./components/header";
+import { cn } from "@/lib/utils";
 
 const FormSchema = z.object({
   firstname: z.string().min(1, {
@@ -47,10 +48,13 @@ const FormSchema = z.object({
   url: z.string().min(1, {
     message: "Please enter the url.",
   }),
+  youtube: z.string(),
+  instagram: z.string(),
 });
 
-export default function Affiliates() {
+export default function Affiliates({ params }: { params: { slug: string } }) {
   const [mangosqueezyAI, setMangosqueezyAI] = React.useState("");
+  const [isButtonLoading, setIsButtonLoading] = React.useState(false);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -59,6 +63,8 @@ export default function Affiliates() {
       lastname: "",
       email: "",
       url: "",
+      youtube: "",
+      instagram: "",
       wallet: "",
       description: "",
     },
@@ -89,7 +95,11 @@ export default function Affiliates() {
     formData.append("description", data.description);
     formData.append("wallet", data.wallet);
     formData.append("url", data.url);
+    formData.append("youtube", data.youtube);
+    formData.append("instagram", data.instagram);
+    formData.append("company-slug", params.slug);
 
+    setIsButtonLoading(true);
     const result = await createAffiliateAction(formData);
     if (result === "success") {
       toast.success("Successfully created your account");
@@ -98,6 +108,7 @@ export default function Affiliates() {
     } else {
       toast.error("Something went wrong please try again later");
     }
+    setIsButtonLoading(false);
   }
 
   return (
@@ -199,7 +210,7 @@ export default function Affiliates() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3 space-y-0">
+              <div className="grid grid-cols-3 gap-3 space-y-0">
                 <FormField
                   control={form.control}
                   name="url"
@@ -210,7 +221,43 @@ export default function Affiliates() {
                           Website
                         </FormLabel>
                         <FormControl>
-                          <Input placeholder="www.example.com" {...field} />
+                          <Input placeholder="www.any-link.com" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    </>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="youtube"
+                  render={({ field }) => (
+                    <>
+                      <FormItem>
+                        <FormLabel className="truncate text-black">
+                          Youtube
+                        </FormLabel>
+                        <FormControl>
+                          <Input placeholder="@youtuber" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    </>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="instagram"
+                  render={({ field }) => (
+                    <>
+                      <FormItem>
+                        <FormLabel className="truncate text-black">
+                          Instagram
+                        </FormLabel>
+                        <FormControl>
+                          <Input placeholder="@mangosqueezy" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -276,7 +323,18 @@ export default function Affiliates() {
                 )}
               />
 
-              <Button type="submit">Save</Button>
+              <Button
+                disabled={isButtonLoading}
+                className={cn(
+                  isButtonLoading ? "cursor-not-allowed" : "cursor-pointer",
+                )}
+                type="submit"
+              >
+                Save
+                {isButtonLoading && (
+                  <Loader className="size-5 ml-2 animate-spin" />
+                )}
+              </Button>
             </form>
           </Form>
         </main>

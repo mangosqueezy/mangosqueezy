@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import mangoImg from "../../../public/mango.png";
+import mangoImg from "../../../../public/mango.png";
 
 export function Navigation() {
   return (
