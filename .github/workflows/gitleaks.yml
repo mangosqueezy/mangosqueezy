@@ -18,5 +18,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITLEAKS_GITHUB_TOKEN }}
           GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE}} # Only required for Organizations, not personal accounts.
           GITLEAKS_NOTIFY_USER_LIST: "@amitmirgal"
-          GITLEAKS_CONFIG: ../../gitleaks.toml
+          GITLEAKS_CONFIG: ./gitleaks.toml
           GITLEAKS_VERSION: latest
