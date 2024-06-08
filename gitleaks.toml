@@ -1,0 +1,29 @@
+[extend]
+# useDefault will extend the base configuration with the default gitleaks config:
+# https://github.com/zricethezav/gitleaks/blob/master/config/gitleaks.toml
+useDefault = true
+
+[[rules]]
+description = "Trigger.dev dev env secret key"
+regex = '''tr_dev_[a-zA-Z0-9]+'''
+tags = ["key", "Trigger", "dev"]
+
+[[rules]]
+description = "Trigger.dev prod env secret key"
+regex = '''tr_prod_[a-zA-Z0-9]+'''
+tags = ["key", "Trigger", "prod"]
+
+[[rules]]
+description = "Helicone AI secret key"
+regex = '''sk-helicone-[a-zA-Z0-9-]+'''
+tags = ["key", "helicone"]
+
+[[rules]]
+description = "Posthog secret key"
+regex = '''phc_[a-zA-Z0-9]+'''
+tags = ["key", "posthog"]
+
+[[rules]]
+description = "OpenAI secret key"
+regex = '''sk-proj-[a-zA-Z0-9]+'''
+tags = ["key", "openai"]

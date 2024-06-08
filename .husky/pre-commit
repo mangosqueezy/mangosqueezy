@@ -1,0 +1,3 @@
+pnpm check-secrets
+
+pnpm lint-staged

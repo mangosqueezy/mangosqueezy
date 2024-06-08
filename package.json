@@ -6,7 +6,19 @@
     "dev": "prisma generate && next dev",
     "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "commit": "cz",
+    "check-secrets": "docker run --rm -v $(pwd):/path zricethezav/gitleaks:latest protect --source='/path' --config='/path/gitleaks.toml' --staged --no-banner -v",
+    "prepare": "husky install"
+  },
+  "config": {
+    "commitizen": {
+      "path": "@commitlint/cz-commitlint"
+    }
+  },
+  "lint-staged": {
+    "*/**/*.{ts,tsx}": ["pnpm lint --max-warnings=0", "prettier --write"],
+    "*/**/*.md": ["prettier --write"]
   },
   "dependencies": {
     "@headlessui/react": "^2.0.4",
@@ -47,6 +59,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
+    "commitizen": "^4.3.0",
     "compression": "^1.7.4",
     "cookie": "^0.6.0",
     "express": "^4.19.2",
@@ -74,13 +87,20 @@
     "zod-to-json-schema": "^3.23.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.3.0",
+    "@commitlint/config-conventional": "^19.2.2",
+    "@commitlint/cz-commitlint": "^19.2.0",
+    "@commitlint/prompt-cli": "^19.3.1",
     "@types/lodash": "^4.17.4",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.5",
     "postcss": "^8",
+    "prettier": "^3.3.1",
     "prisma": "^5.15.0",
     "tailwindcss": "^3.4.4",
     "typescript": "^5"
