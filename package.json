@@ -17,7 +17,7 @@
     }
   },
   "lint-staged": {
-    "*/**/*.{ts,tsx}": ["eslint", "prettier --write"],
+    "*/**/*.{ts,tsx}": ["next lint", "prettier --write"],
     "*/**/*.md": ["prettier --write"]
   },
   "dependencies": {
