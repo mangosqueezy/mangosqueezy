@@ -6,8 +6,7 @@ export async function auth(_: null | string, formData: FormData) {
   const supabase = createClient();
 
   const email = formData.get("email") as string;
-  const isvalidEmail =
-    typeof email === "string" && email.length > 3 && email.includes("@");
+  const isvalidEmail = typeof email === "string" && email.length > 3 && email.includes("@");
 
   if (!isvalidEmail) {
     return "Please enter your valid email id";
@@ -19,6 +18,7 @@ export async function auth(_: null | string, formData: FormData) {
       emailRedirectTo: "https://mangosqueezy.com/api/login",
       data: {
         slug: "slug.toLowerCase()",
+        provider: "magic link",
       },
     },
   });

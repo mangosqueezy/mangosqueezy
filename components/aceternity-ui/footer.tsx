@@ -1,8 +1,8 @@
 export function Footer() {
   return (
-    <footer className="flex min-h-[80px] items-center justify-center">
-      <div className="flex items-center px-2">
-        <p className="flex items-center whitespace-nowrap text-center text-sm font-medium text-gray-600 dark:text-gray-400">
+    <footer className="flex min-h-[80px] items-center justify-center px-3">
+      <div className="flex items-center">
+        <p className="flex items-center whitespace-nowrap text-center text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">
           Made with ♥️ using&nbsp;
           <a
             href="https://tailwindcss.com/"

@@ -1,7 +1,7 @@
 ![hero](github.png)
 
 <p align="center">
-	<h1 align="center"><b>Mango Squeezy</b></h1>
+	<h1 align="center"><b>mangosqueezy</b></h1>
 <p align="center">
     Affiliate marketing platform
     <br />

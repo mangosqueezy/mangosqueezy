@@ -2,10 +2,7 @@
 import { Footer } from "@/components/aceternity-ui/footer";
 import { Navigation } from "@/components/aceternity-ui/header";
 import { motion } from "framer-motion";
-import {
-  HeroHighlight,
-  Highlight,
-} from "@/components/aceternity-ui/hero-highlight";
+import { HeroHighlight, Highlight } from "@/components/aceternity-ui/hero-highlight";
 import { HoverBorderGradient } from "@/components/aceternity-ui/hover-border-gradient";
 import { Input } from "@/components/aceternity-ui/input";
 import { cn } from "@/lib/utils";
@@ -15,13 +12,7 @@ import Pricing from "@/components/aceternity-ui/pricing";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { joinWaitListUser } from "./actions";
 
 const FormSchema = z.object({
@@ -44,13 +35,9 @@ export default function Index() {
 
     const result = await joinWaitListUser(formData);
     if (result === "success") {
-      toast.success(
-        "Successfully added to waitlist. We'll notify when a spot opens up.",
-      );
+      toast.success("Successfully added to waitlist. We'll notify when a spot opens up.");
     } else if (result === "exists") {
-      toast.success(
-        "Thanks for your interest! You're already on our waitlist.",
-      );
+      toast.success("Thanks for your interest! You're already on our waitlist.");
     } else {
       toast.error("Something went wrong please try again later");
     }
@@ -114,10 +101,7 @@ export default function Index() {
                         <FormItem>
                           <FormControl>
                             <LabelInputContainer className="mb-4 w-[260px]">
-                              <Input
-                                placeholder="partner@mangosqueezy.com"
-                                {...field}
-                              />
+                              <Input placeholder="partner@mangosqueezy.com" {...field} />
                             </LabelInputContainer>
                           </FormControl>
                           <FormMessage />
@@ -141,10 +125,7 @@ export default function Index() {
           </HeroHighlight>
         </div>
 
-        <div className="mx-auto max-w-7xl">
-          <Feature />
-        </div>
-
+        <Feature />
         <Pricing />
         <Footer />
       </div>
@@ -159,9 +140,5 @@ const LabelInputContainer = ({
   children: React.ReactNode;
   className?: string;
 }) => {
-  return (
-    <div className={cn("flex flex-col space-y-2 w-full", className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn("flex flex-col space-y-2 w-full", className)}>{children}</div>;
 };

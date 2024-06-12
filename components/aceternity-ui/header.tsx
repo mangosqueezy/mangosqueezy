@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import mangoImg from "../../public/mango.png";
+import Image from "next/image";
+import mangoImg from "../../public/mangosqueezy-primary-logo.svg";
 
 export function Navigation() {
   return (
@@ -9,13 +9,7 @@ export function Navigation() {
       {/* Left */}
       <Link href="/" className="actionable flex h-8 items-center gap-1">
         <span className="text-base font-medium text-gray-600 dark:text-gray-400">
-          <Avatar className="h-12 w-12">
-            <AvatarImage src={mangoImg.src} alt="@mangosqueezy" />
-            <AvatarFallback>MS</AvatarFallback>
-          </Avatar>
-        </span>
-        <span className="text-base font-medium text-gray-600 dark:text-gray-400">
-          Mangosqueezy
+          <Image src={mangoImg} className="h-6 w-full" alt="" />
         </span>
       </Link>
 
