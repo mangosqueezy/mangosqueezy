@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
@@ -7,7 +8,7 @@ export default function Error() {
   const searchParams = useSearchParams();
 
   return (
-    <>
+    <Suspense>
       <main className="grid min-h-full place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8">
         <div className="text-center">
           <h1 className="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
@@ -26,6 +27,6 @@ export default function Error() {
           </div>
         </div>
       </main>
-    </>
+    </Suspense>
   );
 }
