@@ -13,19 +13,21 @@ export const socialMediaTask = task({
     if (ytChannelHandle) {
       logger.log("running yt metrics collector...", { ytChannelHandle });
       const parameters = {
-        part: "statistics,snippet,topicDetails,status,brandingSettings,contentDetails",
-        forHandle: ytChannelHandle,
+        part: "snippet",
         key: process.env.NEXT_PUBLIC_YOUTUBE_API_KEY!,
+        type: "channel,video,playlist",
+        channelId: ytChannelHandle,
       };
       const queryParameter = new URLSearchParams(parameters);
       const response = await fetch(
-        `https://youtube.googleapis.com/youtube/v3/channels?${queryParameter.toString()}`,
+        `https://youtube.googleapis.com/youtube/v3/search?${queryParameter.toString()}`,
         {
           method: "GET",
-        },
+        }
       );
 
-      ytChannelStats = await response.json();
+      const result = await response.json();
+      ytChannelStats = result.items;
     }
 
     await wait.for({ seconds: 5 });
@@ -44,7 +46,7 @@ export const socialMediaTask = task({
         `https://graph.facebook.com/v20.0/${igBusinessId}?${queryParameter.toString()}`,
         {
           method: "GET",
-        },
+        }
       );
 
       igChannelStats = await response.json();

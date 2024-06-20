@@ -55,6 +55,7 @@ const FormSchema = z.object({
     message: "Please enter the url.",
   }),
   youtube: z.string(),
+  ytChannelId: z.string(),
   instagram: z.string(),
 });
 
@@ -66,6 +67,7 @@ type AllowedFormKey =
   | "wallet"
   | "url"
   | "youtube"
+  | "ytChannelId"
   | "instagram";
 
 export default function Affiliates({ params }: { params: { slug: string } }) {
@@ -83,6 +85,7 @@ export default function Affiliates({ params }: { params: { slug: string } }) {
       email: "",
       url: "",
       youtube: "",
+      ytChannelId: "",
       instagram: "",
       wallet: "",
       description: "",
@@ -124,8 +127,10 @@ export default function Affiliates({ params }: { params: { slug: string } }) {
 
   React.useEffect(() => {
     const ytChannelId = searchParams.get("ytChannelId");
-    if (ytChannelId) {
-      form.setValue("youtube", ytChannelId);
+    const ytChannelHandle = searchParams.get("ytChannelHandle");
+    if (ytChannelHandle) {
+      form.setValue("youtube", ytChannelHandle);
+      form.setValue("ytChannelId", ytChannelId as string);
       updateLocalStorage();
     }
   }, [form, searchParams, updateLocalStorage]);
@@ -190,7 +195,7 @@ export default function Affiliates({ params }: { params: { slug: string } }) {
     formData.append("description", data.description);
     formData.append("wallet", data.wallet);
     formData.append("url", data.url);
-    formData.append("youtube", data.youtube);
+    formData.append("ytChannelId", data.ytChannelId);
     formData.append("instagram", data.instagram);
     formData.append("company-slug", params.slug);
 

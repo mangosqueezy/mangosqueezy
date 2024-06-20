@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { getSlug } from "@/models/llm";
 
 export async function auth(_: null | string, formData: FormData) {
   const supabase = createClient();
@@ -12,12 +13,14 @@ export async function auth(_: null | string, formData: FormData) {
     return "Please enter your valid email id";
   }
 
+  const slug = await getSlug(email);
+
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
       emailRedirectTo: "https://mangosqueezy.com/api/login",
       data: {
-        slug: "slug.toLowerCase()",
+        slug: slug.toLowerCase(),
         provider: "magic link",
       },
     },

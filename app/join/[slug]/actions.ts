@@ -1,10 +1,6 @@
 "use server";
 
-import {
-  createAffiliate,
-  createAffiliateBusiness,
-  getAffiliateByEmail,
-} from "@/models/affiliates";
+import { createAffiliate, createAffiliateBusiness, getAffiliateByEmail } from "@/models/affiliates";
 import { getBusinessBySlug } from "@/models/business";
 import { socialMediaTask } from "@/trigger/social-media-task";
 
@@ -15,7 +11,7 @@ export async function createAffiliateAction(body: FormData) {
   const description = body.get("description") as string;
   const wallet_address = body.get("wallet") as string;
   const url = body.get("url") as string;
-  const youtube = body.get("youtube") as string;
+  const ytChannelId = body.get("ytChannelId") as string;
   const instagram = body.get("instagram") as string;
   const companySlug = body.get("company-slug") as string;
 
@@ -30,7 +26,7 @@ export async function createAffiliateAction(body: FormData) {
         first_name,
         last_name,
         description,
-        social_media_profiles: { url, youtube, instagram },
+        social_media_profiles: { url, youtube: ytChannelId, instagram },
         wallet_address,
         email,
       });
@@ -56,7 +52,7 @@ export async function createAffiliateAction(body: FormData) {
 
         await socialMediaTask.trigger({
           affiliatorId: affiliateResult[0].id,
-          ytChannelHandle: youtube,
+          ytChannelHandle: ytChannelId,
           igChannelHandle: instagram,
         });
       }

@@ -21,7 +21,7 @@ export async function getUserById(id: Business["id"]) {
       });
     }
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 }
 
@@ -44,7 +44,7 @@ export async function getBusinessBySlug(slug: Business["slug"]) {
       });
     }
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 }
 
@@ -59,12 +59,7 @@ export async function updateBusinessInfoById({
   slug,
 }: Omit<
   Business,
-  | "created_at"
-  | "updated_at"
-  | "affiliate_hub_description"
-  | "email"
-  | "url"
-  | "status"
+  "created_at" | "updated_at" | "affiliate_hub_description" | "email" | "url" | "status"
 >) {
   try {
     return prisma.business.update({
@@ -80,6 +75,6 @@ export async function updateBusinessInfoById({
       },
     });
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 }

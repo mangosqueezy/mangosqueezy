@@ -10,7 +10,7 @@ export async function createProduct(
   price: string,
   description: string,
   imageUrl: string,
-  businessId: string,
+  businessId: string
 ) {
   try {
     const parsedPrice = parseFloat(price);
@@ -40,7 +40,7 @@ export async function createProduct(
           business_id: PrismaVectorStore.ContentColumn,
           metadata: PrismaVectorStore.ContentColumn,
         },
-      },
+      }
     );
 
     const productsInfo = [
@@ -56,7 +56,7 @@ export async function createProduct(
 
     await vectorStore.addModels(
       await prisma.$transaction(
-        productsInfo.map((product) =>
+        productsInfo.map(product =>
           prisma.products.create({
             data: {
               name: product.name,
@@ -66,12 +66,12 @@ export async function createProduct(
               business_id: product.businessId,
               metadata: product.metadata,
             },
-          }),
-        ),
-      ),
+          })
+        )
+      )
     );
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 }
 
@@ -88,7 +88,7 @@ export async function updateProductById(
   name: Products["name"],
   price: Products["price"],
   description: Products["description"],
-  imageUrl: Products["image_url"],
+  imageUrl: Products["image_url"]
 ) {
   return prisma.products.update({
     where: {

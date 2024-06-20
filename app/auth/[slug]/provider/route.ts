@@ -46,9 +46,12 @@ export async function GET(request: Request, { params }: { params: { slug: string
     );
 
     const profileResult = await profileResponse.json();
-    const ytChannelId = profileResult.items[0].snippet.customUrl;
+    const ytChannelHandle = profileResult.items[0].snippet.customUrl;
+    const ytChannelId = profileResult.items[0].id;
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}?ytChannelId=${ytChannelId}`);
+      return NextResponse.redirect(
+        `${origin}${next}?ytChannelId=${ytChannelId}&ytChannelHandle=${ytChannelHandle}`
+      );
     }
   }
 
