@@ -14,6 +14,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "yt3.ggpht.com",
       },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
     ],
   },
 };

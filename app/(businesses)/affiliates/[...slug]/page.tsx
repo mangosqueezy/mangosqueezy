@@ -2,12 +2,25 @@ import Image from "next/image";
 import { EnvelopeIcon } from "@heroicons/react/20/solid";
 import Chat from "./components/chat";
 import { Separator } from "@/components/ui/separator";
+import { ytDescriptionExtractor } from "./actions";
+import type { TYoutuber } from "../../providers";
 
-export default async function SingleAffiliatePage({
-  params,
-}: {
-  params: { slug: Array<string> };
-}) {
+export default async function SingleAffiliatePage({ params }: { params: { slug: Array<string> } }) {
+  const searchChannelParameters = {
+    part: "snippet",
+    channelId: params.slug[0],
+    key: process.env.NEXT_PUBLIC_YOUTUBE_API_KEY!,
+    type: "channel,video,playlist",
+    maxResults: "20",
+  };
+  const querySearchChannelParameter = new URLSearchParams(searchChannelParameters);
+  const searchChannelResponse = await fetch(
+    `https://youtube.googleapis.com/youtube/v3/search?${querySearchChannelParameter.toString()}`,
+    {
+      method: "GET",
+    }
+  );
+
   const profileParameters = {
     part: "statistics,snippet,topicDetails,status,brandingSettings,contentDetails",
     id: params.slug[0],
@@ -15,22 +28,35 @@ export default async function SingleAffiliatePage({
   };
   const profileQueryParameter = new URLSearchParams(profileParameters);
   const profileResponse = await fetch(
-    `https://youtube.googleapis.com/youtube/v3/channels?${profileQueryParameter.toString()}`,
+    `https://youtube.googleapis.com/youtube/v3/channels?${profileQueryParameter.toString()}`
+  );
+
+  const [profile, search] = await Promise.all([
+    profileResponse.json(),
+    searchChannelResponse.json(),
+  ]);
+
+  const filteredYtList = search.items.filter(
+    (yt: TYoutuber) => yt.snippet.channelId === params.slug[0]
+  );
+  const youtuberWithVideoId = filteredYtList.find(
+    (yt: TYoutuber) => yt.id.videoId !== null || yt.id.videoId !== undefined
   );
 
   const videoParameters = {
     part: "snippet,contentDetails,statistics",
-    id: params.slug[1],
+    id: youtuberWithVideoId.id.videoId,
     key: process.env.NEXT_PUBLIC_YOUTUBE_API_KEY!,
   };
   const videoQueryParameter = new URLSearchParams(videoParameters);
   const videoResponse = await fetch(
-    `https://youtube.googleapis.com/youtube/v3/videos?${videoQueryParameter.toString()}`,
+    `https://youtube.googleapis.com/youtube/v3/videos?${videoQueryParameter.toString()}`
   );
-  const [profile, video] = await Promise.all([
-    profileResponse.json(),
-    videoResponse.json(),
-  ]);
+  const video = await videoResponse.json();
+
+  const formData = new FormData();
+  formData.append("yt-description", profile.items[0].snippet.description);
+  const extractedDescription = await ytDescriptionExtractor(formData);
 
   return (
     <div className="grid h-full w-full min-h-[100vh]">
@@ -42,9 +68,7 @@ export default async function SingleAffiliatePage({
                 <div>
                   <Image
                     className="h-auto w-full object-cover lg:h-48 rounded-lg"
-                    src={
-                      profile.items[0].brandingSettings.image.bannerExternalUrl
-                    }
+                    src={profile.items[0].brandingSettings?.image?.bannerExternalUrl}
                     width={200}
                     height={128}
                     alt=""
@@ -76,7 +100,7 @@ export default async function SingleAffiliatePage({
                             className="-ml-0.5 h-5 w-5 text-gray-400"
                             aria-hidden="true"
                           />
-                          Message
+                          {extractedDescription?.email ? "Message" : "Nudge"}
                         </button>
                       </div>
                     </div>
@@ -92,13 +116,11 @@ export default async function SingleAffiliatePage({
               <div className="mx-auto mt-6 max-w-5xl px-4 sm:px-6 lg:px-8">
                 <h1 className="font-bold my-2">Channel Stats</h1>
                 <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-3">
-                  {Object.keys(profile.items[0].statistics).map((field) => {
+                  {Object.keys(profile.items[0].statistics).map(field => {
                     return (
                       field !== "hiddenSubscriberCount" && (
                         <div key={field} className="sm:col-span-1">
-                          <dt className="text-sm font-medium text-gray-500">
-                            {field}
-                          </dt>
+                          <dt className="text-sm font-medium text-gray-500">{field}</dt>
                           <dd className="mt-1 text-sm text-gray-900">
                             {profile.items[0].statistics[field]}
                           </dd>
@@ -123,13 +145,11 @@ export default async function SingleAffiliatePage({
               <div className="mx-auto mt-6 max-w-5xl px-4 sm:px-6 lg:px-8">
                 <h1 className="font-bold my-2">Video Stats</h1>
                 <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-3">
-                  {Object.keys(video.items[0].statistics).map((field) => {
+                  {Object.keys(video.items[0]?.statistics).map(field => {
                     return (
                       field !== "hiddenSubscriberCount" && (
                         <div key={field} className="sm:col-span-1">
-                          <dt className="text-sm font-medium text-gray-500">
-                            {field}
-                          </dt>
+                          <dt className="text-sm font-medium text-gray-500">{field}</dt>
                           <dd className="mt-1 text-sm text-gray-900">
                             {video.items[0].statistics[field]}
                           </dd>
@@ -138,6 +158,13 @@ export default async function SingleAffiliatePage({
                     );
                   })}
                 </dl>
+
+                <iframe
+                  className="mt-5 rounded-xl w-full h-64"
+                  src={`https://www.youtube.com/embed/${youtuberWithVideoId.id.videoId}`}
+                  allowFullScreen
+                  title={profile.items[0].snippet.title}
+                />
               </div>
             </article>
           </div>

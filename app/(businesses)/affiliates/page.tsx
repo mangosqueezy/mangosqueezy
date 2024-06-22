@@ -89,7 +89,7 @@ export default function AffiliatePage() {
                       height={200}
                       alt=""
                     />
-                    <Link href={`/affiliates/${youtuber.snippet.channelId}/${youtuber.id.videoId}`}>
+                    <Link href={`/affiliates/${youtuber.snippet.channelId}`}>
                       <div className="font-sans font-bold text-neutral-600 dark:text-neutral-200 mb-2 mt-2">
                         {youtuber.snippet.channelTitle}
                       </div>

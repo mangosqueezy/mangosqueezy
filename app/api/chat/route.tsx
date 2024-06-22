@@ -2,10 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Message as VercelChatMessage, StreamingTextResponse } from "ai";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { RunnableSequence } from "@langchain/core/runnables";
-import {
-  BytesOutputParser,
-  StringOutputParser,
-} from "@langchain/core/output_parsers";
+import { BytesOutputParser, StringOutputParser } from "@langchain/core/output_parsers";
 import { OpenAIEmbeddings, ChatOpenAI } from "@langchain/openai";
 import { MemoryVectorStore } from "langchain/vectorstores/memory";
 import { Document } from "langchain/document";
@@ -17,12 +14,12 @@ const OPENAI_KEY = process.env.OPENAI_KEY;
 const HELICONE_API_KEY = process.env.HELICONE_API_KEY;
 
 const combineDocumentsFn = (docs: Document[]) => {
-  const serializedDocs = docs.map((doc) => doc.pageContent);
+  const serializedDocs = docs.map(doc => doc.pageContent);
   return serializedDocs.join("\n\n");
 };
 
 const formatVercelMessages = (chatHistory: VercelChatMessage[]) => {
-  const formattedDialogueTurns = chatHistory.map((message) => {
+  const formattedDialogueTurns = chatHistory.map(message => {
     if (message.role === "user") {
       return `Human: ${message.content}`;
     } else if (message.role === "assistant") {
@@ -46,9 +43,7 @@ without the chat history.
 Follow Up Input: {question}
 Standalone question:`;
 
-const condenseQuestionPrompt = PromptTemplate.fromTemplate(
-  CONDENSE_QUESTION_TEMPLATE,
-);
+const condenseQuestionPrompt = PromptTemplate.fromTemplate(CONDENSE_QUESTION_TEMPLATE);
 
 const ANSWER_TEMPLATE = ` You are an assistant for question-answering tasks. Use
 the following pieces of retrieved context to answer the
@@ -88,7 +83,7 @@ export async function POST(req: NextRequest) {
     const videoJsonString = JSON.stringify(video);
 
     const model = new ChatOpenAI({
-      openAIApiKey: OPENAI_KEY,
+      apiKey: OPENAI_KEY,
       model: "gpt-4o",
       temperature: 0.2,
       configuration: {
@@ -119,7 +114,7 @@ export async function POST(req: NextRequest) {
       new OpenAIEmbeddings({
         openAIApiKey: OPENAI_KEY,
         model: "text-embedding-3-large",
-      }),
+      })
     );
 
     /**
@@ -138,7 +133,7 @@ export async function POST(req: NextRequest) {
     ]);
 
     let resolveWithDocuments: (value: Document[]) => void;
-    const documentPromise = new Promise<Document[]>((resolve) => {
+    const documentPromise = new Promise<Document[]>(resolve => {
       resolveWithDocuments = resolve;
     });
 
@@ -156,12 +151,9 @@ export async function POST(req: NextRequest) {
 
     const answerChain = RunnableSequence.from([
       {
-        context: RunnableSequence.from([
-          (input) => input.question,
-          retrievalChain,
-        ]),
-        chat_history: (input) => input.chat_history,
-        question: (input) => input.question,
+        context: RunnableSequence.from([input => input.question, retrievalChain]),
+        chat_history: input => input.chat_history,
+        question: input => input.question,
       },
       answerPrompt,
       model,
@@ -170,7 +162,7 @@ export async function POST(req: NextRequest) {
     const conversationalRetrievalQAChain = RunnableSequence.from([
       {
         question: standaloneQuestionChain,
-        chat_history: (input) => input.chat_history,
+        chat_history: input => input.chat_history,
       },
       answerChain,
       new BytesOutputParser(),
@@ -184,13 +176,13 @@ export async function POST(req: NextRequest) {
     const documents = await documentPromise;
     const serializedSources = Buffer.from(
       JSON.stringify(
-        documents.map((doc) => {
+        documents.map(doc => {
           return {
             pageContent: doc.pageContent.slice(0, 50) + "...",
             metadata: doc.metadata,
           };
-        }),
-      ),
+        })
+      )
     ).toString("base64");
 
     return new StreamingTextResponse(stream, {

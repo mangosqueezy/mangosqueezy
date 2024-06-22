@@ -21,6 +21,7 @@
     "@headlessui/react": "^2.0.4",
     "@heroicons/react": "^2.1.4",
     "@hookform/resolvers": "^3.6.0",
+    "@langchain/anthropic": "^0.2.2",
     "@langchain/community": "^0.2.12",
     "@langchain/core": "^0.2.8",
     "@langchain/openai": "^0.1.3",
