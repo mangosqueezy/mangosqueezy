@@ -2,6 +2,7 @@
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { ChatOpenAI } from "@langchain/openai";
 import { z } from "zod";
+import { CheerioWebBaseLoader } from "@langchain/community/document_loaders/web/cheerio";
 
 const descriptionSchema = z.object({
   email: z.string().nullish().describe("The email of the person"),
@@ -48,8 +49,27 @@ export async function ytDescriptionExtractor(formData: FormData) {
       text,
     });
 
-    return result;
+    let webpagesData = [];
+    if (result.urls) {
+      for (const url of result.urls) {
+        const loader = new CheerioWebBaseLoader(url);
+        const docs = await loader.load();
+        webpagesData.push({
+          source: url,
+          pageContent: docs[0].pageContent,
+        });
+      }
+    }
+
+    return {
+      extractedDescription: result,
+      webpagesData,
+    };
   } catch (error) {
     console.error({ error });
+    return {
+      extractedDescription: null,
+      webpagesData: [],
+    };
   }
 }

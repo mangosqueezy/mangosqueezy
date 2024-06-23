@@ -4,6 +4,7 @@ import Chat from "./components/chat";
 import { Separator } from "@/components/ui/separator";
 import { ytDescriptionExtractor } from "./actions";
 import type { TYoutuber } from "../../providers";
+import Link from "next/link";
 
 export default async function SingleAffiliatePage({ params }: { params: { slug: Array<string> } }) {
   const searchChannelParameters = {
@@ -56,7 +57,7 @@ export default async function SingleAffiliatePage({ params }: { params: { slug: 
 
   const formData = new FormData();
   formData.append("yt-description", profile.items[0].snippet.description);
-  const extractedDescription = await ytDescriptionExtractor(formData);
+  const { extractedDescription, webpagesData } = await ytDescriptionExtractor(formData);
 
   return (
     <div className="grid h-full w-full min-h-[100vh]">
@@ -137,6 +138,27 @@ export default async function SingleAffiliatePage({ params }: { params: { slug: 
                       }}
                     />
                   </div>
+
+                  {extractedDescription?.urls && (
+                    <div className="sm:col-span-3">
+                      <dt className="text-sm font-medium text-gray-500">Social Urls</dt>
+                      <div className="flex flex-col space-y-2">
+                        {extractedDescription.urls.map(url => {
+                          return (
+                            <Link
+                              key={url}
+                              href={url}
+                              rel="noopener noreferrer"
+                              target="_blank"
+                              className="font-semibold text-sm text-blue-600 hover:text-blue-400"
+                            >
+                              {url}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </dl>
               </div>
 
@@ -169,7 +191,7 @@ export default async function SingleAffiliatePage({ params }: { params: { slug: 
             </article>
           </div>
           <div className="relative flex h-full max-h-screen flex-col rounded-xl bg-muted/50 p-4 lg:col-span-2">
-            <Chat profile={profile} video={video} />
+            <Chat profile={profile} video={video} webpagesData={webpagesData} />
           </div>
         </main>
       </div>

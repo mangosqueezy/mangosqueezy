@@ -1,5 +1,5 @@
 "use client";
-import { useChat } from "ai/react";
+import { useChat } from "@ai-sdk/react";
 import { CornerDownLeft, User, BotMessageSquare, Loader } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -7,15 +7,23 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/mango-ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-export default function Chat({ profile, video }: { profile: any; video: any }) {
-  const { messages, input, handleInputChange, handleSubmit, isLoading } =
-    useChat({
-      body: {
-        profile,
-        video,
-      },
-      streamMode: "text",
-    });
+export default function Chat({
+  profile,
+  video,
+  webpagesData,
+}: {
+  profile: any;
+  video: any;
+  webpagesData: any;
+}) {
+  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
+    body: {
+      profile,
+      video,
+      webpagesData,
+    },
+    streamMode: "text",
+  });
 
   return (
     <>
@@ -24,7 +32,7 @@ export default function Chat({ profile, video }: { profile: any; video: any }) {
       </Badge>
       <ScrollArea className="h-full w-full">
         <div className="flex flex-col rounded-xl">
-          {messages.map((message) => (
+          {messages.map(message => (
             <div key={message.id} className="py-3 px-2">
               <div className="grid grid-cols-12 items-center">
                 {message.role === "user" ? (
@@ -32,7 +40,7 @@ export default function Chat({ profile, video }: { profile: any; video: any }) {
                 ) : (
                   <BotMessageSquare className="size-5 col-span-1 text-orange-500" />
                 )}
-                <p className="ml-2 text-sm font-medium col-span-11">
+                <p className="ml-2 text-sm font-medium col-span-11 selection:bg-yellow-200">
                   {message.content}
                 </p>
               </div>

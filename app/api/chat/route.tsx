@@ -77,6 +77,7 @@ export async function POST(req: NextRequest) {
     const currentMessageContent = messages[messages.length - 1].content;
     const profile = body.profile ?? [];
     const video = body.video ?? [];
+    const webpagesData = body.webpagesData ?? [];
 
     // Convert the JSON object to a JSON string
     const profileJsonString = JSON.stringify(profile);
@@ -93,7 +94,7 @@ export async function POST(req: NextRequest) {
         },
       },
     });
-    const docs = [
+    let docs = [
       new Document({
         pageContent: profileJsonString,
         metadata: { id: 1, title: "Profile Document" },
@@ -102,7 +103,22 @@ export async function POST(req: NextRequest) {
         pageContent: videoJsonString,
         metadata: { id: 2, title: "Video Document" },
       }),
+      new Document({
+        pageContent: `Hi, my name is mangosqueezy AI, and I was born in June 2024 at Buildspace S5.
+        I am here to assist you with all your queries and help you make the right decision to partner up with the influencer to grow your business.`,
+        metadata: { id: 3, title: "AI Profile Information" },
+      }),
     ];
+
+    webpagesData.forEach((pageData: any, index: number) => {
+      docs.push(
+        new Document({
+          pageContent: pageData.pageContent,
+          metadata: { id: index + 4, title: pageData.source },
+        })
+      );
+    });
+
     const textSplitter = new RecursiveCharacterTextSplitter({
       chunkSize: 1500,
       chunkOverlap: 300,
