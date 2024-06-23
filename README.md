@@ -32,7 +32,7 @@ We are working on the documentation to get started with mangosqueezy for local d
 ### Hosting
 
 - Supabase (database, storage, realtime, auth)
-- Vercel (Website, edge-config, vercel ai and metrics)
+- Vercel (Website, edge-config and metrics)
 
 ### Services
 
