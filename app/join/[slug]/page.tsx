@@ -31,9 +31,22 @@ import { Navigation } from "./components/header";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { useSearchParams } from "next/navigation";
-import { IconBrandGoogle, IconBrandInstagram } from "@tabler/icons-react";
+import { IconBrandYoutube, IconBrandInstagram } from "@tabler/icons-react";
 import Link from "next/link";
 import { CoolMode } from "@/components/magic-ui/cool-mode";
+import { Footer } from "@/components/aceternity-ui/footer";
+
+const formDefaultValues = {
+  firstname: "",
+  lastname: "",
+  email: "",
+  url: "",
+  youtube: "",
+  ytChannelId: "",
+  instagram: "",
+  wallet: "",
+  description: "",
+};
 
 const FormSchema = z.object({
   firstname: z.string().min(1, {
@@ -76,32 +89,18 @@ export default function Affiliates({ params }: { params: { slug: string } }) {
   const [isAILoading, setIsAILoading] = React.useState(false);
   const searchParams = useSearchParams();
   const supabase = createClient();
+  // Retrieve initial form values from localStorage
+  const storedValues = JSON.parse(
+    localStorage.getItem("affiliate-form-details") ?? JSON.stringify(formDefaultValues)
+  );
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues: {
-      firstname: "",
-      lastname: "",
-      email: "",
-      url: "",
-      youtube: "",
-      ytChannelId: "",
-      instagram: "",
-      wallet: "",
-      description: "",
-    },
+    defaultValues: storedValues,
   });
 
-  const updateLocalStorage = React.useCallback(
-    () => localStorage.setItem("affiliate-form-details", JSON.stringify(form.getValues())),
-    [form]
-  );
-
-  React.useEffect(() => {
-    if (form.formState.isValidating) {
-      localStorage.setItem("affiliate-form-details", JSON.stringify(form.getValues()));
-    }
-  }, [form, form.formState.isValidating]);
+  // Watch all form values
+  const watchedFormValues = form?.watch();
 
   const connectGoogle = async () => {
     await supabase.auth.signInWithOAuth({
@@ -113,17 +112,10 @@ export default function Affiliates({ params }: { params: { slug: string } }) {
     });
   };
 
+  // Save form values to localStorage whenever any value changes
   React.useEffect(() => {
-    if (localStorage.getItem("affiliate-form-details")) {
-      const affiliateDetails = localStorage.getItem("affiliate-form-details") as string;
-      const parsedAffiliateDetails = JSON.parse(affiliateDetails);
-
-      for (let item in parsedAffiliateDetails) {
-        const key = item as AllowedFormKey;
-        form.setValue(key, parsedAffiliateDetails[key]);
-      }
-    }
-  }, [form]);
+    localStorage.setItem("affiliate-form-details", JSON.stringify(watchedFormValues));
+  }, [watchedFormValues]);
 
   React.useEffect(() => {
     const ytChannelId = searchParams.get("ytChannelId");
@@ -131,9 +123,8 @@ export default function Affiliates({ params }: { params: { slug: string } }) {
     if (ytChannelHandle) {
       form.setValue("youtube", ytChannelHandle);
       form.setValue("ytChannelId", ytChannelId as string);
-      updateLocalStorage();
     }
-  }, [form, searchParams, updateLocalStorage]);
+  }, [form, searchParams]);
 
   React.useEffect(() => {
     const fetchAccessToken = async () => {
@@ -159,11 +150,10 @@ export default function Affiliates({ params }: { params: { slug: string } }) {
         );
         const result: { igUsername: string } = await response.json();
         form.setValue("instagram", result.igUsername);
-        updateLocalStorage();
       }
     };
     fetchAccessToken();
-  }, [form, updateLocalStorage]);
+  }, [form]);
 
   const callMangosqueezyAI = React.useCallback(
     async (query: string) => {
@@ -179,11 +169,9 @@ export default function Affiliates({ params }: { params: { slug: string } }) {
       });
       const result = await response.json();
       form.setValue("description", result);
-      updateLocalStorage();
-
       setIsAILoading(false);
     },
-    [form, updateLocalStorage]
+    [form]
   );
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
@@ -224,7 +212,8 @@ export default function Affiliates({ params }: { params: { slug: string } }) {
           <Navigation />
         </div>
       </header>
-      <div className="flex min-h-screen w-full flex-col justify-center items-center">
+
+      <div className="flex w-full flex-col justify-center items-center">
         <main className="flex min-h-[calc(100vh_-_theme(spacing.16))] max-w-7xl flex-1 flex-col gap-4 p-4 md:gap-8 md:p-10">
           <h1 className="text-3xl font-semibold tracking-normal">Affiliates</h1>
           <h3 className="text-xl font-semibold tracking-normal">
@@ -332,8 +321,8 @@ export default function Affiliates({ params }: { params: { slug: string } }) {
                         <FormLabel className="truncate text-black">Youtube</FormLabel>
                         <div className="flex">
                           <Button type="button" variant="outline" onClick={() => connectGoogle()}>
-                            <IconBrandGoogle className="h-4 w-4 mr-2 text-blue-500" />
-                            Connect Google
+                            <IconBrandYoutube className="h-4 w-4 mr-2 text-red-500" />
+                            Connect Youtube
                           </Button>
 
                           <FormControl className="ml-3">
@@ -446,6 +435,7 @@ export default function Affiliates({ params }: { params: { slug: string } }) {
                   disabled={isButtonLoading}
                   className={cn(isButtonLoading ? "cursor-not-allowed" : "cursor-pointer")}
                   type="submit"
+                  size="lg"
                 >
                   Save
                   {isButtonLoading && <Loader className="size-5 ml-2 animate-spin" />}
@@ -455,6 +445,8 @@ export default function Affiliates({ params }: { params: { slug: string } }) {
           </Form>
         </main>
       </div>
+
+      <Footer />
     </>
   );
 }

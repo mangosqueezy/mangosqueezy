@@ -111,8 +111,8 @@ importers:
         specifier: ^0.5.7
         version: 0.5.7(tailwindcss@3.4.4)
       '@trigger.dev/sdk':
-        specifier: 3.0.0-beta.39
-        version: 3.0.0-beta.39(typescript@5.4.5)
+        specifier: 3.0.0-beta.42
+        version: 3.0.0-beta.42(typescript@5.4.5)
       '@upstash/redis':
         specifier: ^1.31.6
         version: 1.31.6
@@ -2119,16 +2119,16 @@ packages:
   '@tanstack/virtual-core@3.5.0':
     resolution: {integrity: sha512-KnPRCkQTyqhanNC0K63GBG3wA8I+D1fQuVnAvcBF8f13akOKeQp1gSbu6f77zCxhEk727iV5oQnbHLYzHrECLg==}
 
-  '@trigger.dev/core-backend@3.0.0-beta.39':
-    resolution: {integrity: sha512-jYHRd5MxG/aWAPn5tIfaAxWAKUJTgMuVvFqeL75gjqmTVlblXMLhQDORTnlcv34XeRN3pzKe7hnhRIbDdAzS4w==}
+  '@trigger.dev/core-backend@3.0.0-beta.42':
+    resolution: {integrity: sha512-EOTXynWbZ3YOHbPdNU/Us2QgfxF1lix6o6mZUoYnLT5kxJGV2Qd4o60uNKjKHhWS39j59GWQ3HuAkSt+M9nyLQ==}
     engines: {node: '>=18.0.0'}
 
-  '@trigger.dev/core@3.0.0-beta.39':
-    resolution: {integrity: sha512-DXokIW2Ys56Tp+RvJ8QIJ3gHwSxgYsOOoJYzltCgL6+AkxL+6oaNYBOokgDQKLJ5nN1f4sFHobM+UG+drBp4Ww==}
+  '@trigger.dev/core@3.0.0-beta.42':
+    resolution: {integrity: sha512-WJyG+2hJtf0vDELEDqtZeOWHVHRZOOyUGIAsK37hrTRXhcWhtVvUIiF0T5hbb3sMI6p5I9TdAUejn+hK0fY4hg==}
     engines: {node: '>=18.0.0'}
 
-  '@trigger.dev/sdk@3.0.0-beta.39':
-    resolution: {integrity: sha512-sbMCgPIrrd5j9JgF1Afo/acZfFsaq/co42SOWHDKQxWLOsfXa9nabj4yAjvpOlvF27G1qSeI/nHR4wZHKHR60g==}
+  '@trigger.dev/sdk@3.0.0-beta.42':
+    resolution: {integrity: sha512-7rA/JGGpQI1IldgHDsVsW1UD2cv1UoE96vgh4pbwSsww+eJ6GgkY/OBdw+LooIblxxKoMRaNAiJ8lUVnHAdVJA==}
     engines: {node: '>=18.0.0'}
 
   '@types/conventional-commits-parser@5.0.0':
@@ -3233,10 +3233,6 @@ packages:
 
   form-data-encoder@1.7.2:
     resolution: {integrity: sha512-qfqtYan3rxrnCk1VYaA4H+Ms9xdpPqvLZa6xmMgFvhO32x7/3J/ExcTd6qpxM0vH2GdMI+poehyBZvqfMTto8A==}
-
-  form-data-encoder@4.0.2:
-    resolution: {integrity: sha512-KQVhvhK8ZkWzxKxOr56CPulAhH3dobtuQ4+hNQ+HekH/Wp5gSOafqRAeTphQUJAIk0GBvHZgJ2ZGRWd5kphMuw==}
-    engines: {node: '>= 18'}
 
   form-data@4.0.0:
     resolution: {integrity: sha512-ETEklSGi5t0QMZuiXoA/Q6vcnxcLQP5vdugSpuAyi6SVGi2clPPp+xgEhuMaHC+zGgn31Kd235W35f7Hykkaww==}
@@ -7303,11 +7299,11 @@ snapshots:
 
   '@tanstack/virtual-core@3.5.0': {}
 
-  '@trigger.dev/core-backend@3.0.0-beta.39':
+  '@trigger.dev/core-backend@3.0.0-beta.42':
     dependencies:
       '@opentelemetry/api': 1.9.0
 
-  '@trigger.dev/core@3.0.0-beta.39':
+  '@trigger.dev/core@3.0.0-beta.42':
     dependencies:
       '@google-cloud/precise-date': 4.0.0
       '@opentelemetry/api': 1.9.0
@@ -7321,7 +7317,6 @@ snapshots:
       '@opentelemetry/sdk-trace-base': 1.25.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-trace-node': 1.25.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.25.0
-      form-data-encoder: 4.0.2
       humanize-duration: 3.32.1
       socket.io-client: 4.7.4
       superjson: 2.2.1
@@ -7334,13 +7329,13 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@trigger.dev/sdk@3.0.0-beta.39(typescript@5.4.5)':
+  '@trigger.dev/sdk@3.0.0-beta.42(typescript@5.4.5)':
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/api-logs': 0.48.0
       '@opentelemetry/semantic-conventions': 1.25.0
-      '@trigger.dev/core': 3.0.0-beta.39
-      '@trigger.dev/core-backend': 3.0.0-beta.39
+      '@trigger.dev/core': 3.0.0-beta.42
+      '@trigger.dev/core-backend': 3.0.0-beta.42
       chalk: 5.3.0
       cronstrue: 2.50.0
       debug: 4.3.4
@@ -8720,8 +8715,6 @@ snapshots:
       signal-exit: 4.1.0
 
   form-data-encoder@1.7.2: {}
-
-  form-data-encoder@4.0.2: {}
 
   form-data@4.0.0:
     dependencies:

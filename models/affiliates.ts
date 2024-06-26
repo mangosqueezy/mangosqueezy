@@ -145,6 +145,11 @@ export async function getAffiliatesBySearchQuery({ searchQuery }: { searchQuery:
           email: PrismaVectorStore.ContentColumn,
           metadata: PrismaVectorStore.ContentColumn,
         },
+        filter: {
+          status: {
+            equals: "Active",
+          },
+        },
       }
     );
 

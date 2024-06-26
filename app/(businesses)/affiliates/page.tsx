@@ -122,7 +122,7 @@ export default function AffiliatePage() {
                       alt=""
                     />
                     <Link
-                      href={`/affiliates/${mangosqueezy.metadata.social_media_profiles.youtube}/${mangosqueezy.metadata.metadata.ytChannelStats[0].id.videoId}`}
+                      href={`/affiliates/${mangosqueezy.metadata.social_media_profiles.youtube}`}
                     >
                       <div className="font-sans font-bold text-neutral-600 dark:text-neutral-200 mb-2 mt-2">
                         {mangosqueezy.metadata.first_name}
