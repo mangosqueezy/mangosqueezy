@@ -1,5 +1,5 @@
 "use client";
-import { useContext, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
@@ -8,11 +8,27 @@ import { BusinessContext } from "../providers";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Database } from "lucide-react";
 import { IconBrandYoutube } from "@tabler/icons-react";
+import { useJune } from "@/hooks/useJune";
+import { getUser } from "../actions";
 
 export default function AffiliatePage() {
   const context = useContext(BusinessContext);
   const { youtuberList, setYoutuberList, mangoSqueezyList, setMangosqueezyList } = context;
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const analytics = useJune(process.env.NEXT_PUBLIC_JUNE_API_KEY!);
+
+  const trackAffiliate = useCallback(
+    async (value: string) => {
+      const user = await getUser();
+
+      if (analytics && user) {
+        analytics.track("Affiliate Event", {
+          affiliate: value,
+        });
+      }
+    },
+    [analytics]
+  );
 
   const callAffiliatesBySearchQuery = async () => {
     const formData = new FormData();
@@ -62,7 +78,7 @@ export default function AffiliatePage() {
         <Button onClick={searchYoutuberAPI}>Search</Button>
       </div>
 
-      <Tabs defaultValue="youtube" className="w-full">
+      <Tabs defaultValue="youtube" className="w-full" onValueChange={trackAffiliate}>
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="youtube" className="group">
             YouTube Affiliates

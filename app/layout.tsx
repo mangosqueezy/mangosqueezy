@@ -29,12 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <PHProvider>
-        <body
-          className={cn(
-            "min-h-screen bg-background font-sans antialiased",
-            fontSans.variable,
-          )}
-        >
+        <body className={cn("min-h-screen bg-background font-sans antialiased", fontSans.variable)}>
           <PostHogPageView />
           {children}
           <SpeedInsights />

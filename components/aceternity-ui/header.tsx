@@ -9,7 +9,7 @@ export function Navigation() {
       {/* Left */}
       <Link href="/" className="actionable flex h-8 items-center gap-1">
         <span className="text-base font-medium text-gray-600 dark:text-gray-400">
-          <Image src={mangoImg} className="h-6 w-full" alt="" />
+          <Image src={mangoImg} priority={false} className="h-6 w-full" alt="" />
         </span>
       </Link>
 

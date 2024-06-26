@@ -27,3 +27,8 @@ tags = ["key", "posthog"]
 description = "OpenAI secret key"
 regex = '''sk-proj-[a-zA-Z0-9]+'''
 tags = ["key", "openai"]
+
+[[rules]]
+description = "June secret key"
+regex = '''JL[a-zA-Z0-9]+'''
+tags = ["key", "june"]
