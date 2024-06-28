@@ -56,15 +56,15 @@ export default function DashboardLayout({
             <span className="sr-only">Acme Inc</span>
           </Link>
           <Link
-            href="/dashboard"
+            href="/inbox"
             className={classNames(
-              pathname === "/dashboard"
+              pathname === "/inbox"
                 ? "text-blue-400 hover:text-blue-500"
                 : "text-gray-400 hover:text-gray-500",
               "font-medium text-red"
             )}
           >
-            Dashboard
+            Inbox
           </Link>
           <Link
             href="/orders"
@@ -114,15 +114,15 @@ export default function DashboardLayout({
                 <span className="sr-only">Acme Inc</span>
               </Link>
               <Link
-                href="/dashboard"
+                href="/inbox"
                 className={classNames(
-                  pathname === "/dashboard"
+                  pathname === "/inbox"
                     ? "text-blue-400 hover:text-blue-500"
                     : "text-gray-400 hover:text-gray-500",
                   "font-medium text-red"
                 )}
               >
-                Dashboard
+                Inbox
               </Link>
               <Link
                 href="/orders"
