@@ -15,11 +15,7 @@ export const HeroHighlight = ({
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
-  function handleMouseMove({
-    currentTarget,
-    clientX,
-    clientY,
-  }: React.MouseEvent<HTMLDivElement>) {
+  function handleMouseMove({ currentTarget, clientX, clientY }: React.MouseEvent<HTMLDivElement>) {
     if (!currentTarget) return;
     const { left, top } = currentTarget.getBoundingClientRect();
 
@@ -30,7 +26,7 @@ export const HeroHighlight = ({
     <div
       className={cn(
         "relative h-screen flex items-center justify-center w-full group",
-        containerClassName,
+        containerClassName
       )}
       onMouseMove={handleMouseMove}
     >
@@ -87,7 +83,7 @@ export const Highlight = ({
       }}
       className={cn(
         `relative inline-block pb-1 px-1 rounded-lg bg-gradient-to-r from-orange-300 to-yellow-300 dark:from-orange-500 dark:to-yellow-500`,
-        className,
+        className
       )}
     >
       {children}

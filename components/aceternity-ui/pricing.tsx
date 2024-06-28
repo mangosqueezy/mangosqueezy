@@ -1,4 +1,5 @@
 import { CheckIcon } from "@heroicons/react/20/solid";
+import { GlareCard } from "./glare-card";
 
 const includedFeatures = [
   "Instantly pay the affiliate commissions",
@@ -18,10 +19,9 @@ export default function Pricing() {
         </div>
         <div className="mx-auto mt-16 max-w-2xl rounded-3xl ring-1 ring-gray-200 dark:ring-gray-500 sm:mt-20 lg:mx-0 lg:flex lg:max-w-none">
           <div className="p-8 sm:p-10 lg:flex-auto">
-            <h3 className="text-2xl font-bold tracking-tight dark:text-white">Affiliate</h3>
-            <p className="mt-6 text-base leading-7 text-gray-600 dark:text-white">
-              {`You won't be charged monthly fees for using our affiliate features, and we only take a small percentage from each sale, letting you keep most of what you earn.`}
-            </p>
+            <h3 className="text-3xl font-bold tracking-tight dark:text-white">
+              Free while in beta
+            </h3>
             <div className="mt-10 flex items-center gap-x-4">
               <h4 className="flex-none text-md font-bold leading-6 text-green-600">
                 What’s included
@@ -38,14 +38,12 @@ export default function Pricing() {
             </ul>
           </div>
           <div className="-mt-2 p-2 lg:mt-0 lg:w-full lg:max-w-md lg:flex-shrink-0">
-            <div className="rounded-2xl bg-gray-50 dark:bg-gray-200 py-10 text-center ring-1 ring-inset ring-gray-900/5 lg:flex lg:flex-col lg:justify-center lg:py-16">
+            <div className="rounded-2xl bg-gradient-to-r from-yellow-500 to-orange-400 text-white py-10 text-center ring-1 ring-inset ring-gray-900/5 lg:flex lg:flex-col lg:justify-center lg:py-16">
               <div className="mx-auto max-w-xs px-8">
-                <p className="text-5xl font-semibold text-gray-900 dark:text-white">Free</p>
+                <p className="text-5xl font-semibold text-black">Free</p>
                 <p className="mt-6 flex items-baseline justify-center gap-x-2">
-                  <span className="text-5xl font-bold tracking-tight text-gray-600 dark:text-white">
-                    $0
-                  </span>
-                  <span className="text-sm font-semibold leading-6 tracking-wide text-gray-600 dark:text-white">
+                  <span className="text-5xl font-bold tracking-tight text-black">$0</span>
+                  <span className="text-sm font-semibold leading-6 tracking-wide text-black">
                     /month
                   </span>
                 </p>
@@ -69,7 +67,7 @@ export default function Pricing() {
                     Notify me
                   </button>
                 </form>
-                <p className="mt-6 text-xs leading-5 text-gray-600">
+                <p className="mt-6 text-xs leading-5 text-black">
                   Free while in beta. There will also be a freemium plan for all our users.
                 </p>
               </div>

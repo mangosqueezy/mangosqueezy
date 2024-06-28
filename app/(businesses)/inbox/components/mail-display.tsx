@@ -1,4 +1,4 @@
-import format from "date-fns/format";
+import { format } from "date-fns";
 import { Forward, MoreVertical, Reply, ReplyAll } from "lucide-react";
 
 import { DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
