@@ -31,7 +31,7 @@ export async function POST(req: Request) {
 
   // Extract messages
   const extractedMessages = extractMessages(mail);
-  const affiliateInfo = await getAffiliateByEmail(mail.email);
+  const affiliateInfo = await getAffiliateByEmail(mail?.email as string);
 
   let joinAffiliateLinkMessage = "";
   if (!affiliateInfo) {
