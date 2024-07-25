@@ -102,3 +102,11 @@ export async function updateProductById(
     },
   });
 }
+
+export async function getProductById(id: Products["id"]) {
+  return prisma.products.findUnique({
+    where: {
+      id,
+    },
+  });
+}

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter as FontSans } from "next/font/google";
 import { PHProvider } from "./providers";
 import dynamic from "next/dynamic";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./tailwind.css";
 
 const PostHogPageView = dynamic(() => import("./posthog-pageview"), {
@@ -32,7 +31,6 @@ export default function RootLayout({
         <body className={cn("min-h-screen bg-background font-sans antialiased", fontSans.variable)}>
           <PostHogPageView />
           {children}
-          <SpeedInsights />
         </body>
       </PHProvider>
     </html>

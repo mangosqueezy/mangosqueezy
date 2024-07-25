@@ -5,15 +5,25 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/componen
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { MailDisplay } from "@/app/(businesses)/inbox/components/mail-display";
 import { MailList } from "@/app/(businesses)/inbox/components/mail-list";
-import { type Mail } from "@/app/(businesses)/inbox/data";
 import { useMail } from "@/app/(businesses)/inbox/use-mail";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import type { TMessages } from "./mail-display";
+import type { Products } from "@prisma/client";
 
 interface MailProps {
-  mails: Mail[];
+  mails: TMessages[];
+  products: Array<Products> | undefined;
+  businessId: string;
 }
 
-export function Mail({ mails }: MailProps) {
-  const [mail] = useMail();
+export function Mail({ mails, products, businessId }: MailProps) {
+  const [mail, setMail] = useMail();
+
+  React.useEffect(() => {
+    setMail({
+      selected: mails[0].id,
+    });
+  }, [mails, setMail]);
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -29,7 +39,13 @@ export function Mail({ mails }: MailProps) {
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={655}>
-          <MailDisplay mail={mails.find(item => item.id === mail.selected) || null} />
+          <ScrollArea className="h-full w-full">
+            <MailDisplay
+              mail={mails.find(item => item.id === mail.selected) || null}
+              products={products}
+              businessId={businessId}
+            />
+          </ScrollArea>
         </ResizablePanel>
       </ResizablePanelGroup>
     </TooltipProvider>

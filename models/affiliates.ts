@@ -16,6 +16,9 @@ export async function getAffiliateByEmail(email: Affiliates["email"]) {
     where: {
       email,
     },
+    include: {
+      affiliate_business: true,
+    },
   });
 }
 
@@ -102,7 +105,7 @@ export async function udpateAffiliateStatus(
   });
 }
 
-type TAffiliateBusiness = Omit<Affiliate_Business, "id">;
+type TAffiliateBusiness = Pick<Affiliate_Business, "business_id" | "affiliate_id">;
 
 export async function createAffiliateBusiness({ business_id, affiliate_id }: TAffiliateBusiness) {
   try {

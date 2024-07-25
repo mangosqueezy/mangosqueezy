@@ -131,7 +131,8 @@ export default function AffiliatePage() {
                     <Image
                       className="w-full h-auto flex-none rounded-xl bg-gray-50"
                       src={
-                        mangosqueezy.metadata.metadata.ytChannelStats[0].snippet.thumbnails.high.url
+                        mangosqueezy.metadata.metadata?.ytChannelStats[0]?.snippet.thumbnails.high
+                          .url
                       }
                       width={200}
                       height={200}

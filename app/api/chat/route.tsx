@@ -83,17 +83,6 @@ export async function POST(req: NextRequest) {
     const profileJsonString = JSON.stringify(profile);
     const videoJsonString = JSON.stringify(video);
 
-    const model = new ChatOpenAI({
-      apiKey: OPENAI_KEY,
-      model: "gpt-4o",
-      temperature: 0.2,
-      configuration: {
-        basePath: "https://oai.hconeai.com/v1",
-        defaultHeaders: {
-          "Helicone-Auth": `Bearer ${HELICONE_API_KEY}`,
-        },
-      },
-    });
     let docs = [
       new Document({
         pageContent: profileJsonString,
@@ -144,7 +133,17 @@ export async function POST(req: NextRequest) {
      */
     const standaloneQuestionChain = RunnableSequence.from([
       condenseQuestionPrompt,
-      model,
+      new ChatOpenAI({
+        apiKey: OPENAI_KEY,
+        model: "gpt-4o",
+        temperature: 0.2,
+        configuration: {
+          basePath: "https://oai.hconeai.com/v1",
+          defaultHeaders: {
+            "Helicone-Auth": `Bearer ${HELICONE_API_KEY}`,
+          },
+        },
+      }),
       new StringOutputParser(),
     ]);
 
@@ -172,7 +171,17 @@ export async function POST(req: NextRequest) {
         question: input => input.question,
       },
       answerPrompt,
-      model,
+      new ChatOpenAI({
+        apiKey: OPENAI_KEY,
+        model: "gpt-4o",
+        temperature: 0.2,
+        configuration: {
+          basePath: "https://oai.hconeai.com/v1",
+          defaultHeaders: {
+            "Helicone-Auth": `Bearer ${HELICONE_API_KEY}`,
+          },
+        },
+      }),
     ]);
 
     const conversationalRetrievalQAChain = RunnableSequence.from([

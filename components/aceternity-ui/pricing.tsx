@@ -1,5 +1,6 @@
 import { CheckIcon } from "@heroicons/react/20/solid";
-import { GlareCard } from "./glare-card";
+import Meteors from "@/components/magicui/meteors";
+import { Button } from "@/components/ui/button";
 
 const includedFeatures = [
   "Instantly pay the affiliate commissions",
@@ -17,7 +18,7 @@ export default function Pricing() {
             Simple no-tricks pricing
           </h2>
         </div>
-        <div className="mx-auto mt-16 max-w-2xl rounded-3xl ring-1 ring-gray-200 dark:ring-gray-500 sm:mt-20 lg:mx-0 lg:flex lg:max-w-none">
+        <div className="mx-auto mt-16 max-w-2xl rounded-3xl ring-1 ring-gray-200 dark:ring-gray-500 sm:mt-20 lg:mx-0 lg:flex lg:max-w-none bg-grid-zinc-50">
           <div className="p-8 sm:p-10 lg:flex-auto">
             <h3 className="text-3xl font-bold tracking-tight dark:text-white">
               Free while in beta
@@ -38,9 +39,12 @@ export default function Pricing() {
             </ul>
           </div>
           <div className="-mt-2 p-2 lg:mt-0 lg:w-full lg:max-w-md lg:flex-shrink-0">
-            <div className="rounded-2xl bg-gradient-to-r from-yellow-500 to-orange-400 text-white py-10 text-center ring-1 ring-inset ring-gray-900/5 lg:flex lg:flex-col lg:justify-center lg:py-16">
-              <div className="mx-auto max-w-xs px-8">
-                <p className="text-5xl font-semibold text-black">Free</p>
+            <div className="rounded-2xl bg-white text-black py-10 text-center ring-1 ring-inset ring-gray-900/5 lg:flex lg:flex-col lg:justify-center lg:py-16">
+              <div className="relative mx-auto px-8 flex m-2 w-full flex-col items-center justify-center overflow-hidden">
+                <Meteors number={30} />
+                <span className="pointer-events-none whitespace-pre-wrap bg-gradient-to-b from-black to-gray-300/80 bg-clip-text text-center text-6xl font-semibold leading-none text-transparent dark:from-white dark:to-slate-900/10">
+                  Free
+                </span>
                 <p className="mt-6 flex items-baseline justify-center gap-x-2">
                   <span className="text-5xl font-bold tracking-tight text-black">$0</span>
                   <span className="text-sm font-semibold leading-6 tracking-wide text-black">
@@ -60,12 +64,7 @@ export default function Pricing() {
                     className="min-w-0 flex-auto rounded-md border-0 bg-white/5 px-3.5 py-2 text-black shadow-sm ring-1 ring-inset ring-black/10 focus:ring-2 focus:ring-inset focus:ring-black sm:text-sm sm:leading-6"
                     placeholder="Enter your email"
                   />
-                  <button
-                    type="submit"
-                    className="flex-none rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                  >
-                    Notify me
-                  </button>
+                  <Button type="submit">Notify me</Button>
                 </form>
                 <p className="mt-6 text-xs leading-5 text-black">
                   Free while in beta. There will also be a freemium plan for all our users.

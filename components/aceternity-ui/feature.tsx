@@ -7,7 +7,7 @@ import {
   CurrencyDollarIcon,
 } from "@heroicons/react/20/solid";
 import Image from "next/image";
-import dashboardImg from "../../public/dashboard.png";
+import dashboardImg from "../../public/dashboard.jpeg";
 
 const featuresList = [
   {

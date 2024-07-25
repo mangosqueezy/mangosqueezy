@@ -1,13 +1,12 @@
 import { atom, useAtom } from "jotai";
-
-import { Mail, mails } from "@/app/(businesses)/inbox/data";
+import type { Messages } from "@prisma/client";
 
 type Config = {
-  selected: Mail["id"] | null;
+  selected: Messages["id"] | null;
 };
 
 const configAtom = atom<Config>({
-  selected: mails[0].id,
+  selected: null,
 });
 
 export function useMail() {

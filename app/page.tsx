@@ -46,7 +46,7 @@ export default function Index() {
   return (
     <>
       <Toaster position="top-right" />
-      <div className="flex flex-col h-screen mx-auto">
+      <div className="flex flex-col h-fit mx-auto">
         <div className="flex flex-col w-full mx-auto max-w-7xl">
           <Navigation />
         </div>
@@ -69,7 +69,7 @@ export default function Index() {
             >
               <div className="hidden sm:mb-8 sm:flex sm:justify-center">
                 <div className="relative rounded-full px-3 py-1 text-sm leading-6 text-gray-600 dark:text-white ring-1 ring-gray-900/10 hover:ring-gray-900/20">
-                  OSS affiliate marketing platform.{" "}
+                  open-source affiliate marketing tool.{" "}
                   <a
                     href="https://github.com/mangosqueezy/mangosqueezy"
                     target="_blank"
@@ -81,10 +81,11 @@ export default function Index() {
                   </a>
                 </div>
               </div>
-              Empower your dedicated community with our{" "}
-              <Highlight className="text-black dark:text-white">
-                valuable crypto affiliate tools.
-              </Highlight>
+              Crypto affiliate{" "}
+              <Highlight className="text-black dark:text-white">marketing tool</Highlight>
+              <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-300">
+                {`A tool that takes care of all your influencer marketing needs for your business.`}
+              </p>
             </motion.h1>
 
             <div className="mt-20 flex justify-center items-center text-center">
@@ -111,10 +112,10 @@ export default function Index() {
                   />
 
                   <HoverBorderGradient
-                    containerClassName="rounded-full mt-3"
+                    containerClassName="rounded-lg mt-3"
                     as="button"
                     type="submit"
-                    className="dark:bg-black bg-white text-black dark:text-white flex items-center space-x-2"
+                    className="dark:bg-black bg-white text-black dark:text-white font-semibold flex items-center space-x-2"
                   >
                     <span>Join Waitlist</span>
                   </HoverBorderGradient>

@@ -27,6 +27,30 @@ model Business {
   products                  Products[]
   orders                    Orders[]
   affiliate_business        Affiliate_Business[]
+  messages                  Messages[]
+
+  @@schema("public")
+}
+
+model Messages {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String?
+  email      String?
+  channel_id String?
+  video_id   String?
+  subject    String
+  message    String
+  message_id String?
+  type       String
+  sent_at    DateTime @default(now())
+
+  business_id String   @db.Uuid
+  business    Business @relation(fields: [business_id], references: [id])
+
+  // Self-referential relationship
+  parent_id String?    @db.Uuid
+  parent    Messages?  @relation("MessageReplies", fields: [parent_id], references: [id])
+  replies   Messages[] @relation("MessageReplies")
 
   @@schema("public")
 }
@@ -52,9 +76,14 @@ model Affiliates {
 }
 
 model Affiliate_Business {
-  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  business     Business   @relation(fields: [business_id], references: [id])
-  business_id  String     @db.Uuid
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  affiliate_link     String?
+  affiliate_link_key String?
+
+  business    Business @relation(fields: [business_id], references: [id])
+  business_id String   @db.Uuid
+
   affiliate    Affiliates @relation(fields: [affiliate_id], references: [id])
   affiliate_id Int
 

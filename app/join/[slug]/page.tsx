@@ -29,11 +29,8 @@ import toast, { Toaster } from "react-hot-toast";
 import { createAffiliateAction } from "./actions";
 import { Navigation } from "./components/header";
 import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
-import { useSearchParams } from "next/navigation";
-import { IconBrandYoutube, IconBrandInstagram } from "@tabler/icons-react";
 import Link from "next/link";
-import { CoolMode } from "@/components/magic-ui/cool-mode";
+import { CoolMode } from "@/components/magicui/cool-mode";
 import { Footer } from "@/components/aceternity-ui/footer";
 
 const formDefaultValues = {
@@ -72,88 +69,15 @@ const FormSchema = z.object({
   instagram: z.string(),
 });
 
-type AllowedFormKey =
-  | "firstname"
-  | "lastname"
-  | "email"
-  | "description"
-  | "wallet"
-  | "url"
-  | "youtube"
-  | "ytChannelId"
-  | "instagram";
-
 export default function Affiliates({ params }: { params: { slug: string } }) {
   const [mangosqueezyAI, setMangosqueezyAI] = React.useState("");
   const [isButtonLoading, setIsButtonLoading] = React.useState(false);
   const [isAILoading, setIsAILoading] = React.useState(false);
-  const searchParams = useSearchParams();
-  const supabase = createClient();
-  // Retrieve initial form values from localStorage
-  const storedValues = JSON.parse(
-    localStorage.getItem("affiliate-form-details") ?? JSON.stringify(formDefaultValues)
-  );
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues: storedValues,
+    defaultValues: formDefaultValues,
   });
-
-  // Watch all form values
-  const watchedFormValues = form?.watch();
-
-  const connectGoogle = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `https://mangosqueezy.com/auth/${params.slug}/provider`,
-        scopes: "https://www.googleapis.com/auth/youtube.readonly",
-      },
-    });
-  };
-
-  // Save form values to localStorage whenever any value changes
-  React.useEffect(() => {
-    localStorage.setItem("affiliate-form-details", JSON.stringify(watchedFormValues));
-  }, [watchedFormValues]);
-
-  React.useEffect(() => {
-    const ytChannelId = searchParams.get("ytChannelId");
-    const ytChannelHandle = searchParams.get("ytChannelHandle");
-    if (ytChannelHandle) {
-      form.setValue("youtube", ytChannelHandle);
-      form.setValue("ytChannelId", ytChannelId as string);
-    }
-  }, [form, searchParams]);
-
-  React.useEffect(() => {
-    const fetchAccessToken = async () => {
-      const { hash } = window.location;
-      if (hash) {
-        const params = new URLSearchParams(hash.slice(1));
-        const accessToken = params.get("access_token") as string;
-        const longLivedToken = params.get("long_lived_token") as string;
-        const state = params.get("state") as string;
-
-        const parameters = {
-          accessToken,
-          longLivedToken,
-          state,
-        };
-
-        const queryParameter = new URLSearchParams(parameters);
-        const response = await fetch(
-          `https://mangosqueezy.com/api/instagram/callback?${queryParameter.toString()}`,
-          {
-            method: "GET",
-          }
-        );
-        const result: { igUsername: string } = await response.json();
-        form.setValue("instagram", result.igUsername);
-      }
-    };
-    fetchAccessToken();
-  }, [form]);
 
   const callMangosqueezyAI = React.useCallback(
     async (query: string) => {
@@ -320,15 +244,9 @@ export default function Affiliates({ params }: { params: { slug: string } }) {
                       <FormItem>
                         <FormLabel className="truncate text-black">Youtube</FormLabel>
                         <div className="flex">
-                          <Button type="button" variant="outline" onClick={() => connectGoogle()}>
-                            <IconBrandYoutube className="h-4 w-4 mr-2 text-red-500" />
-                            Connect Youtube
-                          </Button>
-
                           <FormControl className="ml-3">
                             <Input
                               className="font-bold text-orange-900"
-                              disabled
                               placeholder="@youtuber"
                               {...field}
                             />
@@ -348,19 +266,9 @@ export default function Affiliates({ params }: { params: { slug: string } }) {
                       <FormItem>
                         <FormLabel className="truncate text-black">Instagram</FormLabel>
                         <div className="flex">
-                          <Button variant="outline" asChild>
-                            <a
-                              href={`https://www.facebook.com/v20.0/dialog/oauth?client_id=678555187581833&display=page&extras={"setup":{"channel":"IG_API_ONBOARDING"}}&redirect_uri=https://mangosqueezy.com/join/${params.slug}&response_type=token&scope=instagram_basic&state={"slug":"${params.slug}"}`}
-                            >
-                              <IconBrandInstagram className="h-4 w-4 mr-2 text-red-500" />
-                              Connect Instagram
-                            </a>
-                          </Button>
-
                           <FormControl className="ml-3">
                             <Input
                               className="font-bold text-orange-900"
-                              disabled
                               placeholder="@mangosqueezy"
                               {...field}
                             />
