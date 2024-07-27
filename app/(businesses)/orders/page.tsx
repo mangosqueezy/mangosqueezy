@@ -7,13 +7,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -37,17 +31,14 @@ export default async function OrdersPage() {
       <Card>
         <CardHeader>
           <CardTitle>Orders</CardTitle>
-          <CardDescription>
-            Manage your products and view their sales performance.
-          </CardDescription>
+          <CardDescription>Manage your products and view their sales performance.</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Customer Name</TableHead>
-                <TableHead>Customer address</TableHead>
-                <TableHead>Product Id</TableHead>
+                <TableHead>Product Name</TableHead>
                 <TableHead>
                   <span className="sr-only">Actions</span>
                 </TableHead>
@@ -57,19 +48,14 @@ export default async function OrdersPage() {
               {user &&
                 user?.orders.map((order: Orders, index: number) => (
                   <TableRow key={`table-row-${index}`}>
-                    <TableCell className="font-medium">
-                      {order.customer_name}
+                    <TableCell className="font-medium">{order.customer_email}</TableCell>
+                    <TableCell>
+                      {user.products.find(product => product.id === order?.product_id)?.name}
                     </TableCell>
-                    <TableCell>{order?.customer_address}</TableCell>
-                    <TableCell>{order?.products_id}</TableCell>
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button
-                            aria-haspopup="true"
-                            size="icon"
-                            variant="ghost"
-                          >
+                          <Button aria-haspopup="true" size="icon" variant="ghost">
                             <MoreHorizontal className="h-4 w-4" />
                             <span className="sr-only">Toggle menu</span>
                           </Button>

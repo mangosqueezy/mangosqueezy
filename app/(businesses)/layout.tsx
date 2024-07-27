@@ -67,6 +67,17 @@ export default function DashboardLayout({
             Inbox
           </Link>
           <Link
+            href="/metrics"
+            className={classNames(
+              pathname === "/metrics"
+                ? "text-blue-400 hover:text-blue-500"
+                : "text-gray-400 hover:text-gray-500",
+              "font-medium text-red"
+            )}
+          >
+            Metrics
+          </Link>
+          <Link
             href="/orders"
             className={classNames(
               pathname === "/orders"

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 const moonPay = new MoonPay(process.env.MOONPAY_SK!);
 
-export async function GET(request: Request) {
+export async function POST(request: Request) {
   const body = await request.formData();
   const amount: string = body.get("amount") as string;
   const email = body.get("email") as string;
@@ -21,7 +21,7 @@ export async function GET(request: Request) {
      * Must be URL encoded (e.g. https%3A%2F%2Fwww.myurl.com) MoonPay will add transactionId={{transactionId}}&transactionStatus=pending to the redirectURL.
      * We support deep links and appending your own custom parameters.
      */
-    redirectURL: "string",
+    redirectURL: "https%3A%2F%2Fmangosqueezy.com%2Fsuccess",
   };
 
   const url = moonPay.url.generate({ flow: "buy", params });

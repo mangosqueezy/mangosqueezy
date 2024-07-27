@@ -22,6 +22,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "lkjqkobxmgqedqtidcws.supabase.co",
       },
+      {
+        protocol: "https",
+        hostname: "xumm.app",
+      },
     ],
   },
 };

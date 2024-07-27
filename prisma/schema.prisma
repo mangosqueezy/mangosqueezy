@@ -95,17 +95,17 @@ model Affiliate_Business {
 
 model Orders {
   id               String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  customer_name    String
+  customer_name    String?
   customer_email   String
-  customer_address String
+  customer_address String?
   invoice_url      String?
   status           String?
   created_at       DateTime    @default(now())
   updated_at       DateTime    @updatedAt
   Business         Business?   @relation(fields: [business_id], references: [id])
   business_id      String?     @db.Uuid
-  Products         Products?   @relation(fields: [products_id], references: [id])
-  products_id      Int?
+  Products         Products?   @relation(fields: [product_id], references: [id])
+  product_id       Int?
   affiliate        Affiliates? @relation(fields: [affiliate_id], references: [id])
   affiliate_id     Int?
 
