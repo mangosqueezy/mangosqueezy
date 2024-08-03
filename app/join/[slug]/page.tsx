@@ -87,7 +87,7 @@ export default function Affiliates({ params }: { params: { slug: string } }) {
       formData.append("query", query);
       formData.append("text", form.getValues("description"));
 
-      const response = await fetch("https://mangosqueezy.com/api/llm", {
+      const response = await fetch("https://www.mangosqueezy.com/api/llm", {
         method: "POST",
         body: formData,
       });

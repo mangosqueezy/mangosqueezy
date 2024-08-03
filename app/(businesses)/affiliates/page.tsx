@@ -34,7 +34,7 @@ export default function AffiliatePage() {
     const formData = new FormData();
     formData.append("search-query", searchQuery);
 
-    const response = await fetch("https://mangosqueezy.com/api/affiliates", {
+    const response = await fetch("https://www.mangosqueezy.com/api/affiliates", {
       method: "POST",
       body: formData,
     });

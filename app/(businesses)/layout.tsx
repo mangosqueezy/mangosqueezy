@@ -43,7 +43,7 @@ export default function DashboardLayout({
   }, [analytics]);
 
   const handleLogout = async () => {
-    await fetch("https://mangosqueezy.com/api/logout", {
+    await fetch("https://www.mangosqueezy.com/api/logout", {
       method: "POST",
     });
   };

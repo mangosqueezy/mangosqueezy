@@ -27,7 +27,7 @@ export async function sendEmail(formData: FormData) {
   const businessId = formData.get("business-id") as string;
   const parentId = formData.get("parent-id") as string;
 
-  const affiliateLink = `https://mangosqueezy.com/buy/${email}/${productId}`;
+  const affiliateLink = `https://www.mangosqueezy.com/buy/${email}/${productId}`;
 
   let parsedEmailContent = `
     ${emailContent}

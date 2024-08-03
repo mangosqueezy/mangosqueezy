@@ -63,7 +63,7 @@ export default function BuyForm({ product, formattedAmount, affiliateId }: TBuyF
       eventSource.close();
     }
 
-    const newEventSource = new EventSource("https://mangosqueezy.com/api/xaman");
+    const newEventSource = new EventSource("https://www.mangosqueezy.com/api/xaman");
 
     newEventSource.onmessage = event => {
       const newMessage = event.data;
@@ -113,7 +113,7 @@ export default function BuyForm({ product, formattedAmount, affiliateId }: TBuyF
     const formData = new FormData();
     formData.append("email", email);
     formData.append("amount", amount);
-    await fetch("https://mangosqueezy.com/api/moonpay", {
+    await fetch("https://www.mangosqueezy.com/api/moonpay", {
       method: "POST",
       body: formData,
     });

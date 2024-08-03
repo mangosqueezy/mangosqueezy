@@ -32,7 +32,7 @@ export function Send({ extractedDescription, profile, videoId, businessId, chann
       formData.append("name", profile.items[0].snippet.title);
       formData.append("business_id", businessId);
 
-      const response = await fetch("https://mangosqueezy.com/api/email", {
+      const response = await fetch("https://www.mangosqueezy.com/api/email", {
         method: "POST",
         body: formData,
       });
@@ -45,7 +45,7 @@ export function Send({ extractedDescription, profile, videoId, businessId, chann
       formData.append("video_id", videoId);
 
       // nudge influencer's youtube channel
-      const response = await fetch("https://mangosqueezy.com/api/nudge", {
+      const response = await fetch("https://www.mangosqueezy.com/api/nudge", {
         method: "POST",
         body: formData,
       });
