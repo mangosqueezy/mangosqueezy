@@ -42,9 +42,10 @@ export default function DashboardLayout({
     fetchUser();
   }, [analytics]);
 
-  const handleLogout = () => {
-    const formData = new FormData();
-    // fetcher.submit(formData, { method: "POST", action: "/logout" });
+  const handleLogout = async () => {
+    await fetch("https://mangosqueezy.com/api/logout", {
+      method: "POST",
+    });
   };
 
   return (
@@ -184,7 +185,7 @@ export default function DashboardLayout({
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => router.push("/settings")}>Settings</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push("/webhook")}>Webhook</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
             </DropdownMenuContent>

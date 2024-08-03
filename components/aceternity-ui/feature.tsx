@@ -8,6 +8,7 @@ import {
 } from "@heroicons/react/20/solid";
 import Image from "next/image";
 import dashboardImg from "../../public/dashboard.jpeg";
+import { Button as MovingBorder } from "@/components/ui/moving-border";
 
 const featuresList = [
   {
@@ -60,13 +61,18 @@ export default function Feature() {
         </div>
       </div>
       <div className="relative rounded-xl mx-auto max-w-7xl px-6 lg:px-8 mt-10">
-        <Image
-          src={dashboardImg}
-          alt="App screenshot"
-          className="rounded-[inherit] border object-contain shadow-lg dark:hidden"
-          width={2432}
-          height={1442}
-        />
+        <MovingBorder
+          borderRadius="1.75rem"
+          className="bg-white dark:bg-slate-900 text-black dark:text-white border-neutral-200 dark:border-slate-800 h-full w-full"
+        >
+          <Image
+            src={dashboardImg}
+            alt="App screenshot"
+            className="rounded-[inherit] border object-contain shadow-lg dark:hidden"
+            width={2432}
+            height={1442}
+          />
+        </MovingBorder>
       </div>
       <div className="mx-auto mt-16 max-w-7xl px-6 sm:mt-20 md:mt-24 lg:px-8">
         <dl className="mx-auto grid max-w-2xl grid-cols-1 gap-x-6 gap-y-10 text-base leading-7 text-gray-300 sm:grid-cols-2 lg:mx-0 lg:max-w-none lg:grid-cols-3 lg:gap-x-8 lg:gap-y-16">
