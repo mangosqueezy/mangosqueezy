@@ -12,7 +12,8 @@
     "check-secrets": "docker run --rm -v $(pwd):/path zricethezav/gitleaks:latest protect --source='/path' --config='/path/gitleaks.toml' --staged --no-banner -v",
     "deploy:trigger-prod": "npx trigger.dev@3.0.0-beta.34 deploy",
     "deploy:trigger": "npx trigger.dev@3.0.0-beta.34 deploy --env staging",
-    "prepare": "husky"
+    "prepare": "husky",
+    "postinstall": "prisma generate"
   },
   "config": {
     "commitizen": {
@@ -59,7 +60,7 @@
     "@tabler/icons-react": "^3.9.0",
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@tailwindcss/forms": "^0.5.7",
-    "@trigger.dev/sdk": "3.0.0-beta.42",
+    "@trigger.dev/sdk": "3.0.0-beta.34",
     "@upstash/redis": "^1.32.0",
     "@vercel/speed-insights": "^1.0.12",
     "ai": "^3.2.16",

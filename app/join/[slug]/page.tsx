@@ -107,7 +107,7 @@ export default function Affiliates({ params }: { params: { slug: string } }) {
     formData.append("description", data.description);
     formData.append("wallet", data.wallet);
     formData.append("url", data.url);
-    formData.append("ytChannelId", data.ytChannelId);
+    formData.append("ytChannelId", data.youtube);
     formData.append("instagram", data.instagram);
     formData.append("company-slug", params.slug);
 

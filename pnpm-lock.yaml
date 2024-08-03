@@ -126,8 +126,8 @@ importers:
         specifier: ^0.5.7
         version: 0.5.7(tailwindcss@3.4.4)
       '@trigger.dev/sdk':
-        specifier: 3.0.0-beta.42
-        version: 3.0.0-beta.42(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)
+        specifier: 3.0.0-beta.34
+        version: 3.0.0-beta.34(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)
       '@upstash/redis':
         specifier: ^1.32.0
         version: 1.32.0
@@ -2839,16 +2839,16 @@ packages:
   '@tanstack/virtual-core@3.8.1':
     resolution: {integrity: sha512-uNtAwenT276M9QYCjTBoHZ8X3MUeCRoGK59zPi92hMIxdfS9AyHjkDWJ94WroDxnv48UE+hIeo21BU84jKc8aQ==}
 
-  '@trigger.dev/core-backend@3.0.0-beta.42':
-    resolution: {integrity: sha512-EOTXynWbZ3YOHbPdNU/Us2QgfxF1lix6o6mZUoYnLT5kxJGV2Qd4o60uNKjKHhWS39j59GWQ3HuAkSt+M9nyLQ==}
+  '@trigger.dev/core-backend@3.0.0-beta.34':
+    resolution: {integrity: sha512-4bMDlfCaXu5qUkKBbaD/9GK9kZfQubNxMYHZYGbQeD8hsexGAbmcXIuVqPdMEiNuXXD8VRMdPrxSYCyIEUCVwA==}
     engines: {node: '>=18.0.0'}
 
-  '@trigger.dev/core@3.0.0-beta.42':
-    resolution: {integrity: sha512-WJyG+2hJtf0vDELEDqtZeOWHVHRZOOyUGIAsK37hrTRXhcWhtVvUIiF0T5hbb3sMI6p5I9TdAUejn+hK0fY4hg==}
+  '@trigger.dev/core@3.0.0-beta.34':
+    resolution: {integrity: sha512-4hP8to+yATYb/xg3LQ9Zr1wXQVDnocEIQFO5wxM+74DUjM8np886h8GoVPPOvuH0LZP28i5mVho7RxjQq6rP2A==}
     engines: {node: '>=18.0.0'}
 
-  '@trigger.dev/sdk@3.0.0-beta.42':
-    resolution: {integrity: sha512-7rA/JGGpQI1IldgHDsVsW1UD2cv1UoE96vgh4pbwSsww+eJ6GgkY/OBdw+LooIblxxKoMRaNAiJ8lUVnHAdVJA==}
+  '@trigger.dev/sdk@3.0.0-beta.34':
+    resolution: {integrity: sha512-Lf3Ia9uyVSpDmCcIXCUa2wnPAUR1XZ9CbPlafS8h0I9b7ZR9wUfi1PCTfMrTlraos4OGcIedY4caghh3+gamBg==}
     engines: {node: '>=18.0.0'}
 
   '@types/canvas-confetti@1.6.4':
@@ -4152,6 +4152,10 @@ packages:
 
   form-data-encoder@1.7.2:
     resolution: {integrity: sha512-qfqtYan3rxrnCk1VYaA4H+Ms9xdpPqvLZa6xmMgFvhO32x7/3J/ExcTd6qpxM0vH2GdMI+poehyBZvqfMTto8A==}
+
+  form-data-encoder@4.0.2:
+    resolution: {integrity: sha512-KQVhvhK8ZkWzxKxOr56CPulAhH3dobtuQ4+hNQ+HekH/Wp5gSOafqRAeTphQUJAIk0GBvHZgJ2ZGRWd5kphMuw==}
+    engines: {node: '>= 18'}
 
   form-data@4.0.0:
     resolution: {integrity: sha512-ETEklSGi5t0QMZuiXoA/Q6vcnxcLQP5vdugSpuAyi6SVGi2clPPp+xgEhuMaHC+zGgn31Kd235W35f7Hykkaww==}
@@ -9358,11 +9362,11 @@ snapshots:
 
   '@tanstack/virtual-core@3.8.1': {}
 
-  '@trigger.dev/core-backend@3.0.0-beta.42':
+  '@trigger.dev/core-backend@3.0.0-beta.34':
     dependencies:
       '@opentelemetry/api': 1.9.0
 
-  '@trigger.dev/core@3.0.0-beta.42(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@trigger.dev/core@3.0.0-beta.34(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
       '@google-cloud/precise-date': 4.0.0
       '@opentelemetry/api': 1.9.0
@@ -9376,6 +9380,7 @@ snapshots:
       '@opentelemetry/sdk-trace-base': 1.25.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-trace-node': 1.25.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.25.0
+      form-data-encoder: 4.0.2
       humanize-duration: 3.32.1
       socket.io-client: 4.7.4(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       superjson: 2.2.1
@@ -9388,13 +9393,13 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@trigger.dev/sdk@3.0.0-beta.42(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)':
+  '@trigger.dev/sdk@3.0.0-beta.34(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)':
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/api-logs': 0.48.0
       '@opentelemetry/semantic-conventions': 1.25.0
-      '@trigger.dev/core': 3.0.0-beta.42(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@trigger.dev/core-backend': 3.0.0-beta.42
+      '@trigger.dev/core': 3.0.0-beta.34(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@trigger.dev/core-backend': 3.0.0-beta.34
       chalk: 5.3.0
       cronstrue: 2.50.0
       debug: 4.3.4
@@ -10976,6 +10981,8 @@ snapshots:
       signal-exit: 4.1.0
 
   form-data-encoder@1.7.2: {}
+
+  form-data-encoder@4.0.2: {}
 
   form-data@4.0.0:
     dependencies:

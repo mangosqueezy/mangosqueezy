@@ -14,4 +14,6 @@ export const config: TriggerConfig = {
     },
   },
   triggerDirectories: ["trigger"],
+  additionalFiles: ["./prisma/schema.prisma"],
+  additionalPackages: ["prisma@5.16.1"],
 };
