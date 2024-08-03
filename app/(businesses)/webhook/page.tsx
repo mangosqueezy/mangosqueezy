@@ -8,7 +8,7 @@ export default function SvixEmbed() {
   const [appPortal, setAppPortal] = useState<string>();
 
   async function getAppPortalUrl() {
-    const response = await fetch(`https://mangosqueezy.com/api/svix`, { method: "POST" });
+    const response = await fetch(`https://mangosqueezy.com/api/svix-portal`, { method: "POST" });
     const result = await response.json();
 
     setAppPortal(result.url);
