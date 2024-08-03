@@ -23,6 +23,7 @@
     "@headlessui/react": "^2.1.2",
     "@heroicons/react": "^2.1.4",
     "@hookform/resolvers": "^3.9.0",
+    "@intercom/messenger-js-sdk": "^0.0.12",
     "@langchain/anthropic": "^0.2.3",
     "@langchain/community": "^0.2.17",
     "@langchain/core": "^0.2.14",
