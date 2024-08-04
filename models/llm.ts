@@ -12,7 +12,7 @@ export async function mangosqueezyAI(query: string, text: string) {
 
   const model = new ChatOpenAI({
     apiKey: OPENAI_KEY,
-    model: "gpt-4o-mini",
+    model: "gpt-4o",
     temperature: 0.8,
     configuration: {
       basePath: "https://oai.hconeai.com/v1",
@@ -40,7 +40,7 @@ export const getSlug = async (inputText: string) => {
 
   const model = new ChatOpenAI({
     apiKey: OPENAI_KEY,
-    model: "gpt-4o-mini",
+    model: "gpt-4o",
     temperature: 0,
     configuration: {
       basePath: "https://oai.hconeai.com/v1",

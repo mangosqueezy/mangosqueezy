@@ -44,7 +44,7 @@ export async function POST(req: Request) {
   }));
 
   const result = await streamObject({
-    model: openai("gpt-4o-mini") as LanguageModel,
+    model: openai("gpt-4o") as LanguageModel,
     schema: replySchema,
     system: `As a business, mangosqueezy is sending emails to influencers, expressing our happiness to work with them. We should send this type of email based on past influencer interactions. If past influencer emails are not positive regarding collaboration, create a draft reply based on the previous messages.`,
     messages: [

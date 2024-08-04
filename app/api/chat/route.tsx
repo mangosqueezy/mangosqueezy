@@ -135,7 +135,7 @@ export async function POST(req: NextRequest) {
       condenseQuestionPrompt,
       new ChatOpenAI({
         apiKey: OPENAI_KEY,
-        model: "gpt-4o-mini",
+        model: "gpt-4o",
         temperature: 0.2,
         configuration: {
           basePath: "https://oai.hconeai.com/v1",
@@ -173,7 +173,7 @@ export async function POST(req: NextRequest) {
       answerPrompt,
       new ChatOpenAI({
         apiKey: OPENAI_KEY,
-        model: "gpt-4o-mini",
+        model: "gpt-4o",
         temperature: 0.2,
         configuration: {
           basePath: "https://oai.hconeai.com/v1",
