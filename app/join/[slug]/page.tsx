@@ -252,7 +252,7 @@ export default function Affiliates({ params }: { params: { slug: string } }) {
                           <FormControl className="ml-3">
                             <Input
                               className="font-bold text-orange-900"
-                              placeholder="@youtuber"
+                              placeholder="youtuber"
                               {...field}
                             />
                           </FormControl>
@@ -274,7 +274,7 @@ export default function Affiliates({ params }: { params: { slug: string } }) {
                           <FormControl className="ml-3">
                             <Input
                               className="font-bold text-orange-900"
-                              placeholder="@mangosqueezy"
+                              placeholder="mangosqueezy"
                               {...field}
                             />
                           </FormControl>
