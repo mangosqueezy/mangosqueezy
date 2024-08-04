@@ -28,6 +28,8 @@ export const socialMediaTask = task({
 
       const result = await response.json();
       ytChannelStats = result.items;
+
+      logger.log("yt metrics collector output is ...", { ytChannelStats });
     }
 
     await wait.for({ seconds: 5 });
@@ -50,6 +52,8 @@ export const socialMediaTask = task({
       );
 
       igChannelStats = await response.json();
+
+      logger.log("igChannelStats metrics collector output is ...", { igChannelStats });
     }
 
     return {

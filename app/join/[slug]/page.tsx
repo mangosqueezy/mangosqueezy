@@ -32,6 +32,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { CoolMode } from "@/components/magicui/cool-mode";
 import { Footer } from "@/components/aceternity-ui/footer";
+import Intercom from "@intercom/messenger-js-sdk";
 
 const formDefaultValues = {
   firstname: "",
@@ -126,6 +127,10 @@ export default function Affiliates({ params }: { params: { slug: string } }) {
     }
     setIsButtonLoading(false);
   }
+
+  Intercom({
+    app_id: "kby3tvbo",
+  });
 
   return (
     <>
