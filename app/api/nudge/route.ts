@@ -40,7 +40,7 @@ export async function POST(request: Request) {
 
     const model = new ChatOpenAI({
       apiKey: OPENAI_KEY,
-      model: "gpt-4o",
+      model: "gpt-4o-mini",
       temperature: 0.9,
       configuration: {
         basePath: "https://oai.hconeai.com/v1",

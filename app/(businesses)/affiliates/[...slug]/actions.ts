@@ -34,7 +34,7 @@ export async function ytDescriptionExtractor(formData: FormData) {
   try {
     const llm = new ChatOpenAI({
       apiKey: OPENAI_KEY,
-      model: "gpt-4o",
+      model: "gpt-4o-mini",
       temperature: 0.2,
       configuration: {
         basePath: "https://oai.hconeai.com/v1",
