@@ -29,4 +29,4 @@ jobs:
         env:
           TRIGGER_ACCESS_TOKEN: ${{ secrets.TRIGGER_ACCESS_TOKEN }}
         run: |
-          pnpm deploy:trigger
+          pnpm deploy:trigger-prod

@@ -11,7 +11,6 @@
     "commit": "cz",
     "check-secrets": "docker run --rm -v $(pwd):/path zricethezav/gitleaks:latest protect --source='/path' --config='/path/gitleaks.toml' --staged --no-banner -v",
     "deploy:trigger-prod": "pnpm dlx trigger.dev@3.0.0-beta.34 deploy",
-    "deploy:trigger": "pnpm dlx trigger.dev@3.0.0-beta.34 deploy --env staging",
     "prepare": "husky",
     "postinstall": "prisma generate"
   },
@@ -61,7 +60,7 @@
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@tailwindcss/forms": "^0.5.7",
     "@transia/xrpl": "2.7.3-alpha.28",
-    "@trigger.dev/sdk": "3.0.0-beta.52",
+    "@trigger.dev/sdk": "3.0.0-beta.34",
     "@upstash/redis": "^1.32.0",
     "@vercel/speed-insights": "^1.0.12",
     "ai": "^3.2.16",
