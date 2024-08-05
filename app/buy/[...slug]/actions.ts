@@ -24,7 +24,8 @@ export async function createOrderAction(formData: FormData) {
 
     await payoutTask.trigger({
       amount: "20",
-      destination_address: "rwTBPv3uZc6Pja9QZFmZ1aNYZg2zMPHHzV",
+      business_wallet_address: "rwTBPv3uZc6Pja9QZFmZ1aNYZg2zMPHHzV",
+      affiliate_wallet_address: "rssgKvkHxR8h8QwTsm3dYUtT7UDwTmbwhM",
     });
 
     await svix.message.create(SVIX_APP_ID!, {
