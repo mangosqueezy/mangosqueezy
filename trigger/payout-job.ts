@@ -13,13 +13,14 @@ export const payoutTask = task({
     await client.connect();
 
     const mangosqueezy_wallet = Wallet.fromSeed(process.env.MANGOSQUEEZY_WALLET_SECRET_SEED!);
-
+    const commissionAmount = 0.2 * parseFloat(amount);
+    const amountForBusiness = parseFloat(amount) - commissionAmount;
     let result = "success";
     try {
       const businessPayload = await client.autofill({
         TransactionType: "Payment",
         Account: mangosqueezy_wallet.address,
-        Amount: xrpToDrops(amount),
+        Amount: xrpToDrops(amountForBusiness),
         NetworkID: 21338,
         Destination: business_wallet_address, // wallet address of the business user
       });
@@ -32,11 +33,10 @@ export const payoutTask = task({
         balance: getBalanceChanges(businessTransaction?.result.meta),
       });
 
-      const commission = 0.2 * parseFloat(amount);
       const affiliatePayload = await client.autofill({
         TransactionType: "Payment",
         Account: mangosqueezy_wallet.address,
-        Amount: xrpToDrops(commission),
+        Amount: xrpToDrops(commissionAmount),
         NetworkID: 21338,
         Destination: affiliate_wallet_address, // wallet address of the affiliate user
       });
