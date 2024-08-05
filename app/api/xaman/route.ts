@@ -2,6 +2,7 @@ import { Xumm } from "xumm";
 
 const xumm = new Xumm(process.env.XUMM_API_KEY!, process.env.XUMM_API_SECRET);
 
+export const maxDuration = 300;
 export const dynamic = "force-dynamic";
 
 // ==== customer account ====

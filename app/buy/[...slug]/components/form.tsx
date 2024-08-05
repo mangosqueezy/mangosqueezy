@@ -103,11 +103,14 @@ export default function BuyForm({ product, formattedAmount, affiliateId }: TBuyF
       if (successVal) {
         createOrderHandler();
         setOpen(false);
+        if (eventSource) {
+          eventSource.close();
+        }
       } else {
         setOpen(true);
       }
     }
-  }, [messages, createOrderHandler]);
+  }, [messages, createOrderHandler, eventSource]);
 
   const callMoonpay = async (email: string, amount: string) => {
     const formData = new FormData();
@@ -209,7 +212,7 @@ export default function BuyForm({ product, formattedAmount, affiliateId }: TBuyF
                       )}
                       disabled={isXRPButtonLoading}
                     >
-                      Pay
+                      XRP Pay
                       {isXRPButtonLoading && <Loader className="animate-spin" />}
                     </Button>
 
