@@ -14,28 +14,32 @@ export async function createOrderAction(formData: FormData) {
   const product_id = formData.get("product_id") as string;
   const affiliate_id = formData.get("affiliate_id") as string;
 
-  await createOrder({
-    email,
-    business_id,
-    product_id,
-    affiliate_id,
-  });
-
-  await payoutTask.trigger({
-    amount: "20",
-    destination_address: "rwTBPv3uZc6Pja9QZFmZ1aNYZg2zMPHHzV",
-  });
-
-  await svix.message.create(SVIX_APP_ID!, {
-    eventType: "invoice.paid",
-    eventId: "evt_Wqb1k73rXprtTm7Qdlr38G",
-    payload: {
-      type: "invoice.paid",
-      product_id,
-      status: "paid",
+  try {
+    await createOrder({
       email,
-    },
-  });
+      business_id,
+      product_id,
+      affiliate_id,
+    });
+
+    await payoutTask.trigger({
+      amount: "20",
+      destination_address: "rwTBPv3uZc6Pja9QZFmZ1aNYZg2zMPHHzV",
+    });
+
+    await svix.message.create(SVIX_APP_ID!, {
+      eventType: "invoice.paid",
+      eventId: "evt_Wqb1k73rXprtTm7Qdlr38G",
+      payload: {
+        type: "invoice.paid",
+        product_id,
+        status: "paid",
+        email,
+      },
+    });
+  } catch (err) {
+    console.error(err);
+  }
 
   return "success";
 }
