@@ -1,6 +1,7 @@
 "use server";
 
 import { createOrder } from "@/models/orders";
+import { payoutTask } from "@/trigger/payout-job";
 import { Svix } from "svix";
 
 const SVIX_APP_ID = process.env.SVIX_APP_ID;
@@ -18,6 +19,11 @@ export async function createOrderAction(formData: FormData) {
     business_id,
     product_id,
     affiliate_id,
+  });
+
+  await payoutTask.trigger({
+    amount: "20",
+    destination_address: "rwTBPv3uZc6Pja9QZFmZ1aNYZg2zMPHHzV",
   });
 
   await svix.message.create(SVIX_APP_ID!, {

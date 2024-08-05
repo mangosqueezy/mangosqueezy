@@ -4,13 +4,21 @@ const xumm = new Xumm(process.env.XUMM_API_KEY!, process.env.XUMM_API_SECRET);
 
 export const dynamic = "force-dynamic";
 
-// customer account
-// rLq5w4gmdN1y5DXU5Luhz5AKxfPH9N8gEp
-// sEdVRYNGnJvBUas3yaJg5aRhE34nDzc
+// ==== customer account ====
+// rDs197PK7NjGf66i1jj56VqtHQdwNtqUuA
+// snMej7bEHEfqcKUZTvoWsBD5TGeSH
 //
-// mangosqueezy account
-// rUyX9yvBbugCjWkTY3dXu7tGRQX7d7AyWa
-// sEdSbcBTeAWzrTMuTKoaVQPa6zWK7Q4
+// ==== mangosqueezy account ====
+// rNpAeUCbS4gYvkPUh6vb8xrQT2WgYTxmTR
+// spjbgrh8LCQFKcKDkPTgF6iwdU6p6
+//
+// ==== Business account ====
+// rwTBPv3uZc6Pja9QZFmZ1aNYZg2zMPHHzV
+// snXAbainhtFB9ceH76Wd8nMLK5Cgy
+//
+// ==== Affiliate account ====
+// rssgKvkHxR8h8QwTsm3dYUtT7UDwTmbwhM
+// shgepGnaDs2ffn3qmXj9UpnoTErnQ
 
 async function createXummPayment(
   controller: ReadableStreamDefaultController,
@@ -21,7 +29,7 @@ async function createXummPayment(
       {
         TransactionType: "Payment",
         Destination: process.env.MANGOSQUEEZY_WALLET_ADDRESS,
-        Amount: String(1000000), // one million drops, 1 XRP
+        Amount: String(20000000),
       },
       eventMessage => {
         if ("opened" in eventMessage.data) {
