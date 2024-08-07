@@ -16,6 +16,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { joinWaitListUser } from "./actions";
 import { HighlightHub } from "@/components/magicui/highlight-hub";
 import Faq from "@/components/mango-ui/faq";
+import Intercom from "@intercom/messenger-js-sdk";
 
 const FormSchema = z.object({
   email: z.string().min(1, {
@@ -44,6 +45,10 @@ export default function Index() {
       toast.error("Something went wrong please try again later");
     }
   }
+
+  Intercom({
+    app_id: "kby3tvbo",
+  });
 
   return (
     <>
