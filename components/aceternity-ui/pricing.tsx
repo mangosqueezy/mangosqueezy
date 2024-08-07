@@ -1,6 +1,8 @@
 import { CheckIcon } from "@heroicons/react/20/solid";
 import Meteors from "@/components/magicui/meteors";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { IconBrandYoutube } from "@tabler/icons-react";
 
 const includedFeatures = [
   "Instantly pay the affiliate commissions",
@@ -69,6 +71,15 @@ export default function Pricing() {
                     placeholder="Enter your email"
                   />
                   <Button type="submit">Notify me</Button>
+
+                  <Link
+                    href="https://youtu.be/o9rZcebHrls"
+                    target="_blank"
+                    className="flex justify-center items-center text-black font-bold text-sm"
+                  >
+                    <IconBrandYoutube className="size-5 mr-2 text-red-500 hover:animate-tilt" />
+                    Video demo
+                  </Link>
                 </form>
                 <p className="mt-6 text-xs leading-5 text-black">
                   Free while in beta. There will also be a freemium plan for all our users.
