@@ -52,11 +52,11 @@ const secondRow = reviews.slice(reviews.length / 2);
 
 export function HighlightHub() {
   return (
-    <div className="relative flex md:h-[500px] h-[300px] w-full flex-col items-center justify-center overflow-hidden rounded-lg bg-background">
+    <div className="relative flex h-[300px] md:h-[500px] w-full flex-col items-center justify-center overflow-hidden rounded-lg bg-background">
       <Marquee pauseOnHover className="[--duration:20s]">
         {firstRow.map(review => (
           <h1
-            className="font-display text-center text-4xl font-bold tracking-regular text-orange-500 md:text-7xl md:leading-[5rem]"
+            className="text-center text-4xl font-bold text-orange-500 md:text-7xl leading-7"
             key={review.username}
           >
             {review.name}
@@ -66,7 +66,7 @@ export function HighlightHub() {
       <Marquee reverse pauseOnHover className="[--duration:20s]">
         {secondRow.map(review => (
           <h1
-            className="font-display text-center text-4xl font-bold tracking-regular text-blue-500 md:text-7xl md:leading-[5rem]"
+            className="text-center text-4xl font-bold text-blue-500 md:text-7xl leading-7"
             key={review.username}
           >
             {review.name}
