@@ -14,6 +14,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { joinWaitListUser } from "./actions";
+import { HighlightHub } from "@/components/magicui/highlight-hub";
+import Faq from "@/components/mango-ui/faq";
 
 const FormSchema = z.object({
   email: z.string().min(1, {
@@ -127,7 +129,9 @@ export default function Index() {
         </div>
 
         <Feature />
+        <HighlightHub />
         <Pricing />
+        <Faq />
         <Footer />
       </div>
     </>

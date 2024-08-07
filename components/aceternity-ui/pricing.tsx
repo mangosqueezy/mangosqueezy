@@ -51,7 +51,11 @@ export default function Pricing() {
                     /month
                   </span>
                 </p>
-                <form className="mx-auto mt-10 flex max-w-md gap-x-4" action="/" method="POST">
+                <form
+                  className="mx-auto mt-10 flex max-w-md space-y-4 flex-col"
+                  action="/"
+                  method="POST"
+                >
                   <label htmlFor="email" className="sr-only">
                     Email address
                   </label>
