@@ -24,6 +24,7 @@ model Business {
   created_at                DateTime             @default(now())
   updated_at                DateTime             @updatedAt
   affiliate_hub_description String?
+  svix_consumer_app_id      String?
   products                  Products[]
   orders                    Orders[]
   affiliate_business        Affiliate_Business[]

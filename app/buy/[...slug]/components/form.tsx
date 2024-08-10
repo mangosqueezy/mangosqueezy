@@ -63,7 +63,9 @@ export default function BuyForm({ product, formattedAmount, affiliateId }: TBuyF
       eventSource.close();
     }
 
-    const newEventSource = new EventSource("https://www.mangosqueezy.com/api/xaman");
+    const newEventSource = new EventSource(
+      `https://www.mangosqueezy.com/api/xaman?amount=${product?.price.toString()}`
+    );
 
     newEventSource.onmessage = event => {
       const newMessage = event.data;
@@ -89,6 +91,7 @@ export default function BuyForm({ product, formattedAmount, affiliateId }: TBuyF
     formData.append("business_id", product?.business_id as string);
     formData.append("product_id", productId.toString());
     formData.append("affiliate_id", parsedAffiliateId.toString());
+    formData.append("amount", product?.price.toString() as string);
 
     const result = await createOrderAction(formData);
 

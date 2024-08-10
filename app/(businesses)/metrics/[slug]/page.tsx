@@ -2,6 +2,7 @@
 
 import { TrendingUp } from "lucide-react";
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
+import { useParams } from "next/navigation";
 
 import {
   Card,
@@ -17,6 +18,8 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { useCallback, useEffect } from "react";
+import { getAnalytics } from "../actions";
 
 const chartData = [
   { month: "January", desktop: 186 },
@@ -35,6 +38,19 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export default function Analytics() {
+  const params = useParams<{ slug: string }>();
+
+  const getLinkAnalytics = useCallback(async () => {
+    const formData = new FormData();
+    formData.append("linkId", params.slug);
+    const result = await getAnalytics(formData);
+    console.log("metrics result ==> ", result);
+  }, [params.slug]);
+
+  useEffect(() => {
+    getLinkAnalytics();
+  }, [params.slug, getLinkAnalytics]);
+
   return (
     <Card>
       <CardHeader>

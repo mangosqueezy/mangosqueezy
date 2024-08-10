@@ -1,4 +1,5 @@
 import { Xumm } from "xumm";
+import { xrpToDrops } from "@transia/xrpl";
 
 const xumm = new Xumm(process.env.XUMM_API_KEY!, process.env.XUMM_API_SECRET);
 
@@ -23,14 +24,16 @@ export const dynamic = "force-dynamic";
 
 async function createXummPayment(
   controller: ReadableStreamDefaultController,
-  encoder: TextEncoder
+  encoder: TextEncoder,
+  amount: string
 ) {
   try {
+    const amountInDrops = xrpToDrops(Number(amount));
     const { created, resolved }: any = await xumm.payload?.createAndSubscribe(
       {
         TransactionType: "Payment",
         Destination: process.env.MANGOSQUEEZY_WALLET_ADDRESS,
-        Amount: String(20000000),
+        Amount: String(amountInDrops),
       },
       eventMessage => {
         if ("opened" in eventMessage.data) {
@@ -56,12 +59,14 @@ async function createXummPayment(
 }
 
 export async function GET(request: Request) {
+  const url = new URL(request.url);
+  const amount = url.searchParams.get("amount") as string;
   const encoder = new TextEncoder();
 
   const customReadable = new ReadableStream({
     async start(controller) {
       try {
-        await createXummPayment(controller, encoder);
+        await createXummPayment(controller, encoder, amount);
       } catch (error) {
         console.error("Failed to create XUMM payment:", error);
         controller.error(error);

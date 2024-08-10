@@ -37,16 +37,19 @@ export default async function OrdersPage() {
             </TableHeader>
             <TableBody>
               {user &&
-                user?.affiliate_business.map((affiliate: Affiliate_Business, index: number) => (
-                  <TableRow key={`table-row-${index}`}>
-                    <TableCell className="font-medium">{affiliate.affiliate_link}</TableCell>
-                    <TableCell className="flex justify-end">
-                      <Button asChild>
-                        <Link href="/metrics/1234">View</Link>
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                user?.affiliate_business.map(
+                  (affiliate: Affiliate_Business, index: number) =>
+                    affiliate.affiliate_link && (
+                      <TableRow key={`table-row-${index}`}>
+                        <TableCell className="font-medium">{affiliate.affiliate_link}</TableCell>
+                        <TableCell className="flex justify-end">
+                          <Button asChild>
+                            <Link href={`/metrics/${affiliate.affiliate_link_key}`}>View</Link>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    )
+                )}
             </TableBody>
           </Table>
         </CardContent>

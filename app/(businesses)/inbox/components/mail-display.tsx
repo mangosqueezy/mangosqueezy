@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { experimental_useObject as useObject } from "ai/react";
 import { format } from "date-fns";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -25,6 +25,11 @@ import toast, { Toaster } from "react-hot-toast";
 import { CustomToast } from "@/components/mango-ui/custom-toast";
 import { EnvelopeIcon } from "@heroicons/react/20/solid";
 import { cn } from "@/lib/utils";
+
+export type TReplyMessage = {
+  id: string;
+  message: string;
+};
 
 export type TMessages = Messages & {
   replies: Messages[];
@@ -66,6 +71,8 @@ const MessageHeader = ({ mail }: { mail: Messages }) => (
 );
 
 const ReplyForm = ({
+  replyMessage,
+  setReplyMessage,
   recipientName,
   mail,
   products,
@@ -75,6 +82,8 @@ const ReplyForm = ({
   mail: TMessages | null;
   products: Array<Products> | undefined;
   businessId: string;
+  replyMessage: TReplyMessage;
+  setReplyMessage: (value: TReplyMessage) => void;
 }) => {
   const [value, setValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -87,6 +96,24 @@ const ReplyForm = ({
     schema: replySchema,
   });
 
+  useEffect(() => {
+    if (object?.email?.content) {
+      setReplyMessage({
+        id: mail?.id as string,
+        message: object.email.content,
+      });
+    }
+  }, [object?.email?.content, mail?.id, setReplyMessage]);
+
+  useEffect(() => {
+    if (mail?.id !== replyMessage.id) {
+      setReplyMessage({
+        id: "",
+        message: "",
+      });
+    }
+  }, [mail?.id, setReplyMessage, replyMessage.id]);
+
   const sendListner = useCallback(async () => {
     setIsLoading(true);
 
@@ -98,7 +125,7 @@ const ReplyForm = ({
           variant="error"
         />
       ));
-    } else if (!object?.email?.content) {
+    } else if (!replyMessage.message) {
       toast.custom(t => (
         <CustomToast t={t} message="Please enter the reply message." variant="error" />
       ));
@@ -113,7 +140,7 @@ const ReplyForm = ({
       formData.append("email", mail?.email ?? "");
       formData.append("name", parsedAffiliateName as string);
       formData.append("product-id", value);
-      formData.append("email-content", object?.email?.content as string);
+      formData.append("email-content", replyMessage.message as string);
       formData.append(
         "is-affiliate-link",
         object?.email?.affiliateLink ? object?.email?.affiliateLink.toString() : ""
@@ -150,7 +177,7 @@ const ReplyForm = ({
     }
 
     setIsLoading(false);
-  }, [object?.email?.content, object?.email?.affiliateLink, value, businessId, mail]);
+  }, [replyMessage, object?.email?.affiliateLink, value, businessId, mail]);
 
   return (
     <div className="p-4">
@@ -158,7 +185,13 @@ const ReplyForm = ({
         <Textarea
           className="p-4 h-52"
           placeholder={`Reply ${recipientName}...`}
-          value={object?.email?.content}
+          onChange={e =>
+            setReplyMessage({
+              id: mail?.id as string,
+              message: e.target.value,
+            })
+          }
+          value={replyMessage.message}
         />
         <div className="flex items-center">
           {products && products?.length > 0 ? (
@@ -237,6 +270,11 @@ const MessageDisplay = ({ mail }: { mail: Messages }) => (
 );
 
 export function MailDisplay({ mail, products, businessId }: MailDisplayProps) {
+  const [replyMessage, setReplyMessage] = useState<TReplyMessage>({
+    id: "",
+    message: "",
+  });
+
   if (!mail) {
     return <div className="p-8 text-center text-muted-foreground">No message selected</div>;
   }
@@ -253,6 +291,8 @@ export function MailDisplay({ mail, products, businessId }: MailDisplayProps) {
             mail={mail}
             products={products}
             businessId={businessId}
+            replyMessage={replyMessage}
+            setReplyMessage={setReplyMessage}
           />
         )}
         {mail.replies.map((replyMail, index) => (
@@ -264,6 +304,8 @@ export function MailDisplay({ mail, products, businessId }: MailDisplayProps) {
                 mail={mail}
                 products={products}
                 businessId={businessId}
+                replyMessage={replyMessage}
+                setReplyMessage={setReplyMessage}
               />
             )}
           </div>

@@ -10,6 +10,7 @@ import { ChatOpenAI } from "@langchain/openai";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { z } from "zod";
 import { OAuth2Client } from "google-auth-library";
+import { revalidatePath } from "next/cache";
 
 const nudgeSchema = z.object({
   nudge: z.string(),
@@ -85,6 +86,8 @@ export async function sendEmail(formData: FormData) {
     business_id: businessId,
     parent_id: parentId,
   });
+
+  revalidatePath("/inbox");
 
   return { data, error };
 }
@@ -178,6 +181,8 @@ export async function sendNudge(formData: FormData) {
     business_id: businessId,
     parent_id: parentId,
   });
+
+  revalidatePath("/inbox");
 
   return { nudgeResult };
 }

@@ -1,24 +1,8 @@
-"use client";
-import { useEffect, useState } from "react";
-import { AppPortal } from "svix-react";
+import { getUser } from "../actions";
+import SvixAppPortalEmbed from "./app-portal";
 
-import "svix-react/style.css";
+export default async function SvixEmbed() {
+  const user = await getUser();
 
-export default function SvixEmbed() {
-  const [appPortal, setAppPortal] = useState<string>();
-
-  async function getAppPortalUrl() {
-    const response = await fetch(`https://www.mangosqueezy.com/api/svix-portal`, {
-      method: "POST",
-    });
-    const result = await response.json();
-
-    setAppPortal(result.url);
-  }
-
-  useEffect(() => {
-    getAppPortalUrl();
-  }, []);
-
-  return <AppPortal fullSize url={appPortal} />;
+  return <SvixAppPortalEmbed svix_consumer_app_id={user?.svix_consumer_app_id} />;
 }
