@@ -5,6 +5,7 @@ import { Loader } from "lucide-react";
 import { cn } from "@/lib/utils";
 import toast, { Toaster } from "react-hot-toast";
 import { CustomToast } from "@/components/mango-ui/custom-toast";
+import { useAffiliate } from "../../use-affiliate";
 
 type TSend = {
   extractedDescription: {
@@ -19,10 +20,12 @@ type TSend = {
 
 export function Send({ extractedDescription, profile, videoId, businessId, channelId }: TSend) {
   const [isLoading, setIsLoading] = React.useState(false);
+  const [affiliateEmail, setAffiliateEmail] = React.useState(extractedDescription?.email);
+  const [affiliate] = useAffiliate();
 
   const sendMessage = async () => {
     setIsLoading(true);
-    const email = extractedDescription?.email;
+    const email = affiliateEmail;
 
     const formData = new FormData();
     let result;
@@ -66,6 +69,19 @@ export function Send({ extractedDescription, profile, videoId, businessId, chann
     }
   };
 
+  React.useEffect(() => {
+    const foundEmailId = affiliate.find(
+      affiliate => affiliate.metadata.social_media_profiles.youtube === channelId
+    );
+    if (foundEmailId) {
+      if (extractedDescription?.email) {
+        setAffiliateEmail(extractedDescription.email);
+      } else {
+        setAffiliateEmail(foundEmailId.metadata.email);
+      }
+    }
+  }, [affiliate, channelId, extractedDescription]);
+
   return (
     <>
       <Toaster position="top-right" />
@@ -84,7 +100,7 @@ export function Send({ extractedDescription, profile, videoId, businessId, chann
         ) : (
           <EnvelopeIcon className="-ml-0.5 h-5 w-5 text-gray-400" aria-hidden="true" />
         )}
-        {extractedDescription?.email ? "Email" : "Nudge"}
+        {affiliateEmail ? "Email" : "Nudge"}
       </button>
     </>
   );

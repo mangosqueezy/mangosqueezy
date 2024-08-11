@@ -48,7 +48,7 @@ export default async function SingleAffiliatePage({ params }: { params: { slug: 
 
   const videoParameters = {
     part: "snippet,contentDetails,statistics",
-    id: youtuberWithVideoId.id.videoId,
+    id: youtuberWithVideoId?.id?.videoId,
     key: process.env.NEXT_PUBLIC_YOUTUBE_API_KEY!,
   };
   const videoQueryParameter = new URLSearchParams(videoParameters);

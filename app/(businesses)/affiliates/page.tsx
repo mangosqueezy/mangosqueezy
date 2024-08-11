@@ -6,15 +6,19 @@ import Image from "next/image";
 import Link from "next/link";
 import { BusinessContext } from "../providers";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Database } from "lucide-react";
+import { Database, Loader } from "lucide-react";
 import { IconBrandYoutube } from "@tabler/icons-react";
 import { useJune } from "@/hooks/useJune";
 import { getUser } from "../actions";
+import defaultImage from "../../../public/mangosqueezy-primary-logo.svg";
+import { useAffiliate } from "./use-affiliate";
 
 export default function AffiliatePage() {
+  const [_, setAffiliate] = useAffiliate();
   const context = useContext(BusinessContext);
   const { youtuberList, setYoutuberList, mangoSqueezyList, setMangosqueezyList } = context;
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [isMangosqueezyLoading, setIsMangosqueezyLoading] = useState<boolean>(false);
   const analytics = useJune(process.env.NEXT_PUBLIC_JUNE_API_KEY!);
 
   const trackAffiliate = useCallback(
@@ -31,6 +35,7 @@ export default function AffiliatePage() {
   );
 
   const callAffiliatesBySearchQuery = async () => {
+    setIsMangosqueezyLoading(true);
     const formData = new FormData();
     formData.append("search-query", searchQuery);
 
@@ -40,7 +45,9 @@ export default function AffiliatePage() {
     });
     const result = await response.json();
 
+    setAffiliate(result);
     setMangosqueezyList(result);
+    setIsMangosqueezyLoading(false);
   };
 
   const searchYoutuberAPI = async () => {
@@ -86,7 +93,11 @@ export default function AffiliatePage() {
           </TabsTrigger>
           <TabsTrigger value="mangosqueezy" className="group">
             Mangosqueezy Affiliates
-            <Database className="ml-2 size-5 text-blue-500 group-hover:animate-tilt" />
+            {isMangosqueezyLoading ? (
+              <Loader className="size-5 ml-2 text-blue-500 animate-spin" />
+            ) : (
+              <Database className="ml-2 size-5 text-blue-500 group-hover:animate-tilt" />
+            )}
           </TabsTrigger>
         </TabsList>
         <TabsContent value="youtube">
@@ -121,7 +132,7 @@ export default function AffiliatePage() {
 
         <TabsContent value="mangosqueezy">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-7xl mx-auto mt-10">
-            {mangoSqueezyList &&
+            {mangoSqueezyList && mangoSqueezyList.length > 0 ? (
               mangoSqueezyList.map((mangosqueezy, index) => (
                 <div
                   key={`${mangosqueezy.metadata.email}-${index}`}
@@ -131,26 +142,31 @@ export default function AffiliatePage() {
                     <Image
                       className="w-full h-auto flex-none rounded-xl bg-gray-50"
                       src={
-                        mangosqueezy.metadata.metadata?.ytChannelStats[0]?.snippet.thumbnails.high
-                          .url
+                        mangosqueezy?.metadata?.metadata?.ytChannelStats
+                          ? mangosqueezy?.metadata?.metadata?.ytChannelStats[0]?.snippet.thumbnails
+                              .high.url
+                          : defaultImage
                       }
                       width={200}
                       height={200}
                       alt=""
                     />
                     <Link
-                      href={`/affiliates/${mangosqueezy.metadata.social_media_profiles.youtube}`}
+                      href={`/affiliates/${mangosqueezy?.metadata?.social_media_profiles?.youtube}`}
                     >
                       <div className="font-sans font-bold text-neutral-600 dark:text-neutral-200 mb-2 mt-2">
-                        {mangosqueezy.metadata.first_name}
+                        {mangosqueezy.metadata?.first_name}
                       </div>
                       <div className="font-sans font-normal text-neutral-600 text-sm dark:text-neutral-300">
-                        {mangosqueezy.metadata.description}
+                        {mangosqueezy.metadata?.description}
                       </div>
                     </Link>
                   </div>
                 </div>
-              ))}
+              ))
+            ) : (
+              <div className="font-bold text-md">No results found</div>
+            )}
           </div>
         </TabsContent>
       </Tabs>

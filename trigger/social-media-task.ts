@@ -9,18 +9,18 @@ export const socialMediaTask = task({
 
     const { ytChannelHandle, igChannelHandle } = payload;
     let ytChannelStats = {};
+    let ytChannelId = "";
 
     if (ytChannelHandle) {
       logger.log("running yt metrics collector...", { ytChannelHandle });
       const parameters = {
-        part: "snippet",
+        part: "statistics,snippet,topicDetails,status,brandingSettings,contentDetails",
         key: process.env.NEXT_PUBLIC_YOUTUBE_API_KEY!,
-        type: "channel,video,playlist",
-        channelId: ytChannelHandle,
+        forHandle: ytChannelHandle,
       };
       const queryParameter = new URLSearchParams(parameters);
       const response = await fetch(
-        `https://youtube.googleapis.com/youtube/v3/search?${queryParameter.toString()}`,
+        `https://youtube.googleapis.com/youtube/v3/channels?${queryParameter.toString()}`,
         {
           method: "GET",
         }
@@ -28,6 +28,8 @@ export const socialMediaTask = task({
 
       const result = await response.json();
       ytChannelStats = result.items;
+
+      ytChannelId = result.items[0].id;
 
       logger.log("yt metrics collector output is ...", { ytChannelStats });
     }
@@ -57,6 +59,7 @@ export const socialMediaTask = task({
     }
 
     return {
+      ytChannelId,
       ytChannelStats,
       igChannelStats,
     };
@@ -69,12 +72,28 @@ export const socialMediaTask = task({
       output,
     });
 
+    const affiliatProfileInfo = await prisma.affiliates.findUnique({
+      where: {
+        id: affiliatorId,
+      },
+    });
+
+    let socialMediaProfiles = affiliatProfileInfo?.social_media_profiles;
+
+    if (output?.ytChannelId) {
+      socialMediaProfiles = {
+        ...(affiliatProfileInfo?.social_media_profiles as Prisma.JsonObject),
+        youtube: output?.ytChannelId,
+      };
+    }
+
     await prisma.affiliates.update({
       where: {
         id: affiliatorId,
       },
       data: {
         metadata: output as Prisma.JsonObject,
+        social_media_profiles: socialMediaProfiles as Prisma.JsonObject,
       },
     });
   },

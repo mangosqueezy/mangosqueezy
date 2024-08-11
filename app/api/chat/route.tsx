@@ -5,20 +5,21 @@ import { chatSchema } from "./schema";
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
 
+type TChat = {
+  chat: string;
+  profile: any;
+  video: any;
+  webpagesData: any;
+};
+
 export async function POST(req: Request) {
   try {
-    const {
-      chat,
-      profile,
-      video,
-      webpagesData,
-    }: { chat: string; profile: any; video: any; webpagesData: any; messages: any } =
-      await req.json();
+    const { chat, profile, video, webpagesData }: TChat = await req.json();
 
     const result = await streamObject({
       model: openai("gpt-4o-mini"),
       schema: chatSchema,
-      system: `As a research assistant, assist the user by answering their questions.
+      system: `As a affiliate research assistant, assist the user by answering their questions.
 
       Output should be in the following format in text and not in markdown.
 
