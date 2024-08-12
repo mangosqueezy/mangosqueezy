@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/form";
 import Image from "next/image";
 import type { Products } from "@prisma/client";
-import { createOrderAction } from "../actions";
+import { createOrderAction, navigate } from "../actions";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
@@ -48,6 +48,7 @@ type TBuyForm = {
 
 export default function BuyForm({ product, formattedAmount, affiliateId }: TBuyForm) {
   const [isXRPButtonLoading, setIsXRPButtonLoading] = useState(false);
+  const [isMoonpayButtonLoading, setIsMoonpayButtonLoading] = useState(false);
   const [messages, setMessages] = useState<Array<string>>([]);
   const [eventSource, setEventSource] = useState<EventSource | null>(null);
   const [open, setOpen] = useState(true);
@@ -116,13 +117,23 @@ export default function BuyForm({ product, formattedAmount, affiliateId }: TBuyF
   }, [messages, createOrderHandler, eventSource]);
 
   const callMoonpay = async (email: string, amount: string) => {
+    setIsMoonpayButtonLoading(true);
     const formData = new FormData();
     formData.append("email", email);
     formData.append("amount", amount);
-    await fetch("https://www.mangosqueezy.com/api/moonpay", {
+    formData.append("amount", product?.price.toString() as string);
+    const response = await fetch("https://www.mangosqueezy.com/api/moonpay", {
       method: "POST",
       body: formData,
     });
+
+    const url = await response.json();
+
+    if (url) {
+      const navigatForm = new FormData();
+      navigatForm.append("url", url);
+      navigate(navigatForm);
+    }
   };
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
@@ -239,9 +250,14 @@ export default function BuyForm({ product, formattedAmount, affiliateId }: TBuyF
                       type="submit"
                       onClick={() => form.setValue("action-type", "moonpay")}
                       color="purple"
-                      className="w-full px-4 py-3 cursor-pointer"
+                      className={cn(
+                        "w-full px-4 py-3 cursor-pointer",
+                        isMoonpayButtonLoading && "cursor-not-allowed"
+                      )}
+                      disabled={isMoonpayButtonLoading}
                     >
                       Moonpay
+                      {isMoonpayButtonLoading && <Loader className="animate-spin" />}
                     </Button>
                   </div>
                 </div>

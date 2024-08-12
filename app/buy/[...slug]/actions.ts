@@ -3,6 +3,7 @@
 import { getAffiliateBusinessInfoById } from "@/models/affiliate_business";
 import { createOrder } from "@/models/orders";
 import { payoutTask } from "@/trigger/payout-job";
+import { redirect } from "next/navigation";
 import { Svix } from "svix";
 
 const SVIX_API_KEY = process.env.SVIX_API_KEY;
@@ -49,4 +50,9 @@ export async function createOrderAction(formData: FormData) {
   }
 
   return "success";
+}
+
+export async function navigate(data: FormData) {
+  const url = data.get("url") as string;
+  redirect(url);
 }

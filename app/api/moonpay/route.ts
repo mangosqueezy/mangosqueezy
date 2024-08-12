@@ -1,5 +1,4 @@
 import { MoonPay } from "@moonpay/moonpay-node";
-import { NextResponse } from "next/server";
 
 const moonPay = new MoonPay(process.env.MOONPAY_SK!);
 
@@ -26,5 +25,5 @@ export async function POST(request: Request) {
 
   const url = moonPay.url.generate({ flow: "buy", params });
 
-  return NextResponse.redirect(url);
+  return Response.json(url);
 }

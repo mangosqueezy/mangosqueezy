@@ -10,7 +10,7 @@
     "trigger-dev": "pnpm dlx trigger.dev@beta dev",
     "commit": "cz",
     "check-secrets": "docker run --rm -v $(pwd):/path zricethezav/gitleaks:latest protect --source='/path' --config='/path/gitleaks.toml' --staged --no-banner -v",
-    "deploy:trigger-prod": "pnpm dlx trigger.dev@3.0.0-beta.34 deploy",
+    "deploy:trigger-prod": "pnpm dlx trigger.dev@beta deploy",
     "prepare": "husky",
     "postinstall": "prisma generate"
   },
