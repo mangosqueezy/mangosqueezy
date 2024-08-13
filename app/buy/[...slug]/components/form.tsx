@@ -48,7 +48,7 @@ type TBuyForm = {
 
 export default function BuyForm({ product, formattedAmount, affiliateId }: TBuyForm) {
   const [isXRPButtonLoading, setIsXRPButtonLoading] = useState(false);
-  const [isMoonpayButtonLoading, setIsMoonpayButtonLoading] = useState(false);
+  const [isPayButtonLoading, setIsPayButtonLoading] = useState(false);
   const [messages, setMessages] = useState<Array<string>>([]);
   const [eventSource, setEventSource] = useState<EventSource | null>(null);
   const [open, setOpen] = useState(true);
@@ -116,23 +116,49 @@ export default function BuyForm({ product, formattedAmount, affiliateId }: TBuyF
     }
   }, [messages, createOrderHandler, eventSource]);
 
-  const callMoonpay = async (email: string, amount: string) => {
-    setIsMoonpayButtonLoading(true);
-    const formData = new FormData();
-    formData.append("email", email);
-    formData.append("amount", amount);
-    formData.append("amount", product?.price.toString() as string);
-    const response = await fetch("https://www.mangosqueezy.com/api/moonpay", {
-      method: "POST",
-      body: formData,
-    });
+  const callPay = async (email: string, amount: string) => {
+    setIsPayButtonLoading(true);
+    const parsedAmount = parseFloat(amount);
+    if (parsedAmount > 30) {
+      const formData = new FormData();
+      formData.append("email", email);
+      formData.append("amount", product?.price.toString() as string);
+      const response = await fetch("https://www.mangosqueezy.com/api/moonpay", {
+        method: "POST",
+        body: formData,
+      });
 
-    const url = await response.json();
+      const url = await response.json();
 
-    if (url) {
-      const navigatForm = new FormData();
-      navigatForm.append("url", url);
-      navigate(navigatForm);
+      if (url) {
+        const navigatForm = new FormData();
+        navigatForm.append("url", url);
+        navigate(navigatForm);
+      }
+    } else {
+      const productId = product?.id ?? "";
+      const parsedAffiliateId = affiliateId ?? "";
+
+      const formData = new FormData();
+      formData.append("product_name", product?.name as string);
+      formData.append("amount", product?.price.toString() as string);
+      formData.append("email", form.getValues("email"));
+      formData.append("business_id", product?.business_id as string);
+      formData.append("product_id", productId.toString());
+      formData.append("affiliate_id", parsedAffiliateId.toString());
+
+      const response = await fetch("https://www.mangosqueezy.com/api/stripe", {
+        method: "POST",
+        body: formData,
+      });
+
+      const url = await response.json();
+
+      if (url) {
+        const navigatForm = new FormData();
+        navigatForm.append("url", url);
+        navigate(navigatForm);
+      }
     }
   };
 
@@ -140,7 +166,7 @@ export default function BuyForm({ product, formattedAmount, affiliateId }: TBuyF
     const actionType = form.getValues("action-type");
 
     if (actionType === "moonpay") {
-      await callMoonpay(form.getValues("email"), formattedAmount);
+      await callPay(form.getValues("email"), formattedAmount);
     } else if (actionType === "xrp") {
       startStreaming();
     }
@@ -252,12 +278,12 @@ export default function BuyForm({ product, formattedAmount, affiliateId }: TBuyF
                       color="purple"
                       className={cn(
                         "w-full px-4 py-3 cursor-pointer",
-                        isMoonpayButtonLoading && "cursor-not-allowed"
+                        isPayButtonLoading && "cursor-not-allowed"
                       )}
-                      disabled={isMoonpayButtonLoading}
+                      disabled={isPayButtonLoading}
                     >
-                      Moonpay
-                      {isMoonpayButtonLoading && <Loader className="animate-spin" />}
+                      Pay
+                      {isPayButtonLoading && <Loader className="animate-spin" />}
                     </Button>
                   </div>
                 </div>
