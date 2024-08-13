@@ -24,3 +24,14 @@ export async function createOrder({
     console.error(err);
   }
 }
+
+export async function updateOrdersById(id: string, status: string) {
+  return prisma.orders.update({
+    where: {
+      id,
+    },
+    data: {
+      status,
+    },
+  });
+}
