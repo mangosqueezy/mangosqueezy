@@ -24,18 +24,18 @@ export async function POST(request: Request) {
       });
     }
 
-    if (event.type === "checkout.session.completed") {
-      const stripeEventResult: any = event.data.object;
-      const customer_email = stripeEventResult.customerEmail;
-      const business_id = stripeEventResult.businessId;
-      const affiliate_id = stripeEventResult.affiliateId;
-      const product_id = stripeEventResult.productId;
-      const amount = stripeEventResult.amount;
+    if (event.type === "invoice.payment_succeeded") {
+      const stripeEventResult: Stripe.Invoice = event.data.object;
+      const customer_email = stripeEventResult?.metadata?.customerEmail;
+      const business_id = stripeEventResult?.metadata?.businessId;
+      const affiliate_id = stripeEventResult?.metadata?.affiliateId;
+      const product_id = stripeEventResult?.metadata?.productId;
+      const amount = stripeEventResult?.metadata?.amount;
 
       if (!isEmpty(customer_email)) {
         await resend.emails.send({
           from: "amit@tapasom.com",
-          to: customer_email,
+          to: customer_email!,
           subject: `Payment Confirmation`,
           html: `
             <div class="container">
@@ -52,10 +52,10 @@ export async function POST(request: Request) {
       }
 
       const formData = new FormData();
-      formData.append("email", customer_email);
+      formData.append("email", customer_email as string);
       formData.append("business_id", business_id as string);
-      formData.append("product_id", product_id.toString());
-      formData.append("affiliate_id", affiliate_id.toString());
+      formData.append("product_id", product_id!.toString());
+      formData.append("affiliate_id", affiliate_id!.toString());
       formData.append("amount", amount as string);
 
       await createOrderAction(formData);

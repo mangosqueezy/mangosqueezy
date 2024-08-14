@@ -30,15 +30,17 @@ export async function POST(request: Request) {
     automatic_tax: {
       enabled: true,
     },
-    metadata: {
-      customerEmail: email,
-      businessId,
-      affiliateId,
-      productId,
-      amount,
-    },
     invoice_creation: {
       enabled: true,
+      invoice_data: {
+        metadata: {
+          customerEmail: email,
+          businessId,
+          affiliateId,
+          productId,
+          amount,
+        },
+      },
     },
     allow_promotion_codes: true,
     mode: "payment",
