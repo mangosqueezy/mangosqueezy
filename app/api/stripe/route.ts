@@ -19,13 +19,17 @@ export async function POST(request: Request) {
     },
   });
 
-  const paymentLink = await stripe.paymentLinks.create({
+  const session = await stripe.checkout.sessions.create({
+    customer_email: email,
     line_items: [
       {
         price: price.id,
         quantity: 1,
       },
     ],
+    automatic_tax: {
+      enabled: true,
+    },
     metadata: {
       customerEmail: email,
       businessId,
@@ -33,7 +37,14 @@ export async function POST(request: Request) {
       productId,
       amount,
     },
+    invoice_creation: {
+      enabled: true,
+    },
+    allow_promotion_codes: true,
+    mode: "payment",
+    success_url: "https://mangosqueezy.com/success",
+    cancel_url: "https://mangosqueezy.com/error",
   });
 
-  return Response.json(paymentLink.url);
+  return Response.json(session.url);
 }
