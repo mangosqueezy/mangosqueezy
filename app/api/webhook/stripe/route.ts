@@ -24,7 +24,7 @@ export async function POST(request: Request) {
       });
     }
 
-    if (event.type === "invoice.payment_succeeded") {
+    if (event.type === "checkout.session.async_payment_succeeded") {
       const stripeEventResult: any = event.data.object;
       const customer_email = stripeEventResult.customerEmail;
       const business_id = stripeEventResult.businessId;
