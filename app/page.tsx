@@ -96,7 +96,7 @@ export default function Index() {
               Crypto affiliate{" "}
               <Highlight className="text-black dark:text-white">marketing tool</Highlight>
               <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-300">
-                {`A tool that takes care of all your influencer marketing needs for your business.`}
+                {`A tool that takes care of all your affiliate marketing needs for your business.`}
               </p>
             </motion.h1>
 
