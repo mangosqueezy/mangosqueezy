@@ -12,9 +12,11 @@ export default function SvixAppPortalEmbed({ svix_consumer_app_id }: TSvixAppPor
   const [appPortal, setAppPortal] = useState<string>();
 
   const getAppPortalUrl = useCallback(async () => {
+    const formData = new FormData();
+    formData.append("svix_consumer_app_id", svix_consumer_app_id!);
     const response = await fetch(`https://www.mangosqueezy.com/api/svix-portal`, {
       method: "POST",
-      body: JSON.stringify({ svix_consumer_app_id }),
+      body: formData,
     });
     const result = await response.json();
 
@@ -22,8 +24,10 @@ export default function SvixAppPortalEmbed({ svix_consumer_app_id }: TSvixAppPor
   }, [svix_consumer_app_id]);
 
   useEffect(() => {
-    getAppPortalUrl();
-  }, [getAppPortalUrl]);
+    if (svix_consumer_app_id) {
+      getAppPortalUrl();
+    }
+  }, [getAppPortalUrl, svix_consumer_app_id]);
 
   return <AppPortal fullSize url={appPortal} />;
 }
