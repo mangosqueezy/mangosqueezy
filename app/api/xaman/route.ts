@@ -1,5 +1,5 @@
-import { Xumm } from "xumm";
 import { xrpToDrops } from "@transia/xrpl";
+import { Xumm } from "xumm";
 
 const xumm = new Xumm(process.env.XUMM_API_KEY!, process.env.XUMM_API_SECRET);
 
@@ -23,68 +23,90 @@ export const dynamic = "force-dynamic";
 // shgepGnaDs2ffn3qmXj9UpnoTErnQ
 
 async function createXummPayment(
-  controller: ReadableStreamDefaultController,
-  encoder: TextEncoder,
-  amount: string
+	controller: ReadableStreamDefaultController,
+	encoder: TextEncoder,
+	amount: string,
 ) {
-  try {
-    const amountInDrops = xrpToDrops(Number(amount));
-    const { created, resolved }: any = await xumm.payload?.createAndSubscribe(
-      {
-        TransactionType: "Payment",
-        Destination: process.env.MANGOSQUEEZY_WALLET_ADDRESS,
-        Amount: String(amountInDrops),
-      },
-      eventMessage => {
-        if ("opened" in eventMessage.data) {
-          console.log("Payload opened");
-        }
-        if ("signed" in eventMessage.data) {
-          return eventMessage;
-        }
-      }
-    );
+	try {
+		const amountInDrops = xrpToDrops(Number(amount));
 
-    controller.enqueue(encoder.encode(`data: ${created.next.always}\n\n`));
-    controller.enqueue(encoder.encode(`data: ${created.refs.qr_png}\n\n`));
+		// biome-ignore lint: do not have export type for submitAndWait
+		const { created, resolved }: any = await xumm.payload?.createAndSubscribe(
+			{
+				TransactionType: "Payment",
+				Destination: process.env.MANGOSQUEEZY_WALLET_ADDRESS,
+				Amount: String(amountInDrops),
+			},
+			(eventMessage) => {
+				if ("opened" in eventMessage.data) {
+					console.log("Payload opened");
+				}
+				if ("signed" in eventMessage.data) {
+					return eventMessage;
+				}
+			},
+		);
 
-    const result = await resolved;
-    controller.enqueue(encoder.encode(`data: ${result.payload.response.dispatched_result}\n\n`));
+		controller.enqueue(encoder.encode(`data: ${created.next.always}\n\n`));
+		controller.enqueue(encoder.encode(`data: ${created.refs.qr_png}\n\n`));
 
-    return result;
-  } catch (error) {
-    console.error("Error creating XUMM payment:", error);
-    throw error;
-  }
+		const result = await resolved;
+		controller.enqueue(
+			encoder.encode(`data: ${result.payload.response.dispatched_result}\n\n`),
+		);
+
+		return result;
+	} catch (error) {
+		console.error("Error creating XUMM payment:", error);
+		throw error;
+	}
 }
 
 export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const amount = url.searchParams.get("amount") as string;
-  const encoder = new TextEncoder();
+	const url = new URL(request.url);
+	const amount = url.searchParams.get("amount") as string;
+	const encoder = new TextEncoder();
 
-  const customReadable = new ReadableStream({
-    async start(controller) {
-      try {
-        await createXummPayment(controller, encoder, amount);
-      } catch (error) {
-        console.error("Failed to create XUMM payment:", error);
-        controller.error(error);
-        return;
-      }
+	const options = {
+		method: "GET",
+		headers: {
+			accept: "application/json",
+			"Content-Type": "application/json",
+			"X-API-Key": process.env.XUMM_API_KEY!,
+			"X-API-Secret": process.env.XUMM_API_SECRET!,
+		},
+	};
 
-      request.signal.addEventListener("abort", () => {
-        controller.close();
-      });
-    },
-  });
+	const ratesResponse = await fetch(
+		"https://xumm.app/api/v1/platform/rates/USD",
+		options,
+	);
+	const rates = await ratesResponse.json();
 
-  return new Response(customReadable, {
-    headers: {
-      Connection: "keep-alive",
-      "Content-Encoding": "none",
-      "Cache-Control": "no-cache, no-transform",
-      "Content-Type": "text/event-stream; charset=utf-8",
-    },
-  });
+	const parsedAmount = Number.parseFloat(amount) / Number.parseFloat(rates.XAH);
+
+	const customReadable = new ReadableStream({
+		async start(controller) {
+			try {
+				await createXummPayment(controller, encoder, parsedAmount.toString());
+			} catch (error) {
+				console.error("Failed to create XUMM payment:", error);
+				controller.error(error);
+				return;
+			}
+
+			request.signal.addEventListener("abort", () => {
+				controller.close();
+			});
+		},
+	});
+
+	return new Response(customReadable, {
+		headers: {
+			Connection: "keep-alive",
+			"Content-Encoding": "none",
+			"Cache-Control": "no-cache, no-transform",
+			"Content-Type": "text/event-stream; charset=utf-8",
+		},
+	});
 }
