@@ -18,7 +18,7 @@ import { createPostAction } from "./actions";
 
 type TNotesProps = {
 	products: Array<Products> | null | undefined;
-	business_id: string;
+	business_id: string | null | undefined;
 };
 
 export default function Notes({ products, business_id }: TNotesProps) {
@@ -31,7 +31,7 @@ export default function Notes({ products, business_id }: TNotesProps) {
 		const result = await createPostAction(
 			product?.id!,
 			description,
-			business_id,
+			business_id!,
 		);
 		if (result?.id) {
 			toast.custom((t) => (
