@@ -29,6 +29,7 @@ model Business {
   orders                    Orders[]
   affiliate_business        Affiliate_Business[]
   messages                  Messages[]
+  posts                     Posts[]
 
   @@schema("public")
 }
@@ -128,6 +129,20 @@ model Products {
   Business    Business? @relation(fields: [business_id], references: [id])
   business_id String?   @db.Uuid
   orders      Orders[]
+  Posts       Posts[]
+
+  @@schema("public")
+}
+
+model Posts {
+  id      Int     @id @default(autoincrement())
+  content String?
+  remark  String?
+
+  Business    Business? @relation(fields: [business_id], references: [id])
+  business_id String?   @db.Uuid
+  Products    Products? @relation(fields: [product_id], references: [id])
+  product_id  Int?
 
   @@schema("public")
 }
