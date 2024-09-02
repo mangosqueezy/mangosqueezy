@@ -1,6 +1,7 @@
 "use client";
 
 import { CustomToast } from "@/components/mango-ui/custom-toast";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { classNames } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import {
@@ -49,6 +50,16 @@ export default function Notes({ products, business_id }: TNotesProps) {
 	return (
 		<>
 			<Toaster position="top-right" />
+
+			{!products && (
+				<div className="flex items-center justify-center h-96">
+					<Alert>
+						<AlertTitle>Heads up!</AlertTitle>
+						<AlertDescription>Add a product to create a note.</AlertDescription>
+					</Alert>
+				</div>
+			)}
+
 			<div className="relative">
 				<div className="overflow-hidden rounded-lg border border-gray-300 shadow-sm focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500">
 					<label htmlFor="description" className="sr-only">
