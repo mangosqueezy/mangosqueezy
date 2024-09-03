@@ -9,6 +9,14 @@ datasource db {
   schemas  = ["public"]
 }
 
+enum PaymentPreference {
+  FullCrypto
+  HalfCryptoHalfFiat
+  FullFiat
+
+  @@schema("public")
+}
+
 model Business {
   id                        String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   first_name                String?
@@ -25,11 +33,13 @@ model Business {
   updated_at                DateTime             @updatedAt
   affiliate_hub_description String?
   svix_consumer_app_id      String?
+  payment_preference        PaymentPreference    @default(FullCrypto)
   products                  Products[]
   orders                    Orders[]
   affiliate_business        Affiliate_Business[]
   messages                  Messages[]
   posts                     Posts[]
+  pending_payments          Pending_Payments[]
 
   @@schema("public")
 }
@@ -152,5 +162,23 @@ model Waitlist {
   email      String   @unique
   created_at DateTime @default(now())
 
+  @@schema("public")
+}
+
+model Pending_Payments {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  business_id   String    @db.Uuid
+  product_id    Int
+  full_amount   Decimal?  @db.Decimal(10, 2)
+  fiat_amount   Decimal?  @db.Decimal(10, 2)
+  crypto_amount Decimal?  @db.Decimal(10, 2)
+  payout_date   DateTime? @db.Date
+  status        String    @default("Pending")
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+
+  business Business @relation(fields: [business_id], references: [id])
+
+  @@map("pending_payments")
   @@schema("public")
 }

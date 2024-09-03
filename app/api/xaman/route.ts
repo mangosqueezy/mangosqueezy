@@ -83,7 +83,7 @@ export async function GET(request: Request) {
 	);
 	const rates = await ratesResponse.json();
 
-	const parsedAmount = Number.parseFloat(amount) / Number.parseFloat(rates.XAH);
+	const parsedAmount = Number.parseFloat(amount) / Number.parseFloat(rates.XRP);
 
 	const customReadable = new ReadableStream({
 		async start(controller) {
