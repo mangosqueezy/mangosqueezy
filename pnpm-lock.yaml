@@ -132,8 +132,8 @@ importers:
         specifier: 2.7.3-alpha.28
         version: 2.7.3-alpha.28(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@trigger.dev/sdk':
-        specifier: 3.0.0-beta.52
-        version: 3.0.0-beta.52(bufferutil@4.0.8)(typescript@5.5.4)(utf-8-validate@5.0.10)
+        specifier: 3.0.0-beta.56
+        version: 3.0.0-beta.56(bufferutil@4.0.8)(typescript@5.5.4)(utf-8-validate@5.0.10)
       '@upstash/redis':
         specifier: ^1.34.0
         version: 1.34.0
@@ -1235,8 +1235,8 @@ packages:
     resolution: {integrity: sha512-0ZcCVQxifZmhwNBoQIrystCb+2sWBY2Zw8lpfJBPCHGCA/HWqehITeCRVIv4VMy8MPlaHo2w2pTHFV2pFfqKPw==}
     engines: {node: '>=18'}
 
-  '@mswjs/interceptors@0.29.1':
-    resolution: {integrity: sha512-3rDakgJZ77+RiQUuSK69t1F0m8BQKA8Vh5DCS5V0DWvNY67zob2JhhQrhCO0AKLGINTRSFd1tBaHcJTkhefoSw==}
+  '@mswjs/interceptors@0.25.16':
+    resolution: {integrity: sha512-8QC8JyKztvoGAdPgyZy49c9vSHHAZjHagwl4RY9E8carULk8ym3iTaiawrT1YoLF/qb449h48f71XDPgkUSOUg==}
     engines: {node: '>=18'}
 
   '@next/env@14.2.5':
@@ -3235,16 +3235,16 @@ packages:
     resolution: {integrity: sha512-Ox0JwpXa0pTIELMGqSQItMGM4JWWG/cMw7bceHrBBdNQtFP82edcD1o8vdApYZnezzbHMoITE/yz9IQ2q9Of/g==}
     engines: {node: '>=10.13.0'}
 
-  '@trigger.dev/core-backend@3.0.0-beta.52':
-    resolution: {integrity: sha512-UQOfMjpFl6tgxfnEfb24KwFeKjSnRBf1dnbfxLo+8wA+E/5T7Dvq2BuWNrCArFI1LBCL2QL73zlGTf0ON9ovuQ==}
+  '@trigger.dev/core-backend@3.0.0-beta.56':
+    resolution: {integrity: sha512-8GmYTgUmljFIWGUzZy+Mh/uuaxgzs0GCHjZgwnigChG3znmz46InwQH7HW9Gxo+6A3aSss05NZUzVKrnFCY1bQ==}
     engines: {node: '>=18.0.0'}
 
-  '@trigger.dev/core@3.0.0-beta.52':
-    resolution: {integrity: sha512-t4DRibuiQjHXgauQBHS46xtyrVeUo9dHa5Cerl2XUgVSYFCAUKLDdP/a1gMgDtotS46vcSRIe3bIecKDqMXHbQ==}
+  '@trigger.dev/core@3.0.0-beta.56':
+    resolution: {integrity: sha512-b4ZeH1k5sy4NISWgkZGmVxspe2r5vFpZ+KdNpYxiobQ/ameM/979OYXNRceeimWKuEdEEp1SMcMJNfZ0Pt5L1A==}
     engines: {node: '>=18.0.0'}
 
-  '@trigger.dev/sdk@3.0.0-beta.52':
-    resolution: {integrity: sha512-fiT3n2udWfpGDnbIHiSs/HMRBeJqLej0p1mgMaV/9b5xu59G6FF8MP9cV9AS2llK4nmH7kE8ySpzqmi+lykXqA==}
+  '@trigger.dev/sdk@3.0.0-beta.56':
+    resolution: {integrity: sha512-RdIoO0u8SyNPiNiU8lYelKgpIUox37wVH5bLO99T5sFetnF/v9ncYPqS+6QPmkHVMEoS0HdXnZ5XKuS3oFs8nQ==}
     engines: {node: '>=18.0.0'}
 
   '@types/canvas-confetti@1.6.4':
@@ -5871,12 +5871,12 @@ packages:
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
 
-  msw@2.3.1:
-    resolution: {integrity: sha512-ocgvBCLn/5l3jpl1lssIb3cniuACJLoOfZu01e3n5dbJrpA5PeeWn28jCLgQDNt6d7QT8tF2fYRzm9JoEHtiig==}
+  msw@2.2.1:
+    resolution: {integrity: sha512-DCsZAQwan+2onEcpD86fiEnCKW4IvYzqcwDq/2TIoeNrmBqNp/mJW4wHQyxcoYrRPwgujin7wDFflqiSO1iT/w==}
     engines: {node: '>=18'}
     hasBin: true
     peerDependencies:
-      typescript: '>= 4.7.x'
+      typescript: '>= 4.7.x <= 5.3.x'
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -8227,7 +8227,7 @@ snapshots:
 
   '@mswjs/cookies@1.1.0': {}
 
-  '@mswjs/interceptors@0.29.1':
+  '@mswjs/interceptors@0.25.16':
     dependencies:
       '@open-draft/deferred-promise': 2.2.0
       '@open-draft/logger': 0.3.0
@@ -8527,7 +8527,7 @@ snapshots:
       '@types/shimmer': 1.0.5
       import-in-the-middle: 1.7.1
       require-in-the-middle: 7.3.0
-      semver: 7.6.2
+      semver: 7.6.3
       shimmer: 1.2.1
     transitivePeerDependencies:
       - supports-color
@@ -8540,7 +8540,7 @@ snapshots:
       '@types/shimmer': 1.0.5
       import-in-the-middle: 1.7.1
       require-in-the-middle: 7.3.0
-      semver: 7.6.2
+      semver: 7.6.3
       shimmer: 1.2.1
     transitivePeerDependencies:
       - supports-color
@@ -8552,7 +8552,7 @@ snapshots:
       '@types/shimmer': 1.0.5
       import-in-the-middle: 1.11.0
       require-in-the-middle: 7.3.0
-      semver: 7.6.2
+      semver: 7.6.3
       shimmer: 1.2.1
     transitivePeerDependencies:
       - supports-color
@@ -8696,7 +8696,7 @@ snapshots:
       '@opentelemetry/propagator-b3': 1.22.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/propagator-jaeger': 1.22.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-trace-base': 1.22.0(@opentelemetry/api@1.9.0)
-      semver: 7.6.2
+      semver: 7.6.3
 
   '@opentelemetry/sdk-trace-node@1.25.0(@opentelemetry/api@1.9.0)':
     dependencies:
@@ -8706,7 +8706,7 @@ snapshots:
       '@opentelemetry/propagator-b3': 1.25.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/propagator-jaeger': 1.25.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-trace-base': 1.25.0(@opentelemetry/api@1.9.0)
-      semver: 7.6.2
+      semver: 7.6.3
 
   '@opentelemetry/semantic-conventions@1.22.0': {}
 
@@ -10568,11 +10568,11 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@trigger.dev/core-backend@3.0.0-beta.52':
+  '@trigger.dev/core-backend@3.0.0-beta.56':
     dependencies:
       '@opentelemetry/api': 1.9.0
 
-  '@trigger.dev/core@3.0.0-beta.52(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@trigger.dev/core@3.0.0-beta.56(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
       '@google-cloud/precise-date': 4.0.0
       '@opentelemetry/api': 1.9.0
@@ -10598,21 +10598,21 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@trigger.dev/sdk@3.0.0-beta.52(bufferutil@4.0.8)(typescript@5.5.4)(utf-8-validate@5.0.10)':
+  '@trigger.dev/sdk@3.0.0-beta.56(bufferutil@4.0.8)(typescript@5.5.4)(utf-8-validate@5.0.10)':
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/api-logs': 0.48.0
       '@opentelemetry/semantic-conventions': 1.25.1
-      '@trigger.dev/core': 3.0.0-beta.52(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@trigger.dev/core-backend': 3.0.0-beta.52
+      '@trigger.dev/core': 3.0.0-beta.56(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@trigger.dev/core-backend': 3.0.0-beta.56
       chalk: 5.3.0
       cronstrue: 2.50.0
-      debug: 4.3.4
+      debug: 4.3.6
       evt: 2.5.7
       get-caller-file: 2.0.5
       git-remote-origin-url: 4.0.0
       git-repo-info: 2.1.1
-      msw: 2.3.1(typescript@5.5.4)
+      msw: 2.2.1(typescript@5.5.4)
       slug: 6.1.0
       terminal-link: 3.0.0
       ulid: 2.3.0
@@ -11845,7 +11845,7 @@ snapshots:
       '@one-ini/wasm': 0.1.1
       commander: 10.0.1
       minimatch: 9.0.1
-      semver: 7.6.2
+      semver: 7.6.3
 
   ee-first@1.1.1: {}
 
@@ -13433,13 +13433,13 @@ snapshots:
 
   ms@2.1.3: {}
 
-  msw@2.3.1(typescript@5.5.4):
+  msw@2.2.1(typescript@5.5.4):
     dependencies:
       '@bundled-es-modules/cookie': 2.0.0
       '@bundled-es-modules/statuses': 1.0.1
       '@inquirer/confirm': 3.1.9
       '@mswjs/cookies': 1.1.0
-      '@mswjs/interceptors': 0.29.1
+      '@mswjs/interceptors': 0.25.16
       '@open-draft/until': 2.1.0
       '@types/cookie': 0.6.0
       '@types/statuses': 2.0.5
