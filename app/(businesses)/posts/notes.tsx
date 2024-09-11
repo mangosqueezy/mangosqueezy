@@ -28,8 +28,6 @@ export default function Notes({ products, business_id }: TNotesProps) {
 	const [description, setDescription] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 
-	console.log(products);
-
 	const postHandler = async () => {
 		setIsLoading(true);
 		const result = await createPostAction(
