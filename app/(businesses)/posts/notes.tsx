@@ -2,6 +2,7 @@
 
 import { CustomToast } from "@/components/mango-ui/custom-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useJune } from "@/hooks/useJune";
 import { classNames } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import {
@@ -24,6 +25,7 @@ type TNotesProps = {
 };
 
 export default function Notes({ products, business_id }: TNotesProps) {
+	const analytics = useJune(process.env.NEXT_PUBLIC_JUNE_API_KEY!);
 	const [product, setProduct] = useState(products ? products[0] : null);
 	const [description, setDescription] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
@@ -36,6 +38,11 @@ export default function Notes({ products, business_id }: TNotesProps) {
 			business_id!,
 		);
 		if (result?.id) {
+			analytics?.track("post_created", {
+				product_id: product?.id,
+				business_id: business_id,
+				description: description,
+			});
 			toast.custom((t) => (
 				<CustomToast
 					t={t}
@@ -79,7 +86,7 @@ export default function Notes({ products, business_id }: TNotesProps) {
 						name="description"
 						rows={2}
 						value={description}
-						placeholder="Write a note..."
+						placeholder="Write a prompt to let the system know what you're looking for in affiliates or any specific requirements you have. If you don't have anything to share, feel free to leave it blank..."
 						className="block w-full resize-none border-0 py-0 mt-3 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
 						onChange={(e) => setDescription(e.target.value)}
 					/>
