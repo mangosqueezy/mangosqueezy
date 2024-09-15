@@ -29,6 +29,11 @@ regex = '''sk-proj-[a-zA-Z0-9]+'''
 tags = ["key", "openai"]
 
 [[rules]]
-description = "June secret key"
+description = "June production secret key"
 regex = '''JL[a-zA-Z0-9]+'''
-tags = ["key", "june"]
+tags = ["key", "june", "prod"]
+
+[[rules]]
+description = "June development secret key"
+regex = '''wk-[a-zA-Z0-9]+'''
+tags = ["key", "june", "dev"]
