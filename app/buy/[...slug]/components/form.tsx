@@ -234,7 +234,12 @@ export default function BuyForm({
 												<div className="ml-6 flex flex-1 flex-col">
 													<div className="flex">
 														<div className="min-w-0 flex-1">
-															<h4 className="text-sm">{product.name}</h4>
+															<h4 className="text-sm font-medium text-gray-900">
+																{product.name}
+															</h4>
+															<p className="text-sm text-gray-500">
+																{product.description}
+															</p>
 														</div>
 													</div>
 
