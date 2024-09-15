@@ -14,7 +14,7 @@ export async function getUserById(id: Business["id"]) {
 				},
 				products: true,
 				orders: true,
-				posts: true,
+				pipelines: true,
 			},
 		});
 	} catch (err) {

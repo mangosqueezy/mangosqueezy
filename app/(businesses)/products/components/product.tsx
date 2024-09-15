@@ -281,7 +281,7 @@ export default function Product({
 																Name
 															</FormLabel>
 															<FormControl>
-																<Input placeholder="mango squeezy" {...field} />
+																<Input placeholder="mangosqueezy" {...field} />
 															</FormControl>
 															<FormMessage />
 														</FormItem>

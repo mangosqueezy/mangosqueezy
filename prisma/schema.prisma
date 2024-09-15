@@ -38,7 +38,7 @@ model Business {
   orders                    Orders[]
   affiliate_business        Affiliate_Business[]
   messages                  Messages[]
-  posts                     Posts[]
+  pipelines                 Pipelines[]
   pending_payments          Pending_Payments[]
 
   @@schema("public")
@@ -139,15 +139,17 @@ model Products {
   Business    Business? @relation(fields: [business_id], references: [id])
   business_id String?   @db.Uuid
   orders      Orders[]
-  Posts       Posts[]
+  pipelines   Pipelines[]
 
   @@schema("public")
 }
 
-model Posts {
+model Pipelines {
   id      Int     @id @default(autoincrement())
-  content String?
+  prompt String?
+  context String?
   remark  String?
+  affiliate_count Int?
 
   Business    Business? @relation(fields: [business_id], references: [id])
   business_id String?   @db.Uuid

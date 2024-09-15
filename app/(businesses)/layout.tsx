@@ -65,7 +65,7 @@ export default function DashboardLayout({
 							pathname === "/inbox"
 								? "text-blue-400 hover:text-blue-500"
 								: "text-gray-400 hover:text-gray-500",
-							"font-medium text-red",
+							"font-medium",
 						)}
 					>
 						Inbox
@@ -73,10 +73,10 @@ export default function DashboardLayout({
 					<Link
 						href="/metrics"
 						className={classNames(
-							pathname === "/metrics"
+							pathname.includes("/metrics")
 								? "text-blue-400 hover:text-blue-500"
 								: "text-gray-400 hover:text-gray-500",
-							"font-medium text-red",
+							"font-medium",
 						)}
 					>
 						Metrics
@@ -87,7 +87,7 @@ export default function DashboardLayout({
 							pathname === "/orders"
 								? "text-blue-400 hover:text-blue-500"
 								: "text-gray-400 hover:text-gray-500",
-							"font-medium text-red",
+							"font-medium",
 						)}
 					>
 						Orders
@@ -98,21 +98,21 @@ export default function DashboardLayout({
 							pathname === "/products"
 								? "text-blue-400 hover:text-blue-500"
 								: "text-gray-400 hover:text-gray-500",
-							"font-medium text-red",
+							"font-medium",
 						)}
 					>
 						Products
 					</Link>
 					<Link
-						href="/posts"
+						href="/pipeline"
 						className={classNames(
-							pathname === "/posts"
+							pathname.includes("/pipeline")
 								? "text-blue-400 hover:text-blue-500"
 								: "text-gray-400 hover:text-gray-500",
-							"font-medium text-red",
+							"font-medium flex",
 						)}
 					>
-						Posts
+						Autofinder
 					</Link>
 					<Link
 						href="/affiliates"
@@ -120,7 +120,7 @@ export default function DashboardLayout({
 							pathname.includes("/affiliates")
 								? "text-blue-400 hover:text-blue-500"
 								: "text-gray-400 hover:text-gray-500",
-							"font-medium text-red",
+							"font-medium",
 						)}
 					>
 						Affiliates
@@ -152,7 +152,7 @@ export default function DashboardLayout({
 									pathname === "/inbox"
 										? "text-blue-400 hover:text-blue-500"
 										: "text-gray-400 hover:text-gray-500",
-									"font-medium text-red",
+									"font-medium",
 								)}
 							>
 								Inbox
@@ -163,7 +163,7 @@ export default function DashboardLayout({
 									pathname === "/orders"
 										? "text-blue-400 hover:text-blue-500"
 										: "text-gray-400 hover:text-gray-500",
-									"font-medium text-red",
+									"font-medium",
 								)}
 							>
 								Orders
@@ -174,29 +174,29 @@ export default function DashboardLayout({
 									pathname === "/products"
 										? "text-blue-400 hover:text-blue-500"
 										: "text-gray-400 hover:text-gray-500",
-									"font-medium text-red",
+									"font-medium",
 								)}
 							>
 								Products
 							</Link>
 							<Link
-								href="/posts"
+								href="/pipeline"
 								className={classNames(
-									pathname === "/posts"
+									pathname.includes("/pipeline")
 										? "text-blue-400 hover:text-blue-500"
 										: "text-gray-400 hover:text-gray-500",
-									"font-medium text-red",
+									"font-medium",
 								)}
 							>
-								Posts
+								Autofinder
 							</Link>
 							<Link
 								href="/affiliates"
 								className={classNames(
-									pathname === "/affiliates"
+									pathname.includes("/affiliates")
 										? "text-blue-400 hover:text-blue-500"
 										: "text-gray-400 hover:text-gray-500",
-									"font-medium text-red",
+									"font-medium",
 								)}
 							>
 								Affiliates

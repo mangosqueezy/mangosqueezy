@@ -16,7 +16,7 @@ const fontSans = FontSans({
 });
 
 export const metadata: Metadata = {
-	title: "Mango Squeezy App",
+	title: "mangosqueezy affiliates tool",
 	description: "The open source affiliate tool.",
 };
 
