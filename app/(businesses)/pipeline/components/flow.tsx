@@ -65,6 +65,14 @@ function Flow({ products, business_id }: TFlowProps) {
 		setProducts(products);
 	}, [products, setProducts]);
 
+	useEffect(() => {
+		if (analytics) {
+			analytics.page("Pipeline", {
+				business_id,
+			});
+		}
+	}, [analytics, business_id]);
+
 	const pipelineHandler = async () => {
 		setIsLoading(true);
 		const product = nodes.find((node) => node.id === "node-1") as TInputNode;
@@ -153,7 +161,7 @@ function Flow({ products, business_id }: TFlowProps) {
 					fitView
 					style={rfStyle}
 				>
-					<Controls />
+					<Controls position="top-left" />
 					<MiniMap />
 					<Background variant={BackgroundVariant.Dots} gap={12} size={1} />
 				</ReactFlow>

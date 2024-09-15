@@ -18,6 +18,7 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useJune } from "@/hooks/useJune";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Products } from "@prisma/client";
@@ -51,6 +52,7 @@ export default function BuyForm({
 	formattedAmount,
 	affiliateId,
 }: TBuyForm) {
+	const analytics = useJune(process.env.NEXT_PUBLIC_JUNE_API_KEY!);
 	const [isXRPButtonLoading, setIsXRPButtonLoading] = useState(false);
 	const [isPayButtonLoading, setIsPayButtonLoading] = useState(false);
 	const [messages, setMessages] = useState<Array<string>>([]);
@@ -88,6 +90,14 @@ export default function BuyForm({
 	const createOrderHandler = useCallback(async () => {
 		setIsXRPButtonLoading(true);
 
+		analytics?.track("Order Created", {
+			product_id: product?.id,
+			product_price: product?.price,
+			affiliate_id: affiliateId,
+			email: form.getValues("email"),
+			type: "xrp",
+		});
+
 		const productId = product?.id ?? "";
 		const parsedAffiliateId = affiliateId ?? "";
 
@@ -103,7 +113,7 @@ export default function BuyForm({
 		if (result) {
 			router.push("/success");
 		}
-	}, [affiliateId, form, product, router]);
+	}, [affiliateId, form, product, router, analytics]);
 
 	useEffect(() => {
 		if (messages.length > 0) {
@@ -124,6 +134,14 @@ export default function BuyForm({
 		setIsPayButtonLoading(true);
 		const parsedAmount = Number.parseFloat(amount);
 		if (parsedAmount > 30) {
+			analytics?.track("Order Created", {
+				product_id: product?.id,
+				product_price: product?.price,
+				affiliate_id: affiliateId,
+				email,
+				type: "moonpay",
+			});
+
 			const formData = new FormData();
 			formData.append("email", email);
 			formData.append("amount", product?.price.toString() as string);
@@ -140,6 +158,13 @@ export default function BuyForm({
 				navigate(navigatForm);
 			}
 		} else {
+			analytics?.track("Order Created", {
+				product_id: product?.id,
+				product_price: product?.price,
+				affiliate_id: affiliateId,
+				email,
+				type: "stripe",
+			});
 			const productId = product?.id ?? "";
 			const parsedAffiliateId = affiliateId ?? "";
 
@@ -165,6 +190,14 @@ export default function BuyForm({
 			}
 		}
 	};
+
+	useEffect(() => {
+		if (analytics) {
+			analytics.page("Buy", {
+				affiliate_id: affiliateId,
+			});
+		}
+	}, [analytics, affiliateId]);
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
 		const actionType = form.getValues("action-type");
