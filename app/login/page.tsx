@@ -1,9 +1,11 @@
 "use client";
+import { getUser } from "@/app/(businesses)/actions";
 import { Footer } from "@/components/aceternity-ui/footer";
 import { Navigation } from "@/components/aceternity-ui/header";
 import { Input } from "@/components/aceternity-ui/input";
 import { Label } from "@/components/aceternity-ui/label";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useFormState } from "react-dom";
 import toast, { Toaster } from "react-hot-toast";
@@ -11,6 +13,17 @@ import { auth } from "./actions";
 
 export default function Login() {
 	const [state, loginAction] = useFormState(auth, null);
+	const router = useRouter();
+
+	useEffect(() => {
+		const fetchUser = async () => {
+			const user = await getUser();
+			if (user?.id) {
+				router.push("/inbox");
+			}
+		};
+		fetchUser();
+	}, [router]);
 
 	useEffect(() => {
 		if (state && state === "Please check your inbox") {
