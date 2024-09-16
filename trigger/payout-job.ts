@@ -67,7 +67,7 @@ export const payoutTask = task({
 		const mangosqueezy_wallet = Wallet.fromSeed(
 			process.env.MANGOSQUEEZY_WALLET_SECRET_SEED!,
 		);
-		const commissionAmount = commission * parsedAmount;
+		const commissionAmount = (commission / 100) * parsedAmount;
 		const amountForBusiness = parsedAmount - commissionAmount;
 		let result = "success";
 		try {

@@ -119,37 +119,43 @@ function Flow({ products, business_id }: TFlowProps) {
 		<>
 			<Toaster position="top-right" />
 			<div className="h-screen w-full">
-				<div className="flex items-center justify-end space-x-3 px-2 py-2 sm:px-3">
-					<Button asChild variant="ghost" className="mr-2">
-						<Link href="/pipeline/status">View Status</Link>
-					</Button>
-					{products?.length ? (
-						<Button
-							variant="outline"
-							type="button"
-							disabled={isLoading || !products?.length}
-							onClick={pipelineHandler}
-							className={cn(
-								"bg-white px-3 py-2 text-sm font-semibold text-orange-600 ring-1 ring-inset ring-orange-300 bg-orange-200 hover:bg-orange-50",
-								isLoading || (!products?.length && "cursor-not-allowed"),
-							)}
-						>
-							{isLoading ? (
-								<Loader className="mr-1 h-5 w-5 text-gray-400 animate-spin" />
-							) : (
-								<Play className="mr-1 h-5 w-5 text-orange-400" />
-							)}
-							Run
+				<div className="flex items-center justify-between space-x-3 px-2 py-2 sm:px-3">
+					<div className="text-md font-bold lg:text-3xl text-gray-800">
+						AI Affiliate Finder
+					</div>
+
+					<div className="flex items-center justify-end space-x-3 px-2 py-2 sm:px-3">
+						<Button asChild variant="ghost" className="mr-2">
+							<Link href="/pipeline/status">View Status</Link>
 						</Button>
-					) : (
-						<Button
-							asChild
-							variant="outline"
-							className="bg-orange-200 hover:bg-orange-50 text-orange-600"
-						>
-							<Link href="/products">Add Products</Link>
-						</Button>
-					)}
+						{products?.length ? (
+							<Button
+								variant="outline"
+								type="button"
+								disabled={isLoading || !products?.length}
+								onClick={pipelineHandler}
+								className={cn(
+									"bg-white px-3 py-2 text-sm font-semibold text-orange-600 ring-1 ring-inset ring-orange-300 bg-orange-200 hover:bg-orange-50",
+									isLoading || (!products?.length && "cursor-not-allowed"),
+								)}
+							>
+								{isLoading ? (
+									<Loader className="mr-1 h-5 w-5 text-gray-400 animate-spin" />
+								) : (
+									<Play className="mr-1 h-5 w-5 text-orange-400" />
+								)}
+								Run
+							</Button>
+						) : (
+							<Button
+								asChild
+								variant="outline"
+								className="bg-orange-200 hover:bg-orange-50 text-orange-600"
+							>
+								<Link href="/products">Add Products</Link>
+							</Button>
+						)}
+					</div>
 				</div>
 				<ReactFlow
 					nodes={nodes}
