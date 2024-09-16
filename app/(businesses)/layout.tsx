@@ -14,8 +14,8 @@ import { classNames } from "@/lib/utils";
 import { CircleUser, Menu, Package2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { getUser } from "./actions";
+import { useEffect, useState } from "react";
+import { getShowManualAffiliateFeature, getUser } from "./actions";
 import { Providers } from "./providers";
 
 export default function DashboardLayout({
@@ -23,6 +23,8 @@ export default function DashboardLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	const [showManualAffiliateFeature, setShowManualAffiliateFeature] =
+		useState<boolean>(false);
 	const router = useRouter();
 	const pathname = usePathname();
 	const analytics = useJune(process.env.NEXT_PUBLIC_JUNE_API_KEY!);
@@ -41,6 +43,15 @@ export default function DashboardLayout({
 
 		fetchUser();
 	}, [analytics]);
+
+	useEffect(() => {
+		const fetchShowManualAffiliateFeature = async () => {
+			const showManualAffiliateFeature = await getShowManualAffiliateFeature();
+			setShowManualAffiliateFeature(showManualAffiliateFeature as boolean);
+		};
+
+		fetchShowManualAffiliateFeature();
+	}, []);
 
 	const handleLogout = async () => {
 		const response = await fetch("https://www.mangosqueezy.com/api/logout", {
@@ -117,17 +128,19 @@ export default function DashboardLayout({
 					>
 						Autofinder
 					</Link>
-					<Link
-						href="/affiliates"
-						className={classNames(
-							pathname.includes("/affiliates")
-								? "text-blue-400 hover:text-blue-500"
-								: "text-gray-400 hover:text-gray-500",
-							"font-medium",
-						)}
-					>
-						Affiliates
-					</Link>
+					{showManualAffiliateFeature && (
+						<Link
+							href="/affiliates"
+							className={classNames(
+								pathname.includes("/affiliates")
+									? "text-blue-400 hover:text-blue-500"
+									: "text-gray-400 hover:text-gray-500",
+								"font-medium",
+							)}
+						>
+							Affiliates
+						</Link>
+					)}
 				</nav>
 				<Sheet>
 					<SheetTrigger asChild>
@@ -193,17 +206,19 @@ export default function DashboardLayout({
 							>
 								Autofinder
 							</Link>
-							<Link
-								href="/affiliates"
-								className={classNames(
-									pathname.includes("/affiliates")
-										? "text-blue-400 hover:text-blue-500"
-										: "text-gray-400 hover:text-gray-500",
-									"font-medium",
-								)}
-							>
-								Affiliates
-							</Link>
+							{showManualAffiliateFeature && (
+								<Link
+									href="/affiliates"
+									className={classNames(
+										pathname.includes("/affiliates")
+											? "text-blue-400 hover:text-blue-500"
+											: "text-gray-400 hover:text-gray-500",
+										"font-medium",
+									)}
+								>
+									Affiliates
+								</Link>
+							)}
 						</nav>
 					</SheetContent>
 				</Sheet>
