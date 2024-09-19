@@ -8,7 +8,7 @@ export async function GET(request: Request) {
 
 	console.log("/api/webhook/ig/ GET => ", hubMode);
 
-	if (hubVerifyToken === process.env.IG_VERIFY_TOKEN) {
+	if (hubVerifyToken === process.env.INSTAGRAM_VERIFY_TOKEN) {
 		return new Response(hubChallenge, {
 			status: 200,
 		});
