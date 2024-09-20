@@ -1,10 +1,7 @@
 export async function GET(request: Request) {
 	const { searchParams } = new URL(request.url);
-	const hubMode = searchParams.get("hub.mode");
 	const hubChallenge = searchParams.get("hub.challenge");
 	const hubVerifyToken = searchParams.get("hub.verify_token");
-
-	console.log("/api/webhook/ig/ GET => ", hubMode);
 
 	if (hubVerifyToken === process.env.INSTAGRAM_VERIFY_TOKEN) {
 		return new Response(hubChallenge, {
@@ -22,7 +19,11 @@ export async function POST(request: Request) {
 
 	const jsonBody = JSON.parse(body);
 
-	console.log("/api/webhook/ig/ POST => ", jsonBody);
+	const messaging = jsonBody?.entry[0].messaging;
+
+	const message = messaging[0];
+
+	console.log("/api/webhook/ig/ POST => ", message);
 
 	return new Response("Received", { status: 200 });
 }
