@@ -8,3 +8,19 @@ export const showManualAffiliateFeature = flag({
 		return value ?? false;
 	},
 });
+
+export const showInboxFeature = flag({
+	key: "inbox_feature",
+	async decide() {
+		const value = await get("inbox_feature");
+		return value ?? false;
+	},
+});
+
+export const isRealTimePaymentsEnabled = flag({
+	key: "affiliates_real_time_payments",
+	async decide() {
+		const value = await get("affiliates_real_time_payments");
+		return value ?? false;
+	},
+});

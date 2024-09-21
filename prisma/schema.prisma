@@ -81,8 +81,9 @@ model Affiliates {
   metadata              Json?
   embedding             Unsupported("vector")?
 
-  orders             Orders[]
-  affiliate_business Affiliate_Business[]
+  orders                     Orders[]
+  affiliate_business         Affiliate_Business[]
+  affiliate_pending_payments Affiliate_Pending_Payments[]
 
   @@schema("public")
 }
@@ -114,9 +115,9 @@ model Orders {
   status           String?
   created_at       DateTime    @default(now())
   updated_at       DateTime    @updatedAt
-  Business         Business?   @relation(fields: [business_id], references: [id])
+  business         Business?   @relation(fields: [business_id], references: [id])
   business_id      String?     @db.Uuid
-  Products         Products?   @relation(fields: [product_id], references: [id])
+  products         Products?   @relation(fields: [product_id], references: [id])
   product_id       Int?
   affiliate        Affiliates? @relation(fields: [affiliate_id], references: [id])
   affiliate_id     Int?
@@ -136,8 +137,8 @@ model Products {
   metadata    Json?
   embedding   Unsupported("vector")?
 
-  Business    Business? @relation(fields: [business_id], references: [id])
-  business_id String?   @db.Uuid
+  business    Business?   @relation(fields: [business_id], references: [id])
+  business_id String?     @db.Uuid
   orders      Orders[]
   pipelines   Pipelines[]
 
@@ -145,11 +146,11 @@ model Products {
 }
 
 model Pipelines {
-  id      Int     @id @default(autoincrement())
-  prompt String?
-  format String?
-  location String?
-  remark  String?
+  id              Int     @id @default(autoincrement())
+  prompt          String?
+  format          String?
+  location        String?
+  remark          String?
   affiliate_count Int?
 
   Business    Business? @relation(fields: [business_id], references: [id])
@@ -183,5 +184,23 @@ model Pending_Payments {
   business Business @relation(fields: [business_id], references: [id])
 
   @@map("pending_payments")
+  @@schema("public")
+}
+
+model Affiliate_Pending_Payments {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  affiliate_id  Int
+  product_id    Int
+  full_amount   Decimal?  @db.Decimal(10, 2)
+  fiat_amount   Decimal?  @db.Decimal(10, 2)
+  crypto_amount Decimal?  @db.Decimal(10, 2)
+  payout_date   DateTime? @db.Date
+  status        String    @default("Pending")
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+
+  affiliate Affiliates @relation(fields: [affiliate_id], references: [id])
+
+  @@map("affiliate_pending_payments")
   @@schema("public")
 }

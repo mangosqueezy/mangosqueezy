@@ -11,7 +11,9 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import type { Products } from "@prisma/client";
+import { useRouter } from "next/navigation";
 import * as React from "react";
+import { getShowInboxFeature } from "../../actions";
 import type { TMessages } from "./mail-display";
 
 interface MailProps {
@@ -22,6 +24,18 @@ interface MailProps {
 
 export function Mail({ mails, products, businessId }: MailProps) {
 	const [mail, setMail] = useMail();
+	const router = useRouter();
+
+	React.useEffect(() => {
+		const fetchShowInboxFeature = async () => {
+			const showInboxFeature = await getShowInboxFeature();
+			if (!showInboxFeature) {
+				router.push("/pipeline");
+			}
+		};
+
+		fetchShowInboxFeature();
+	}, [router]);
 
 	React.useEffect(() => {
 		setMail({

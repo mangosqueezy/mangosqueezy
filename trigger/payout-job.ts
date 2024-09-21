@@ -1,3 +1,4 @@
+import { isRealTimePaymentsEnabled } from "@/config/flags";
 import prisma from "@/lib/prisma";
 import { Client, Wallet, getBalanceChanges, xrpToDrops } from "@transia/xrpl";
 import { logger, task } from "@trigger.dev/sdk/v3";
@@ -10,6 +11,7 @@ const svix = new Svix(SVIX_API_KEY!);
 type PaymentPreference = "FullCrypto" | "HalfCryptoHalfFiat" | "FullFiat";
 
 type TPayload = {
+	affiliate_id: number;
 	business_id: string;
 	commission: number;
 	amount: string;
@@ -29,6 +31,7 @@ export const payoutTask = task({
 		logger.log("payout task...", { payload, ctx });
 
 		const {
+			affiliate_id,
 			business_id,
 			commission,
 			amount,
@@ -50,25 +53,26 @@ export const payoutTask = task({
 			},
 		};
 
+		const realTimePaymentsEnabled = await isRealTimePaymentsEnabled();
 		const ratesResponse = await fetch(
 			"https://xumm.app/api/v1/platform/rates/USD",
 			options,
 		);
 		const rates = await ratesResponse.json();
 
-		const parsedAmount =
+		const parsedXRPAmount =
 			Number.parseFloat(amount) / Number.parseFloat(rates.XRP);
 
 		const resend = new Resend(process.env.RESEND_API_KEY);
-		const net = process.env.XAHAU_NETWORK!;
+		const net = process.env.XRPL_NETWORK!;
 		const client = new Client(net);
 		await client.connect();
 
 		const mangosqueezy_wallet = Wallet.fromSeed(
 			process.env.MANGOSQUEEZY_WALLET_SECRET_SEED!,
 		);
-		const commissionAmount = (commission / 100) * parsedAmount;
-		const amountForBusiness = parsedAmount - commissionAmount;
+		const inXrpCommissionAmount = (commission / 100) * parsedXRPAmount;
+		const amountForBusiness = parsedXRPAmount - inXrpCommissionAmount;
 		let result = "success";
 		try {
 			if (payment_preference === "FullCrypto") {
@@ -197,38 +201,57 @@ export const payoutTask = task({
 				});
 			}
 
-			const affiliatePayload = await client.autofill({
-				TransactionType: "Payment",
-				Account: mangosqueezy_wallet.address,
-				Amount: xrpToDrops(commissionAmount),
-				NetworkID: 21338,
-				Destination: affiliate_wallet_address, // wallet address of the affiliate user
+			logger.log("affiliates_real_time_payments feature flag result...", {
+				realTimePaymentsEnabled,
 			});
 
-			const affiliateSigned = mangosqueezy_wallet.sign(affiliatePayload);
+			if (realTimePaymentsEnabled) {
+				const affiliatePayload = await client.autofill({
+					TransactionType: "Payment",
+					Account: mangosqueezy_wallet.address,
+					Amount: xrpToDrops(inXrpCommissionAmount),
+					NetworkID: 21338,
+					Destination: affiliate_wallet_address, // wallet address of the affiliate user
+				});
 
-			// biome-ignore lint: do not have export type for submitAndWait
-			const affiliateTransaction: any = await client.submitAndWait(
-				affiliateSigned.tx_blob,
-			);
+				const affiliateSigned = mangosqueezy_wallet.sign(affiliatePayload);
 
-			logger.log("payout task for affiliate result is...", {
-				balance: getBalanceChanges(affiliateTransaction?.result.meta),
-			});
+				// biome-ignore lint: do not have export type for submitAndWait
+				const affiliateTransaction: any = await client.submitAndWait(
+					affiliateSigned.tx_blob,
+				);
 
-			const { data, error } = await resend.emails.send({
-				from: "mangosqueezy <amit@tapasom.com>",
-				to: [affiliate_email],
-				subject: "Your Payout Has Been Sent!",
-				replyTo: process.env.SLACK_REPLY_TO,
-				text: `We're pleased to inform you that your payout has been successfully sent to your account. If you have any questions or concerns, feel free to reply to this email or contact our support team.`,
-			});
+				logger.log("payout task for affiliate result is...", {
+					balance: getBalanceChanges(affiliateTransaction?.result.meta),
+				});
 
-			logger.log("email sent to users...", {
-				emails: { affiliate_email },
-				data,
-				error,
-			});
+				const { data, error } = await resend.emails.send({
+					from: "mangosqueezy <amit@tapasom.com>",
+					to: [affiliate_email],
+					subject: "Your Payout Has Been Sent!",
+					replyTo: process.env.SLACK_REPLY_TO,
+					text: `We're pleased to inform you that your payout has been successfully sent to your account. If you have any questions or concerns, feel free to reply to this email or contact our support team.`,
+				});
+
+				logger.log("email sent to users...", {
+					emails: { affiliate_email },
+					data,
+					error,
+				});
+			} else {
+				const inFiatCommissionAmount =
+					(commission / 100) * Number.parseFloat(amount);
+
+				await prisma.affiliate_Pending_Payments.create({
+					data: {
+						affiliate_id,
+						product_id: Number(product_id),
+						full_amount: Number.parseFloat(amount),
+						fiat_amount: inFiatCommissionAmount,
+						crypto_amount: inXrpCommissionAmount,
+					},
+				});
+			}
 		} catch (error) {
 			result = "error";
 			console.error(error);

@@ -32,6 +32,7 @@ export async function createOrderAction(formData: FormData) {
 		);
 
 		await payoutTask.trigger({
+			affiliate_id: Number.parseInt(affiliate_id),
 			business_id,
 			svix_consumer_app_id: information?.business.svix_consumer_app_id!,
 			commission: information?.business.commission as number,

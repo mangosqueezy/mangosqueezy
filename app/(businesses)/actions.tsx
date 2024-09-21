@@ -1,6 +1,6 @@
 "use server";
 
-import { showManualAffiliateFeature } from "@/config/flags";
+import { showInboxFeature, showManualAffiliateFeature } from "@/config/flags";
 import { createClient } from "@/lib/supabase/server";
 import { getUserById } from "@/models/business";
 
@@ -21,4 +21,9 @@ export async function getUser() {
 export async function getShowManualAffiliateFeature() {
 	const manualAffiliateFeature = await showManualAffiliateFeature();
 	return manualAffiliateFeature;
+}
+
+export async function getShowInboxFeature() {
+	const inboxFeature = await showInboxFeature();
+	return inboxFeature;
 }

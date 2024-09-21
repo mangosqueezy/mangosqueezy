@@ -39,7 +39,7 @@ export function Navigation() {
 				<div className="flex items-center gap-2">
 					{userId ? (
 						<Button variant="outline" asChild>
-							<Link href="/inbox">Inbox</Link>
+							<Link href="/pipeline">Pipeline</Link>
 						</Button>
 					) : (
 						<Button asChild>

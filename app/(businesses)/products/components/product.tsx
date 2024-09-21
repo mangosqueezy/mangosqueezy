@@ -58,7 +58,7 @@ import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Business, Products } from "@prisma/client";
 import { MoreHorizontal, PlusCircle } from "lucide-react";
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import { useFormState } from "react-dom";
 import { useForm } from "react-hook-form";
 import toast, { Toaster } from "react-hot-toast";
@@ -200,6 +200,7 @@ export default function Product({
 				variant="success"
 			/>
 		));
+		updateFormState.success = "";
 	} else if (deleteFormState?.success === "deleted successfully") {
 		toast.custom((t) => (
 			<CustomToast
@@ -208,6 +209,7 @@ export default function Product({
 				variant="success"
 			/>
 		));
+		deleteFormState.success = "";
 	} else if (
 		updateFormState?.errors?.message ||
 		deleteFormState?.errors?.message
@@ -219,6 +221,8 @@ export default function Product({
 				variant="error"
 			/>
 		));
+		updateFormState.errors.message = "";
+		deleteFormState.errors.message = "";
 	}
 
 	const uploadProductPhoto = (event: React.ChangeEvent<HTMLInputElement>) => {

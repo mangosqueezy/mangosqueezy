@@ -19,7 +19,7 @@ export default function Login() {
 		const fetchUser = async () => {
 			const user = await getUser();
 			if (user?.id) {
-				router.push("/inbox");
+				router.push("/pipeline");
 			}
 		};
 		fetchUser();

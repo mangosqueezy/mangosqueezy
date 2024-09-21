@@ -15,7 +15,11 @@ import { CircleUser, Menu, Package2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getShowManualAffiliateFeature, getUser } from "./actions";
+import {
+	getShowInboxFeature,
+	getShowManualAffiliateFeature,
+	getUser,
+} from "./actions";
 import { Providers } from "./providers";
 
 export default function DashboardLayout({
@@ -25,6 +29,7 @@ export default function DashboardLayout({
 }>) {
 	const [showManualAffiliateFeature, setShowManualAffiliateFeature] =
 		useState<boolean>(false);
+	const [showInboxFeature, setShowInboxFeature] = useState<boolean>(false);
 	const router = useRouter();
 	const pathname = usePathname();
 	const analytics = useJune(process.env.NEXT_PUBLIC_JUNE_API_KEY!);
@@ -45,12 +50,14 @@ export default function DashboardLayout({
 	}, [analytics]);
 
 	useEffect(() => {
-		const fetchShowManualAffiliateFeature = async () => {
+		const fetchFeatureFlags = async () => {
 			const showManualAffiliateFeature = await getShowManualAffiliateFeature();
+			const showInboxFeature = await getShowInboxFeature();
 			setShowManualAffiliateFeature(showManualAffiliateFeature as boolean);
+			setShowInboxFeature(showInboxFeature as boolean);
 		};
 
-		fetchShowManualAffiliateFeature();
+		fetchFeatureFlags();
 	}, []);
 
 	const handleLogout = async () => {
@@ -73,16 +80,30 @@ export default function DashboardLayout({
 						<Package2 className="h-6 w-6" />
 						<span className="sr-only">Acme Inc</span>
 					</Link>
+					{showInboxFeature && (
+						<Link
+							href="/inbox"
+							className={classNames(
+								pathname === "/inbox"
+									? "text-blue-400 hover:text-blue-500"
+									: "text-gray-400 hover:text-gray-500",
+								"font-medium",
+							)}
+						>
+							Inbox
+						</Link>
+					)}
+
 					<Link
-						href="/inbox"
+						href="/pipeline"
 						className={classNames(
-							pathname === "/inbox"
+							pathname.includes("/pipeline")
 								? "text-blue-400 hover:text-blue-500"
 								: "text-gray-400 hover:text-gray-500",
-							"font-medium",
+							"font-medium flex",
 						)}
 					>
-						Inbox
+						Autofinder
 					</Link>
 					<Link
 						href="/metrics"
@@ -116,17 +137,6 @@ export default function DashboardLayout({
 						)}
 					>
 						Products
-					</Link>
-					<Link
-						href="/pipeline"
-						className={classNames(
-							pathname.includes("/pipeline")
-								? "text-blue-400 hover:text-blue-500"
-								: "text-gray-400 hover:text-gray-500",
-							"font-medium flex",
-						)}
-					>
-						Autofinder
 					</Link>
 					{showManualAffiliateFeature && (
 						<Link
@@ -162,16 +172,41 @@ export default function DashboardLayout({
 								<Package2 className="h-6 w-6" />
 								<span className="sr-only">Acme Inc</span>
 							</Link>
+							{showInboxFeature && (
+								<Link
+									href="/inbox"
+									className={classNames(
+										pathname === "/inbox"
+											? "text-blue-400 hover:text-blue-500"
+											: "text-gray-400 hover:text-gray-500",
+										"font-medium",
+									)}
+								>
+									Inbox
+								</Link>
+							)}
+
 							<Link
-								href="/inbox"
+								href="/pipeline"
 								className={classNames(
-									pathname === "/inbox"
+									pathname.includes("/pipeline")
 										? "text-blue-400 hover:text-blue-500"
 										: "text-gray-400 hover:text-gray-500",
 									"font-medium",
 								)}
 							>
-								Inbox
+								Autofinder
+							</Link>
+							<Link
+								href="/metrics"
+								className={classNames(
+									pathname.includes("/metrics")
+										? "text-blue-400 hover:text-blue-500"
+										: "text-gray-400 hover:text-gray-500",
+									"font-medium",
+								)}
+							>
+								Metrics
 							</Link>
 							<Link
 								href="/orders"
@@ -194,17 +229,6 @@ export default function DashboardLayout({
 								)}
 							>
 								Products
-							</Link>
-							<Link
-								href="/pipeline"
-								className={classNames(
-									pathname.includes("/pipeline")
-										? "text-blue-400 hover:text-blue-500"
-										: "text-gray-400 hover:text-gray-500",
-									"font-medium",
-								)}
-							>
-								Autofinder
 							</Link>
 							{showManualAffiliateFeature && (
 								<Link
