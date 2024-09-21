@@ -7,14 +7,16 @@ export async function createPipelineAction(
 	product_id: number,
 	prompt: string,
 	affiliate_count: number,
-	context: string,
+	format: string,
+	location: string,
 	business_id: string,
 ) {
 	const pipeline = await createPipeline({
 		product_id,
 		prompt,
 		affiliate_count,
-		context,
+		format,
+		location,
 		business_id,
 	});
 

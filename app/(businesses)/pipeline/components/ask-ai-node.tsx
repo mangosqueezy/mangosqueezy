@@ -18,14 +18,13 @@ export default function AskAINode({
 }: NodeProps<AskAINodeProps>) {
 	const updateNodeData = useStore((state) => state.updateNodeData);
 	const [prompt, setPrompt] = useState(
-		"Seeking Ideas: How to Find the Right Affiliates for Our Subscription-Based SaaS Product",
-	);
-	const [context, setContext] = useState(
-		"We’re expanding the affiliate program for [Your SaaS Product], a subscription-based tool designed to help [target market, e.g., businesses, freelancers] with [key benefits, e.g., productivity, collaboration]. To maximize growth, we’re looking for insights on which types of affiliates or categories are most effective at promoting subscription-based products. We want to partner with affiliates who can best reach our target audience and highlight our product’s value.",
+		`Generate an engaging Instagram caption using the product description provided.
+
+Based on your product description and location, generate 8-12 relevant hashtags that target your audience and niche.`,
 	);
 
 	return (
-		<div className="h-full border border-gray-300 rounded bg-white">
+		<div className="h-full w-80 border border-gray-300 rounded bg-white">
 			<div className="bg-green-300 p-2 rounded-t">
 				<div className="flex items-center">
 					<Brain className="h-5 w-5 mr-2" />
@@ -53,30 +52,14 @@ export default function AskAINode({
 				<textarea
 					id="textarea"
 					name="textarea"
+					rows={5}
 					onChange={(e) => {
 						setPrompt(e.target.value);
 						updateNodeData(id, e.target.value);
 					}}
 					value={prompt}
-					className="nodrag w-full p-1.5 border border-gray-300 rounded text-sm"
-				/>
-			</div>
-			<div className="p-2">
-				<label
-					className="block text-sm font-medium text-gray-700 mb-1"
-					htmlFor="context"
-				>
-					Context:
-				</label>
-				<textarea
-					id="context"
-					name="context"
-					onChange={(e) => {
-						setContext(e.target.value);
-						updateNodeData(id, e.target.value);
-					}}
-					value={context}
-					className="nodrag w-full p-1.5 border border-gray-300 rounded text-sm"
+					disabled={true}
+					className="nodrag w-full p-1.5 border border-gray-300 rounded cursor-not-allowed bg-gray-100"
 				/>
 			</div>
 

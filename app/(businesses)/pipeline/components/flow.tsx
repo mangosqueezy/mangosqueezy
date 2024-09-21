@@ -23,11 +23,15 @@ import type {
 	AppState,
 	AffiliatesNode as TAffiliatesNode,
 	AskAINode as TAskAINode,
+	FormatNode as TFormatNode,
 	InputNode as TInputNode,
+	LocationNode as TLocationNode,
 } from "../types/appNode";
 import AffiliatesNode from "./affiliates-node";
 import AskAINode from "./ask-ai-node";
+import FormatNode from "./format-node";
 import InputNode from "./input-node";
+import LocationNode from "./location-node";
 
 type TFlowProps = {
 	products: Array<Products> | null | undefined;
@@ -53,6 +57,8 @@ const nodeTypes = {
 	inputProduct: InputNode,
 	inputAffiliate: AffiliatesNode,
 	inputAskAI: AskAINode,
+	inputFormat: FormatNode,
+	inputLocation: LocationNode,
 };
 
 function Flow({ products, business_id }: TFlowProps) {
@@ -79,35 +85,40 @@ function Flow({ products, business_id }: TFlowProps) {
 		const affiliate = nodes.find(
 			(node) => node.id === "node-2",
 		) as TAffiliatesNode;
-		const description = nodes.find(
-			(node) => node.id === "node-3",
-		) as TAskAINode;
+		const askAINode = nodes.find((node) => node.id === "node-3") as TAskAINode;
+		const formatNode = nodes.find(
+			(node) => node.id === "node-6",
+		) as TFormatNode;
+		const locationNode = nodes.find(
+			(node) => node.id === "node-5",
+		) as TLocationNode;
 
 		let product_id = Number.parseInt(product.data.value);
 		if (product.data.value === "" && products) {
 			product_id = products[0].id;
 		}
-		const prompt = description.data.value;
+		const prompt = askAINode.data.value;
 		const affiliate_count = Number.parseInt(affiliate.data.value);
-		const context = description.data.context as string;
-
+		const format = formatNode.data.value as string;
+		const location = locationNode.data.value as string;
 		const result = await createPipelineAction(
 			product_id,
 			prompt,
 			affiliate_count,
-			context,
+			format,
+			location,
 			business_id as string,
 		);
 		if (result?.id) {
 			analytics?.track("pipeline_created", {
 				product_id: product?.id,
 				business_id: business_id,
-				description: description,
+				prompt: prompt,
 			});
 			toast.custom((t) => (
 				<CustomToast
 					t={t}
-					message="Pipeline created successfully."
+					message="Pipeline created successfully. Please check status page."
 					variant="success"
 				/>
 			));

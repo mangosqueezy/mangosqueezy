@@ -34,7 +34,29 @@ export type AskAINode = Node<
 	"inputAskAI"
 >;
 
-export type AppNode = BuiltInNode | InputNode | AffiliatesNode | AskAINode;
+export type LocationNode = Node<
+	{
+		value: string;
+		label: string;
+	},
+	"inputLocation"
+>;
+
+export type FormatNode = Node<
+	{
+		value: string;
+		label: string;
+	},
+	"inputFormat"
+>;
+
+export type AppNode =
+	| BuiltInNode
+	| InputNode
+	| AffiliatesNode
+	| AskAINode
+	| LocationNode
+	| FormatNode;
 
 export type AppState = {
 	nodes: AppNode[];

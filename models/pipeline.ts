@@ -3,14 +3,16 @@ import prisma from "@/lib/prisma";
 export async function createPipeline({
 	product_id,
 	prompt,
-	context,
 	affiliate_count,
+	format,
+	location,
 	business_id,
 }: {
 	product_id: number;
 	prompt: string;
 	affiliate_count: number;
-	context: string;
+	format: string;
+	location: string;
 	business_id: string;
 }) {
 	try {
@@ -20,8 +22,9 @@ export async function createPipeline({
 				business_id,
 				prompt,
 				affiliate_count,
-				context,
-				remark: "mangosqueezy is working on this ETA 24-48 hours",
+				format,
+				location,
+				remark: "mangosqueezy is working on this",
 			},
 		});
 	} catch (err) {

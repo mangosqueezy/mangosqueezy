@@ -147,7 +147,8 @@ model Products {
 model Pipelines {
   id      Int     @id @default(autoincrement())
   prompt String?
-  context String?
+  format String?
+  location String?
   remark  String?
   affiliate_count Int?
 

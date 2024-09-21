@@ -3,40 +3,38 @@ import { useState } from "react";
 
 import useStore from "@/app/store/store";
 import { Handle, type NodeProps, Position } from "@xyflow/react";
-import { Hash } from "lucide-react";
-import type { AffiliatesNode as AffiliatesNodeProps } from "../types/appNode";
+import { MapPin } from "lucide-react";
+import type { LocationNode as LocationNodeProps } from "../types/appNode";
 
-export default function AffiliatesNode({
+export default function LocationNode({
 	id,
 	isConnectable,
-}: NodeProps<AffiliatesNodeProps>) {
+}: NodeProps<LocationNodeProps>) {
 	const updateNodeData = useStore((state) => state.updateNodeData);
-	const [affiliateCount, setAffiliateCount] = useState("3");
+	const [location, setLocation] = useState("global");
 
 	return (
 		<div className="h-full border border-gray-300 rounded bg-white">
-			<div className="bg-orange-300 p-2 rounded-t">
+			<div className="bg-indigo-300 p-2 rounded-t">
 				<div className="flex items-center">
-					<Hash className="h-5 w-5 mr-2" />
-					<span className="text-sm font-medium text-gray-700">
-						Affiliates Count
-					</span>
+					<MapPin className="h-5 w-5 mr-2" />
+					<span className="text-sm font-medium text-gray-700">Location</span>
 				</div>
 			</div>
 			<div className="p-2">
 				<label
 					className="block text-sm font-medium text-gray-700 mb-1"
-					htmlFor="count"
+					htmlFor="location"
 				>
-					Count:
+					Location:
 				</label>
 				<input
-					id="count"
-					name="count"
-					type="number"
-					value={affiliateCount}
+					id="location"
+					name="location"
+					type="text"
+					value={location}
 					onChange={(e) => {
-						setAffiliateCount(e.target.value);
+						setLocation(e.target.value);
 						updateNodeData(id, e.target.value);
 					}}
 					className="nodrag w-full p-1.5 border border-gray-300 rounded"
@@ -45,7 +43,7 @@ export default function AffiliatesNode({
 			<Handle
 				type="source"
 				position={Position.Bottom}
-				id="c"
+				id="g"
 				isConnectable={isConnectable}
 			/>
 		</div>

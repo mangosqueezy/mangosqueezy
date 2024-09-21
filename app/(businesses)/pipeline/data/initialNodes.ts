@@ -18,20 +18,46 @@ export const initialNodes = [
 		id: "node-3",
 		type: "inputAskAI",
 		targetPosition: "top",
-		position: { x: 200, y: 400 },
+		position: { x: 550, y: 200 },
 		data: {
-			value:
-				"Seeking Ideas: How to Find the Right Affiliates for Our Subscription-Based SaaS Product",
+			value: `Generate an engaging Instagram caption using the product description provided.
+				Based on your product description and location, generate 8-12 relevant hashtags that target your audience and niche.
+				`,
 			label: "Ask AI",
-			context:
-				"We’re expanding the affiliate program for [Your SaaS Product], a subscription-based tool designed to help [target market, e.g., businesses, freelancers] with [key benefits, e.g., productivity, collaboration]. To maximize growth, we’re looking for insights on which types of affiliates or categories are most effective at promoting subscription-based products. We want to partner with affiliates who can best reach our target audience and highlight our product’s value.",
 		},
 	},
 	{
 		id: "node-4",
 		type: "output",
 		targetPosition: "top",
-		position: { x: 200, y: 800 },
+		position: { x: 400, y: 860 },
 		data: { label: "Output" },
+	},
+	{
+		id: "node-5",
+		type: "inputLocation",
+		position: { x: 550, y: 0 },
+		targetPosition: "top",
+		data: { value: "global", label: "Location" },
+	},
+	{
+		id: "node-6",
+		type: "inputFormat",
+		position: { x: 550, y: 500 },
+		targetPosition: "top",
+		data: {
+			value: `Generate a caption and hashtags in the following format:
+
+Hook (First Line): Start with a question or attention-grabbing statement.
+Main Content (Tell a Story or Share Value): Describe the benefits of the product, service, or promotion in an engaging way.
+Call-to-Action (CTA): End with a clear call to action.
+Emojis: Use emojis to enhance the post and highlight key points.
+Hashtags: Include 8-12 relevant hashtags in one line.
+Format Requirements:
+
+Use line breaks for clarity.
+Maintain a visually appealing structure.`,
+			label: "Format",
+		},
 	},
 ] as AppNode[];
