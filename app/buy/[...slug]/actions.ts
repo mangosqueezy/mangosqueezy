@@ -1,5 +1,6 @@
 "use server";
 
+import { isRealTimePaymentsEnabled } from "@/config/flags";
 import { getAffiliateBusinessInfoById } from "@/models/affiliate_business";
 import { createOrder } from "@/models/orders";
 import { payoutTask } from "@/trigger/payout-job";
@@ -17,6 +18,7 @@ export async function createOrderAction(formData: FormData) {
 	const product_id = formData.get("product_id") as string;
 	const affiliate_id = formData.get("affiliate_id") as string;
 	const amount = formData.get("amount") as string;
+	const realTimePaymentsEnabled = await isRealTimePaymentsEnabled();
 
 	try {
 		await createOrder({
@@ -45,6 +47,7 @@ export async function createOrderAction(formData: FormData) {
 			email,
 			payment_preference: information?.business
 				.payment_preference satisfies PaymentPreference,
+			realTimePaymentsEnabled: realTimePaymentsEnabled as boolean,
 		});
 	} catch (err) {
 		console.error(err);

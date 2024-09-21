@@ -1,4 +1,3 @@
-import { isRealTimePaymentsEnabled } from "@/config/flags";
 import prisma from "@/lib/prisma";
 import { Client, Wallet, getBalanceChanges, xrpToDrops } from "@transia/xrpl";
 import { logger, task } from "@trigger.dev/sdk/v3";
@@ -23,6 +22,7 @@ type TPayload = {
 	email: string;
 	svix_consumer_app_id: string;
 	payment_preference: PaymentPreference | undefined;
+	realTimePaymentsEnabled: boolean;
 };
 
 export const payoutTask = task({
@@ -41,6 +41,7 @@ export const payoutTask = task({
 			affiliate_email,
 			payment_preference,
 			product_id,
+			realTimePaymentsEnabled,
 		} = payload;
 
 		const options = {
@@ -53,7 +54,6 @@ export const payoutTask = task({
 			},
 		};
 
-		const realTimePaymentsEnabled = await isRealTimePaymentsEnabled();
 		const ratesResponse = await fetch(
 			"https://xumm.app/api/v1/platform/rates/USD",
 			options,
