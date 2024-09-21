@@ -17,15 +17,11 @@ export default async function PipelinePage() {
 						<div className="min-w-0">
 							<div className="flex items-start gap-x-3">
 								<p className="text-sm font-semibold leading-6 text-gray-500">
-									{`Product Id - ${pipeline.product_id}`}
+									{`Pipeline Id - ${pipeline.id}`}
 								</p>
 								<p className="text-orange-700 bg-orange-50 ring-orange-600/20 mt-0.5 whitespace-nowrap rounded-md px-1.5 py-0.5 text-xs font-medium ring-1 ring-inset">
 									{pipeline.remark}
 								</p>
-							</div>
-
-							<div className="mt-1 flex items-center gap-x-2 text-md leading-5 text-gray-900">
-								<p className="whitespace-nowrap">{`Prompt - ${pipeline.prompt}`}</p>
 							</div>
 						</div>
 					</li>
