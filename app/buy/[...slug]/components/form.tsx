@@ -45,12 +45,14 @@ type TBuyForm = {
 	product: Products | null;
 	formattedAmount: string;
 	affiliateId: number | undefined;
+	moonpayEnabled: boolean;
 };
 
 export default function BuyForm({
 	product,
 	formattedAmount,
 	affiliateId,
+	moonpayEnabled,
 }: TBuyForm) {
 	const analytics = useJune(process.env.NEXT_PUBLIC_JUNE_API_KEY!);
 	const [isXRPButtonLoading, setIsXRPButtonLoading] = useState(false);
@@ -133,7 +135,7 @@ export default function BuyForm({
 	const callPay = async (email: string, amount: string) => {
 		setIsPayButtonLoading(true);
 		const parsedAmount = Number.parseFloat(amount);
-		if (parsedAmount > 30) {
+		if (parsedAmount > 30 && moonpayEnabled) {
 			analytics?.track("Order Created", {
 				product_id: product?.id,
 				product_price: product?.price,

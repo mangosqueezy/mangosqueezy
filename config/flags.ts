@@ -24,3 +24,11 @@ export const isRealTimePaymentsEnabled = flag({
 		return value ?? false;
 	},
 });
+
+export const isMoonpayEnabled = flag({
+	key: "moonpay_enabled",
+	async decide() {
+		const value = await get("moonpay_enabled");
+		return value ?? false;
+	},
+});
