@@ -14,7 +14,6 @@ import {
 	FormControl,
 	FormField,
 	FormItem,
-	FormLabel,
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -22,7 +21,7 @@ import { useJune } from "@/hooks/useJune";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Products } from "@prisma/client";
-import { Loader } from "lucide-react";
+import { CreditCard, HandCoins, Loader } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -262,7 +261,7 @@ export default function BuyForm({
 														alt={"product image"}
 														width={200}
 														height={200}
-														className="w-20 rounded-md"
+														className="w-20 md:w-80 rounded-md"
 													/>
 												</div>
 
@@ -299,7 +298,8 @@ export default function BuyForm({
 											)}
 											disabled={isXRPButtonLoading}
 										>
-											XRP Pay
+											<HandCoins className="mr-2" />
+											Pay with crypto
 											{isXRPButtonLoading && (
 												<Loader className="animate-spin" />
 											)}
@@ -331,14 +331,15 @@ export default function BuyForm({
 										<Button
 											type="submit"
 											onClick={() => form.setValue("action-type", "moonpay")}
-											color="purple"
+											color="blue"
 											className={cn(
 												"w-full px-4 py-3 cursor-pointer",
 												isPayButtonLoading && "cursor-not-allowed",
 											)}
 											disabled={isPayButtonLoading}
 										>
-											Pay
+											<CreditCard className="mr-2" />
+											Pay with card
 											{isPayButtonLoading && (
 												<Loader className="animate-spin" />
 											)}
