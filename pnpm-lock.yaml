@@ -183,8 +183,8 @@ importers:
         specifier: ^3.6.0
         version: 3.6.0
       dub:
-        specifier: ^0.36.0
-        version: 0.36.0(zod@3.23.8)
+        specifier: ^0.41.1
+        version: 0.41.1(zod@3.23.8)
       express:
         specifier: ^4.19.2
         version: 4.19.2
@@ -4413,8 +4413,8 @@ packages:
     resolution: {integrity: sha512-20TuZZHCEZ2O71q9/+8BwKwZ0QtD9D8ObhrihJPr+vLLYlSuAU3/zL4cSlgbfeoGHTjCSJBa7NGcrF9/Bx/WJQ==}
     engines: {node: '>=4'}
 
-  dub@0.36.0:
-    resolution: {integrity: sha512-nrZvRu9//GtHFT0xWwcV7mox4JHzBKdZK1CGuEOtMPklnILeEXMjO77JKAFzTgMp9F0dcWujgRmv/BH+J7s00w==}
+  dub@0.41.1:
+    resolution: {integrity: sha512-29wCdTL88FVOq6KOICwu1PKluwJYxRCC/GF+LJ1sWhyuQc8BuzZdoi6DcQUrBYtsfCJwG/xvzej+SEKmpYidFA==}
     peerDependencies:
       zod: '>= 3'
 
@@ -12005,7 +12005,7 @@ snapshots:
 
   dset@3.1.3: {}
 
-  dub@0.36.0(zod@3.23.8):
+  dub@0.41.1(zod@3.23.8):
     dependencies:
       zod: 3.23.8
 

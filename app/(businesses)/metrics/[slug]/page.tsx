@@ -21,9 +21,9 @@ import {
 } from "@/components/ui/chart";
 import { format, parseISO } from "date-fns";
 import type {
-	ClicksCountries,
-	ClicksReferers,
-	ClicksTimeseries,
+	AnalyticsCountries,
+	AnalyticsReferers,
+	AnalyticsTimeseries,
 } from "dub/models/components";
 import { useParams } from "next/navigation";
 import { getAnalytics } from "../actions";
@@ -57,11 +57,11 @@ const referrerChartConfig = {
 
 export default function Analytics() {
 	const params = useParams<{ slug: string }>();
-	const [chartData, setChartData] = useState<Array<ClicksTimeseries>>();
+	const [chartData, setChartData] = useState<Array<AnalyticsTimeseries>>();
 	const [countryChartData, setCountryChartData] =
-		useState<Array<ClicksCountries>>();
+		useState<Array<AnalyticsCountries>>();
 	const [referrerChartData, setReferrerChartData] =
-		useState<Array<ClicksReferers>>();
+		useState<Array<AnalyticsReferers>>();
 
 	const getLinkAnalytics = useCallback(async () => {
 		const formData = new FormData();
@@ -70,7 +70,7 @@ export default function Analytics() {
 		const { clickTimeseries, countryTimeseries, referrerTimeseries } =
 			analytics || {};
 
-		const metricList: Array<ClicksTimeseries> = [];
+		const metricList: Array<AnalyticsTimeseries> = [];
 		if (clickTimeseries) {
 			for (const metric of clickTimeseries) {
 				const date = parseISO(metric.start);

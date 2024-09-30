@@ -25,5 +25,16 @@ export async function POST(request: Request) {
 
 	console.log("/api/webhook/ig/ POST => ", message);
 
+	await fetch("https://mangosqueezy-hono-app.vercel.app/api/workflow", {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify({
+			recipientId: message.sender.id,
+			text: message.message.text,
+		}),
+	});
+
 	return new Response("Received", { status: 200 });
 }

@@ -1,9 +1,9 @@
 "use server";
 import { Dub } from "dub";
 import type {
-	ClicksCountries,
-	ClicksReferers,
-	ClicksTimeseries,
+	AnalyticsCountries,
+	AnalyticsReferers,
+	AnalyticsTimeseries,
 } from "dub/models/components";
 
 const dub = new Dub({
@@ -33,9 +33,9 @@ export async function getAnalytics(body: FormData) {
 			groupBy: "referers",
 		});
 
-		const clickTimeseries = clickEvent as ClicksTimeseries[];
-		const countryTimeseries = countryEvent as ClicksCountries[];
-		const referrerTimeseries = referrerEvent as ClicksReferers[];
+		const clickTimeseries = clickEvent as AnalyticsTimeseries[];
+		const countryTimeseries = countryEvent as AnalyticsCountries[];
+		const referrerTimeseries = referrerEvent as AnalyticsReferers[];
 
 		return { clickTimeseries, countryTimeseries, referrerTimeseries };
 	} catch (error) {

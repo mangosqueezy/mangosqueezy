@@ -78,7 +78,7 @@
 		"compression": "^1.7.4",
 		"cookie": "^0.6.0",
 		"date-fns": "^3.6.0",
-		"dub": "^0.36.0",
+		"dub": "^0.41.1",
 		"express": "^4.19.2",
 		"framer-motion": "^11.3.28",
 		"google-auth-library": "^9.14.0",
