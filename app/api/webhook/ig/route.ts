@@ -15,18 +15,20 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+	const IG_BUSINESS_ID = process.env.IG_BUSINESS_ID;
 	const body = await request.text();
 
 	const jsonBody = JSON.parse(body);
 
+	const appUsersIgUserId = jsonBody?.entry[0]?.id;
 	const messaging = jsonBody?.entry[0].messaging;
 
 	const message = messaging[0];
 
-	console.log("/api/webhook/ig/ POST => ", message);
+	console.log("/api/webhook/ig/ POST => ", { message, appUsersIgUserId });
 
 	// exclude ourself
-	if (message.sender.id !== "17841458398835295") {
+	if (message.sender.id !== IG_BUSINESS_ID) {
 		await fetch("https://mangosqueezy-hono-app.vercel.app/api/workflow", {
 			method: "POST",
 			headers: {
