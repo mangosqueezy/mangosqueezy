@@ -57,15 +57,6 @@ export async function sendEmail(formData: FormData) {
 
       Here is the affiliate link ${dubResponse.shortLink}. Now you can share it with your audience and grow.
       `;
-
-			if (!affiliateInfo?.id) {
-				// trigger background job to create the affiliate profile in our database
-				await createAffiliateTask.trigger({
-					first_name: name,
-					businessId,
-					email,
-				});
-			}
 		}
 	}
 
