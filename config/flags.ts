@@ -32,3 +32,11 @@ export const isMoonpayEnabled = flag({
 		return value ?? false;
 	},
 });
+
+export const isIgAssistEnabled = flag({
+	key: "ig_assist_enabled",
+	async decide() {
+		const value = await get("ig_assist_enabled");
+		return value ?? false;
+	},
+});

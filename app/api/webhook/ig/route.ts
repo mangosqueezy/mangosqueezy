@@ -1,3 +1,5 @@
+import { isIgAssistEnabled } from "@/config/flags";
+
 export async function GET(request: Request) {
 	const { searchParams } = new URL(request.url);
 	const hubChallenge = searchParams.get("hub.challenge");
@@ -27,8 +29,8 @@ export async function POST(request: Request) {
 
 	console.log("/api/webhook/ig/ POST => ", { message, appUsersIgUserId });
 
-	// exclude ourself
-	if (message.sender.id !== IG_BUSINESS_ID) {
+	const igAssistEnabled = (await isIgAssistEnabled()) as boolean;
+	if (message.sender.id !== IG_BUSINESS_ID && igAssistEnabled) {
 		await fetch("https://mangosqueezy-hono-app.vercel.app/api/workflow", {
 			method: "POST",
 			headers: {

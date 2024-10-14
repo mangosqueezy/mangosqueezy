@@ -34,10 +34,10 @@ importers:
         version: 0.2.28(@langchain/anthropic@0.2.15)(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@upstash/redis@1.34.0)(cheerio@1.0.0)(crypto-js@4.2.0)(fast-xml-parser@4.4.1)(google-auth-library@9.14.0)(googleapis@142.0.0)(html-to-text@9.0.5)(ignore@5.3.1)(lodash@4.17.21)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))
       '@langchain/core':
         specifier: ^0.2.27
-        version: 0.2.27(langchain@0.2.16(@langchain/anthropic@0.2.15(langchain@0.2.16)(openai@4.56.0(zod@3.23.8)))(@langchain/community@0.2.28(@langchain/anthropic@0.2.15)(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@upstash/redis@1.34.0)(cheerio@1.0.0)(crypto-js@4.2.0)(fast-xml-parser@4.4.1)(google-auth-library@9.14.0)(googleapis@142.0.0)(html-to-text@9.0.5)(ignore@5.3.1)(lodash@4.17.21)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(cheerio@1.0.0)(fast-xml-parser@4.4.1)(html-to-text@9.0.5)(ignore@5.3.1)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(openai@4.56.0(zod@3.23.8))
+        version: 0.2.27(langchain@0.2.16)(openai@4.56.0(zod@3.23.8))
       '@langchain/openai':
         specifier: ^0.2.7
-        version: 0.2.7(langchain@0.2.16(@langchain/anthropic@0.2.15(langchain@0.2.16)(openai@4.56.0(zod@3.23.8)))(@langchain/community@0.2.28(@langchain/anthropic@0.2.15)(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@upstash/redis@1.34.0)(cheerio@1.0.0)(crypto-js@4.2.0)(fast-xml-parser@4.4.1)(google-auth-library@9.14.0)(googleapis@142.0.0)(html-to-text@9.0.5)(ignore@5.3.1)(lodash@4.17.21)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(cheerio@1.0.0)(fast-xml-parser@4.4.1)(html-to-text@9.0.5)(ignore@5.3.1)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))
+        version: 0.2.7(langchain@0.2.16)
       '@moonpay/moonpay-node':
         specifier: ^0.2.6
         version: 0.2.6
@@ -134,6 +134,9 @@ importers:
       '@trigger.dev/sdk':
         specifier: 3.0.0-beta.56
         version: 3.0.0-beta.56(bufferutil@4.0.8)(typescript@5.5.4)(utf-8-validate@5.0.10)
+      '@upstash/qstash':
+        specifier: ^2.7.12
+        version: 2.7.12
       '@upstash/redis':
         specifier: ^1.34.0
         version: 1.34.0
@@ -205,7 +208,7 @@ importers:
         version: 2.9.3(@types/react@18.3.3)(react@18.3.1)
       langchain:
         specifier: ^0.2.16
-        version: 0.2.16(@langchain/anthropic@0.2.15(langchain@0.2.16)(openai@4.56.0(zod@3.23.8)))(@langchain/community@0.2.28(@langchain/anthropic@0.2.15)(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@upstash/redis@1.34.0)(cheerio@1.0.0)(crypto-js@4.2.0)(fast-xml-parser@4.4.1)(google-auth-library@9.14.0)(googleapis@142.0.0)(html-to-text@9.0.5)(ignore@5.3.1)(lodash@4.17.21)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(cheerio@1.0.0)(fast-xml-parser@4.4.1)(html-to-text@9.0.5)(ignore@5.3.1)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))
+        version: 0.2.16(@langchain/anthropic@0.2.15)(@langchain/community@0.2.28(@langchain/anthropic@0.2.15)(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@upstash/redis@1.34.0)(cheerio@1.0.0)(crypto-js@4.2.0)(fast-xml-parser@4.4.1)(google-auth-library@9.14.0)(googleapis@142.0.0)(html-to-text@9.0.5)(ignore@5.3.1)(lodash@4.17.21)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(cheerio@1.0.0)(fast-xml-parser@4.4.1)(html-to-text@9.0.5)(ignore@5.3.1)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -3420,6 +3423,9 @@ packages:
     resolution: {integrity: sha512-c6EIQRHhcpl6+tO8EMR+kjkkV+ugUNXOmeASA1rlzkd8EPIriavpWoiEz1HR/VLhbVIdhqnV6E7JZm00cBDx2A==}
     engines: {node: ^16.0.0 || >=18.0.0}
 
+  '@upstash/qstash@2.7.12':
+    resolution: {integrity: sha512-QUCIA8eFciExQ2pmEbuVJMf35fFGCGkqBLUOhaOLcqzyoZu3w7N/jtEZgxq8R73o2kkcoRRQJFJMF+TGBUJ+nw==}
+
   '@upstash/redis@1.34.0':
     resolution: {integrity: sha512-TrXNoJLkysIl8SBc4u9bNnyoFYoILpCcFJcLyWCccb/QSUmaVKdvY0m5diZqc3btExsapcMbaw/s/wh9Sf1pJw==}
 
@@ -5393,6 +5399,9 @@ packages:
   jose@5.2.1:
     resolution: {integrity: sha512-qiaQhtQRw6YrOaOj0v59h3R6hUY9NvxBmmnMfKemkqYmBB0tEc97NbLP7ix44VP5p9/0YHG8Vyhzuo5YBNwviA==}
 
+  jose@5.9.4:
+    resolution: {integrity: sha512-WBBl6au1qg6OHj67yCffCgFR3BADJBXN8MdRvCgJDuMv3driV2nHr7jdGvaKX9IolosAsn+M0XRArqLXUhyJHQ==}
+
   jotai@2.9.3:
     resolution: {integrity: sha512-IqMWKoXuEzWSShjd9UhalNsRGbdju5G2FrqNLQJT+Ih6p41VNYe2sav5hnwQx4HJr25jq9wRqvGSWGviGG6Gjw==}
     engines: {node: '>=12.20.0'}
@@ -6002,6 +6011,10 @@ packages:
 
   neo-async@2.6.2:
     resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
+
+  neverthrow@7.2.0:
+    resolution: {integrity: sha512-iGBUfFB7yPczHHtA8dksKTJ9E8TESNTAx1UQWW6TzMF280vo9jdPYpLUXrMN1BCkPdHFdNG3fxOt2CUad8KhAw==}
+    engines: {node: '>=18'}
 
   new-date@1.0.3:
     resolution: {integrity: sha512-0fsVvQPbo2I18DT2zVHpezmeeNYV2JaJSrseiHLc17GNOxJzUdx5mvSigPu8LtIfZSij5i1wXnXFspEs2CD6hA==}
@@ -8222,7 +8235,7 @@ snapshots:
   '@langchain/anthropic@0.2.15(langchain@0.2.16)(openai@4.56.0(zod@3.23.8))':
     dependencies:
       '@anthropic-ai/sdk': 0.25.2
-      '@langchain/core': 0.2.27(langchain@0.2.16(@langchain/anthropic@0.2.15(langchain@0.2.16)(openai@4.56.0(zod@3.23.8)))(@langchain/community@0.2.28(@langchain/anthropic@0.2.15)(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@upstash/redis@1.34.0)(cheerio@1.0.0)(crypto-js@4.2.0)(fast-xml-parser@4.4.1)(google-auth-library@9.14.0)(googleapis@142.0.0)(html-to-text@9.0.5)(ignore@5.3.1)(lodash@4.17.21)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(cheerio@1.0.0)(fast-xml-parser@4.4.1)(html-to-text@9.0.5)(ignore@5.3.1)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(openai@4.56.0(zod@3.23.8))
+      '@langchain/core': 0.2.27(langchain@0.2.16)(openai@4.56.0(zod@3.23.8))
       fast-xml-parser: 4.4.1
       zod: 3.23.8
       zod-to-json-schema: 3.23.2(zod@3.23.8)
@@ -8233,14 +8246,14 @@ snapshots:
 
   '@langchain/community@0.2.28(@langchain/anthropic@0.2.15)(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@upstash/redis@1.34.0)(cheerio@1.0.0)(crypto-js@4.2.0)(fast-xml-parser@4.4.1)(google-auth-library@9.14.0)(googleapis@142.0.0)(html-to-text@9.0.5)(ignore@5.3.1)(lodash@4.17.21)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))':
     dependencies:
-      '@langchain/core': 0.2.27(langchain@0.2.16(@langchain/anthropic@0.2.15(langchain@0.2.16)(openai@4.56.0(zod@3.23.8)))(@langchain/community@0.2.28(@langchain/anthropic@0.2.15)(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@upstash/redis@1.34.0)(cheerio@1.0.0)(crypto-js@4.2.0)(fast-xml-parser@4.4.1)(google-auth-library@9.14.0)(googleapis@142.0.0)(html-to-text@9.0.5)(ignore@5.3.1)(lodash@4.17.21)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(cheerio@1.0.0)(fast-xml-parser@4.4.1)(html-to-text@9.0.5)(ignore@5.3.1)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(openai@4.56.0(zod@3.23.8))
-      '@langchain/openai': 0.2.7(langchain@0.2.16(@langchain/anthropic@0.2.15(langchain@0.2.16)(openai@4.56.0(zod@3.23.8)))(@langchain/community@0.2.28(@langchain/anthropic@0.2.15)(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@upstash/redis@1.34.0)(cheerio@1.0.0)(crypto-js@4.2.0)(fast-xml-parser@4.4.1)(google-auth-library@9.14.0)(googleapis@142.0.0)(html-to-text@9.0.5)(ignore@5.3.1)(lodash@4.17.21)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(cheerio@1.0.0)(fast-xml-parser@4.4.1)(html-to-text@9.0.5)(ignore@5.3.1)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))
+      '@langchain/core': 0.2.27(langchain@0.2.16)(openai@4.56.0(zod@3.23.8))
+      '@langchain/openai': 0.2.7(langchain@0.2.16)
       binary-extensions: 2.3.0
       expr-eval: 2.0.2
       flat: 5.0.2
       js-yaml: 4.1.0
-      langchain: 0.2.16(@langchain/anthropic@0.2.15(langchain@0.2.16)(openai@4.56.0(zod@3.23.8)))(@langchain/community@0.2.28(@langchain/anthropic@0.2.15)(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@upstash/redis@1.34.0)(cheerio@1.0.0)(crypto-js@4.2.0)(fast-xml-parser@4.4.1)(google-auth-library@9.14.0)(googleapis@142.0.0)(html-to-text@9.0.5)(ignore@5.3.1)(lodash@4.17.21)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(cheerio@1.0.0)(fast-xml-parser@4.4.1)(html-to-text@9.0.5)(ignore@5.3.1)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))
-      langsmith: 0.1.30(n35iqsknezlm2vrplv5ojhnezi)
+      langchain: 0.2.16(@langchain/anthropic@0.2.15)(@langchain/community@0.2.28(@langchain/anthropic@0.2.15)(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@upstash/redis@1.34.0)(cheerio@1.0.0)(crypto-js@4.2.0)(fast-xml-parser@4.4.1)(google-auth-library@9.14.0)(googleapis@142.0.0)(html-to-text@9.0.5)(ignore@5.3.1)(lodash@4.17.21)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(cheerio@1.0.0)(fast-xml-parser@4.4.1)(html-to-text@9.0.5)(ignore@5.3.1)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))
+      langsmith: 0.1.30(@langchain/core@0.2.27(langchain@0.2.16)(openai@4.56.0(zod@3.23.8)))(langchain@0.2.16)(openai@4.56.0(zod@3.23.8))
       uuid: 10.0.0
       zod: 3.23.8
       zod-to-json-schema: 3.23.2(zod@3.23.8)
@@ -8273,13 +8286,13 @@ snapshots:
       - peggy
       - pyodide
 
-  '@langchain/core@0.2.27(langchain@0.2.16(@langchain/anthropic@0.2.15(langchain@0.2.16)(openai@4.56.0(zod@3.23.8)))(@langchain/community@0.2.28(@langchain/anthropic@0.2.15)(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@upstash/redis@1.34.0)(cheerio@1.0.0)(crypto-js@4.2.0)(fast-xml-parser@4.4.1)(google-auth-library@9.14.0)(googleapis@142.0.0)(html-to-text@9.0.5)(ignore@5.3.1)(lodash@4.17.21)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(cheerio@1.0.0)(fast-xml-parser@4.4.1)(html-to-text@9.0.5)(ignore@5.3.1)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(openai@4.56.0(zod@3.23.8))':
+  '@langchain/core@0.2.27(langchain@0.2.16)(openai@4.56.0(zod@3.23.8))':
     dependencies:
       ansi-styles: 5.2.0
       camelcase: 6.3.0
       decamelize: 1.2.0
       js-tiktoken: 1.0.12
-      langsmith: 0.1.42(n35iqsknezlm2vrplv5ojhnezi)
+      langsmith: 0.1.42(@langchain/core@0.2.27(langchain@0.2.16)(openai@4.56.0(zod@3.23.8)))(langchain@0.2.16)(openai@4.56.0(zod@3.23.8))
       mustache: 4.2.0
       p-queue: 6.6.2
       p-retry: 4.6.2
@@ -8290,9 +8303,9 @@ snapshots:
       - langchain
       - openai
 
-  '@langchain/openai@0.2.7(langchain@0.2.16(@langchain/anthropic@0.2.15(langchain@0.2.16)(openai@4.56.0(zod@3.23.8)))(@langchain/community@0.2.28(@langchain/anthropic@0.2.15)(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@upstash/redis@1.34.0)(cheerio@1.0.0)(crypto-js@4.2.0)(fast-xml-parser@4.4.1)(google-auth-library@9.14.0)(googleapis@142.0.0)(html-to-text@9.0.5)(ignore@5.3.1)(lodash@4.17.21)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(cheerio@1.0.0)(fast-xml-parser@4.4.1)(html-to-text@9.0.5)(ignore@5.3.1)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))':
+  '@langchain/openai@0.2.7(langchain@0.2.16)':
     dependencies:
-      '@langchain/core': 0.2.27(langchain@0.2.16(@langchain/anthropic@0.2.15(langchain@0.2.16)(openai@4.56.0(zod@3.23.8)))(@langchain/community@0.2.28(@langchain/anthropic@0.2.15)(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@upstash/redis@1.34.0)(cheerio@1.0.0)(crypto-js@4.2.0)(fast-xml-parser@4.4.1)(google-auth-library@9.14.0)(googleapis@142.0.0)(html-to-text@9.0.5)(ignore@5.3.1)(lodash@4.17.21)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(cheerio@1.0.0)(fast-xml-parser@4.4.1)(html-to-text@9.0.5)(ignore@5.3.1)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(openai@4.56.0(zod@3.23.8))
+      '@langchain/core': 0.2.27(langchain@0.2.16)(openai@4.56.0(zod@3.23.8))
       js-tiktoken: 1.0.12
       openai: 4.56.0(zod@3.23.8)
       zod: 3.23.8
@@ -8301,9 +8314,9 @@ snapshots:
       - encoding
       - langchain
 
-  '@langchain/textsplitters@0.0.2(langchain@0.2.16(@langchain/anthropic@0.2.15(langchain@0.2.16)(openai@4.56.0(zod@3.23.8)))(@langchain/community@0.2.28(@langchain/anthropic@0.2.15)(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@upstash/redis@1.34.0)(cheerio@1.0.0)(crypto-js@4.2.0)(fast-xml-parser@4.4.1)(google-auth-library@9.14.0)(googleapis@142.0.0)(html-to-text@9.0.5)(ignore@5.3.1)(lodash@4.17.21)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(cheerio@1.0.0)(fast-xml-parser@4.4.1)(html-to-text@9.0.5)(ignore@5.3.1)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(openai@4.56.0(zod@3.23.8))':
+  '@langchain/textsplitters@0.0.2(langchain@0.2.16)(openai@4.56.0(zod@3.23.8))':
     dependencies:
-      '@langchain/core': 0.2.27(langchain@0.2.16(@langchain/anthropic@0.2.15(langchain@0.2.16)(openai@4.56.0(zod@3.23.8)))(@langchain/community@0.2.28(@langchain/anthropic@0.2.15)(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@upstash/redis@1.34.0)(cheerio@1.0.0)(crypto-js@4.2.0)(fast-xml-parser@4.4.1)(google-auth-library@9.14.0)(googleapis@142.0.0)(html-to-text@9.0.5)(ignore@5.3.1)(lodash@4.17.21)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(cheerio@1.0.0)(fast-xml-parser@4.4.1)(html-to-text@9.0.5)(ignore@5.3.1)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(openai@4.56.0(zod@3.23.8))
+      '@langchain/core': 0.2.27(langchain@0.2.16)(openai@4.56.0(zod@3.23.8))
       js-tiktoken: 1.0.12
     transitivePeerDependencies:
       - langchain
@@ -10901,6 +10914,12 @@ snapshots:
       '@typescript-eslint/types': 7.2.0
       eslint-visitor-keys: 3.4.3
 
+  '@upstash/qstash@2.7.12':
+    dependencies:
+      crypto-js: 4.2.0
+      jose: 5.9.4
+      neverthrow: 7.2.0
+
   '@upstash/redis@1.34.0':
     dependencies:
       crypto-js: 4.2.0
@@ -12235,7 +12254,7 @@ snapshots:
       debug: 4.3.4
       enhanced-resolve: 5.17.1
       eslint: 9.9.0(jiti@1.21.0)
-      eslint-module-utils: 2.8.1(@typescript-eslint/parser@7.2.0(eslint@9.9.0(jiti@1.21.0))(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.2.0(eslint@9.9.0(jiti@1.21.0))(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@9.9.0(jiti@1.21.0)))(eslint@9.9.0(jiti@1.21.0))
+      eslint-module-utils: 2.8.1(@typescript-eslint/parser@7.2.0(eslint@9.9.0(jiti@1.21.0))(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@9.9.0(jiti@1.21.0))
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.2.0(eslint@9.9.0(jiti@1.21.0))(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.1)(eslint@9.9.0(jiti@1.21.0))
       fast-glob: 3.3.2
       get-tsconfig: 4.7.5
@@ -12247,7 +12266,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-module-utils@2.8.1(@typescript-eslint/parser@7.2.0(eslint@9.9.0(jiti@1.21.0))(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.2.0(eslint@9.9.0(jiti@1.21.0))(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@9.9.0(jiti@1.21.0)))(eslint@9.9.0(jiti@1.21.0)):
+  eslint-module-utils@2.8.1(@typescript-eslint/parser@7.2.0(eslint@9.9.0(jiti@1.21.0))(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@9.9.0(jiti@1.21.0)):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
@@ -12268,7 +12287,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.9.0(jiti@1.21.0)
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.8.1(@typescript-eslint/parser@7.2.0(eslint@9.9.0(jiti@1.21.0))(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.2.0(eslint@9.9.0(jiti@1.21.0))(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@9.9.0(jiti@1.21.0)))(eslint@9.9.0(jiti@1.21.0))
+      eslint-module-utils: 2.8.1(@typescript-eslint/parser@7.2.0(eslint@9.9.0(jiti@1.21.0))(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@9.9.0(jiti@1.21.0))
       hasown: 2.0.2
       is-core-module: 2.13.1
       is-glob: 4.0.3
@@ -13250,6 +13269,8 @@ snapshots:
 
   jose@5.2.1: {}
 
+  jose@5.9.4: {}
+
   jotai@2.9.3(@types/react@18.3.3)(react@18.3.1):
     optionalDependencies:
       '@types/react': 18.3.3
@@ -13339,16 +13360,16 @@ snapshots:
     dependencies:
       json-buffer: 3.0.1
 
-  langchain@0.2.16(@langchain/anthropic@0.2.15(langchain@0.2.16)(openai@4.56.0(zod@3.23.8)))(@langchain/community@0.2.28(@langchain/anthropic@0.2.15)(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@upstash/redis@1.34.0)(cheerio@1.0.0)(crypto-js@4.2.0)(fast-xml-parser@4.4.1)(google-auth-library@9.14.0)(googleapis@142.0.0)(html-to-text@9.0.5)(ignore@5.3.1)(lodash@4.17.21)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(cheerio@1.0.0)(fast-xml-parser@4.4.1)(html-to-text@9.0.5)(ignore@5.3.1)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)):
+  langchain@0.2.16(@langchain/anthropic@0.2.15)(@langchain/community@0.2.28(@langchain/anthropic@0.2.15)(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@upstash/redis@1.34.0)(cheerio@1.0.0)(crypto-js@4.2.0)(fast-xml-parser@4.4.1)(google-auth-library@9.14.0)(googleapis@142.0.0)(html-to-text@9.0.5)(ignore@5.3.1)(lodash@4.17.21)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(cheerio@1.0.0)(fast-xml-parser@4.4.1)(html-to-text@9.0.5)(ignore@5.3.1)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)):
     dependencies:
-      '@langchain/core': 0.2.27(langchain@0.2.16(@langchain/anthropic@0.2.15(langchain@0.2.16)(openai@4.56.0(zod@3.23.8)))(@langchain/community@0.2.28(@langchain/anthropic@0.2.15)(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@upstash/redis@1.34.0)(cheerio@1.0.0)(crypto-js@4.2.0)(fast-xml-parser@4.4.1)(google-auth-library@9.14.0)(googleapis@142.0.0)(html-to-text@9.0.5)(ignore@5.3.1)(lodash@4.17.21)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(cheerio@1.0.0)(fast-xml-parser@4.4.1)(html-to-text@9.0.5)(ignore@5.3.1)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(openai@4.56.0(zod@3.23.8))
-      '@langchain/openai': 0.2.7(langchain@0.2.16(@langchain/anthropic@0.2.15(langchain@0.2.16)(openai@4.56.0(zod@3.23.8)))(@langchain/community@0.2.28(@langchain/anthropic@0.2.15)(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@upstash/redis@1.34.0)(cheerio@1.0.0)(crypto-js@4.2.0)(fast-xml-parser@4.4.1)(google-auth-library@9.14.0)(googleapis@142.0.0)(html-to-text@9.0.5)(ignore@5.3.1)(lodash@4.17.21)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(cheerio@1.0.0)(fast-xml-parser@4.4.1)(html-to-text@9.0.5)(ignore@5.3.1)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))
-      '@langchain/textsplitters': 0.0.2(langchain@0.2.16(@langchain/anthropic@0.2.15(langchain@0.2.16)(openai@4.56.0(zod@3.23.8)))(@langchain/community@0.2.28(@langchain/anthropic@0.2.15)(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@upstash/redis@1.34.0)(cheerio@1.0.0)(crypto-js@4.2.0)(fast-xml-parser@4.4.1)(google-auth-library@9.14.0)(googleapis@142.0.0)(html-to-text@9.0.5)(ignore@5.3.1)(lodash@4.17.21)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(cheerio@1.0.0)(fast-xml-parser@4.4.1)(html-to-text@9.0.5)(ignore@5.3.1)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(openai@4.56.0(zod@3.23.8))
+      '@langchain/core': 0.2.27(langchain@0.2.16)(openai@4.56.0(zod@3.23.8))
+      '@langchain/openai': 0.2.7(langchain@0.2.16)
+      '@langchain/textsplitters': 0.0.2(langchain@0.2.16)(openai@4.56.0(zod@3.23.8))
       binary-extensions: 2.3.0
       js-tiktoken: 1.0.12
       js-yaml: 4.1.0
       jsonpointer: 5.0.1
-      langsmith: 0.1.42(n35iqsknezlm2vrplv5ojhnezi)
+      langsmith: 0.1.42(@langchain/core@0.2.27(langchain@0.2.16)(openai@4.56.0(zod@3.23.8)))(langchain@0.2.16)(openai@4.56.0(zod@3.23.8))
       openapi-types: 12.1.3
       p-retry: 4.6.2
       uuid: 10.0.0
@@ -13368,7 +13389,7 @@ snapshots:
       - encoding
       - openai
 
-  langsmith@0.1.30(n35iqsknezlm2vrplv5ojhnezi):
+  langsmith@0.1.30(@langchain/core@0.2.27(langchain@0.2.16)(openai@4.56.0(zod@3.23.8)))(langchain@0.2.16)(openai@4.56.0(zod@3.23.8)):
     dependencies:
       '@types/uuid': 9.0.8
       commander: 10.0.1
@@ -13376,11 +13397,11 @@ snapshots:
       p-retry: 4.6.2
       uuid: 9.0.1
     optionalDependencies:
-      '@langchain/core': 0.2.27(langchain@0.2.16(@langchain/anthropic@0.2.15(langchain@0.2.16)(openai@4.56.0(zod@3.23.8)))(@langchain/community@0.2.28(@langchain/anthropic@0.2.15)(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@upstash/redis@1.34.0)(cheerio@1.0.0)(crypto-js@4.2.0)(fast-xml-parser@4.4.1)(google-auth-library@9.14.0)(googleapis@142.0.0)(html-to-text@9.0.5)(ignore@5.3.1)(lodash@4.17.21)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(cheerio@1.0.0)(fast-xml-parser@4.4.1)(html-to-text@9.0.5)(ignore@5.3.1)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(openai@4.56.0(zod@3.23.8))
-      langchain: 0.2.16(@langchain/anthropic@0.2.15(langchain@0.2.16)(openai@4.56.0(zod@3.23.8)))(@langchain/community@0.2.28(@langchain/anthropic@0.2.15)(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@upstash/redis@1.34.0)(cheerio@1.0.0)(crypto-js@4.2.0)(fast-xml-parser@4.4.1)(google-auth-library@9.14.0)(googleapis@142.0.0)(html-to-text@9.0.5)(ignore@5.3.1)(lodash@4.17.21)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(cheerio@1.0.0)(fast-xml-parser@4.4.1)(html-to-text@9.0.5)(ignore@5.3.1)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))
+      '@langchain/core': 0.2.27(langchain@0.2.16)(openai@4.56.0(zod@3.23.8))
+      langchain: 0.2.16(@langchain/anthropic@0.2.15)(@langchain/community@0.2.28(@langchain/anthropic@0.2.15)(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@upstash/redis@1.34.0)(cheerio@1.0.0)(crypto-js@4.2.0)(fast-xml-parser@4.4.1)(google-auth-library@9.14.0)(googleapis@142.0.0)(html-to-text@9.0.5)(ignore@5.3.1)(lodash@4.17.21)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(cheerio@1.0.0)(fast-xml-parser@4.4.1)(html-to-text@9.0.5)(ignore@5.3.1)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))
       openai: 4.56.0(zod@3.23.8)
 
-  langsmith@0.1.42(n35iqsknezlm2vrplv5ojhnezi):
+  langsmith@0.1.42(@langchain/core@0.2.27(langchain@0.2.16)(openai@4.56.0(zod@3.23.8)))(langchain@0.2.16)(openai@4.56.0(zod@3.23.8)):
     dependencies:
       '@types/uuid': 9.0.8
       commander: 10.0.1
@@ -13389,8 +13410,8 @@ snapshots:
       semver: 7.6.3
       uuid: 9.0.1
     optionalDependencies:
-      '@langchain/core': 0.2.27(langchain@0.2.16(@langchain/anthropic@0.2.15(langchain@0.2.16)(openai@4.56.0(zod@3.23.8)))(@langchain/community@0.2.28(@langchain/anthropic@0.2.15)(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@upstash/redis@1.34.0)(cheerio@1.0.0)(crypto-js@4.2.0)(fast-xml-parser@4.4.1)(google-auth-library@9.14.0)(googleapis@142.0.0)(html-to-text@9.0.5)(ignore@5.3.1)(lodash@4.17.21)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(cheerio@1.0.0)(fast-xml-parser@4.4.1)(html-to-text@9.0.5)(ignore@5.3.1)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(openai@4.56.0(zod@3.23.8))
-      langchain: 0.2.16(@langchain/anthropic@0.2.15(langchain@0.2.16)(openai@4.56.0(zod@3.23.8)))(@langchain/community@0.2.28(@langchain/anthropic@0.2.15)(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@upstash/redis@1.34.0)(cheerio@1.0.0)(crypto-js@4.2.0)(fast-xml-parser@4.4.1)(google-auth-library@9.14.0)(googleapis@142.0.0)(html-to-text@9.0.5)(ignore@5.3.1)(lodash@4.17.21)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(cheerio@1.0.0)(fast-xml-parser@4.4.1)(html-to-text@9.0.5)(ignore@5.3.1)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))
+      '@langchain/core': 0.2.27(langchain@0.2.16)(openai@4.56.0(zod@3.23.8))
+      langchain: 0.2.16(@langchain/anthropic@0.2.15)(@langchain/community@0.2.28(@langchain/anthropic@0.2.15)(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@upstash/redis@1.34.0)(cheerio@1.0.0)(crypto-js@4.2.0)(fast-xml-parser@4.4.1)(google-auth-library@9.14.0)(googleapis@142.0.0)(html-to-text@9.0.5)(ignore@5.3.1)(lodash@4.17.21)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@supabase/supabase-js@2.45.4(bufferutil@4.0.8)(utf-8-validate@5.0.10))(cheerio@1.0.0)(fast-xml-parser@4.4.1)(html-to-text@9.0.5)(ignore@5.3.1)(openai@4.56.0(zod@3.23.8))(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))
       openai: 4.56.0(zod@3.23.8)
 
   language-subtag-registry@0.3.23: {}
@@ -13655,6 +13676,8 @@ snapshots:
   negotiator@0.6.3: {}
 
   neo-async@2.6.2: {}
+
+  neverthrow@7.2.0: {}
 
   new-date@1.0.3:
     dependencies:
