@@ -44,7 +44,7 @@ export const POST = verifySignatureAppRouter(async (req: Request) => {
 	}
 
 	const containerStatusResponse = await fetch(
-		`https://graph.facebook.com/${mediaContainerId}?access_token=${INSTAGRAM_ACCESS_TOKEN}&fields=status_code`,
+		`https://graph.instagram.com/v21.0/${mediaContainerId}?access_token=${INSTAGRAM_ACCESS_TOKEN}&fields=status_code`,
 		{
 			method: "GET",
 		},
