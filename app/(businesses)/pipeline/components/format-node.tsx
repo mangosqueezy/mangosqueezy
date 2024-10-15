@@ -11,17 +11,13 @@ export default function FormatNode({
 	isConnectable,
 }: NodeProps<FormatNodeProps>) {
 	const updateNodeData = useStore((state) => state.updateNodeData);
-	const [format, setFormat] = useState(`Generate a caption and hashtags in the following format:
+	const [format, setFormat] = useState(`Desired format:
 
-Hook (First Line): Start with a question or attention-grabbing statement.
-Main Content (Tell a Story or Share Value): Describe the benefits of the product, service, or promotion in an engaging way.
-Call-to-Action (CTA): End with a clear call to action.
-Emojis: Use emojis to enhance the post and highlight key points.
-Hashtags: Include 8-12 relevant hashtags in one line.
-Format Requirements:
-
-Use line breaks for clarity.
-Maintain a visually appealing structure.`);
+Hook (First Line): <Start with a question or attention-grabbing statement>
+Main Content (Tell a Story or Share Value): <Describe the benefits of the product, service, or promotion in an engaging way>
+Call-to-Action (CTA): <End with a clear call to action>
+Emojis: <Use emojis to enhance the post and highlight key points>
+Hashtags: <Include 8-12 relevant hashtags in one line>`);
 
 	return (
 		<div className="h-full w-80 border border-gray-300 rounded bg-white">

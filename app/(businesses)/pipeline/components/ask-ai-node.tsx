@@ -19,7 +19,6 @@ export default function AskAINode({
 	const updateNodeData = useStore((state) => state.updateNodeData);
 	const [prompt, setPrompt] = useState(
 		`Generate an engaging Instagram caption using the product description provided.
-
 Based on your product description and location, generate 8-12 relevant hashtags that target your audience and niche.`,
 	);
 

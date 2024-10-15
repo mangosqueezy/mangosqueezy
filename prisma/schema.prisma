@@ -145,8 +145,8 @@ model Pipelines {
   ig_post_id      String?
   ig_post_url     String?
 
-  Business        Business? @relation(fields: [business_id], references: [id])
-  Products        Products? @relation(fields: [product_id], references: [id])
+  business        Business? @relation(fields: [business_id], references: [id])
+  products        Products? @relation(fields: [product_id], references: [id])
 
   @@schema("public")
 }

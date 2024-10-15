@@ -48,6 +48,9 @@ export async function getPipelineByVideoId(videoId: string) {
 	try {
 		return await prisma.pipelines.findFirst({
 			where: { heygen_video_id: videoId },
+			include: {
+				products: true,
+			},
 		});
 	} catch (err) {
 		console.error(err);

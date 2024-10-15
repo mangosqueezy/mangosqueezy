@@ -63,12 +63,21 @@ export const POST = verifySignatureAppRouter(async (req: Request) => {
 
 	if (heygenResult?.data?.status === "completed") {
 		const pipeline = await getPipelineByVideoId(videoId);
+		const prompt = `
+		${pipeline?.prompt}
+	
+		product description: ${pipeline?.products?.description}
+		
+		location: ${pipeline?.location}
+		`;
 
 		const { text } = await generateText({
 			model: openai("gpt-4o-2024-08-06"),
-			system:
-				"You are a Instagram caption generator. Provide a short and engaging caption for the Instagram Reel.",
-			prompt: pipeline?.prompt as string,
+			system: `You are a Instagram caption generator. Provide a short and engaging caption for the Instagram Reel. 
+			${pipeline?.format}
+			Use line breaks for clarity. Maintain a visually appealing structure.	
+				`,
+			prompt: prompt,
 		});
 
 		const encodedText = encodeURIComponent(text);

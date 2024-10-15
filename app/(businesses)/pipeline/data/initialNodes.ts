@@ -21,7 +21,7 @@ export const initialNodes = [
 		position: { x: 550, y: 200 },
 		data: {
 			value: `Generate an engaging Instagram caption using the product description provided.
-				Based on your product description and location, generate 8-12 relevant hashtags that target your audience and niche.
+Based on your product description and location, generate 8-12 relevant hashtags that target your audience and niche.
 				`,
 			label: "Ask AI",
 		},
@@ -46,17 +46,14 @@ export const initialNodes = [
 		position: { x: 550, y: 500 },
 		targetPosition: "top",
 		data: {
-			value: `Generate a caption and hashtags in the following format:
+			value: `Desired format:
 
-Hook (First Line): Start with a question or attention-grabbing statement.
-Main Content (Tell a Story or Share Value): Describe the benefits of the product, service, or promotion in an engaging way.
-Call-to-Action (CTA): End with a clear call to action.
-Emojis: Use emojis to enhance the post and highlight key points.
-Hashtags: Include 8-12 relevant hashtags in one line.
-Format Requirements:
-
-Use line breaks for clarity.
-Maintain a visually appealing structure.`,
+Hook (First Line): <Start with a question or attention-grabbing statement>
+Main Content (Tell a Story or Share Value): <Describe the benefits of the product, service, or promotion in an engaging way>
+Call-to-Action (CTA): <End with a clear call to action>
+Emojis: <Use emojis to enhance the post and highlight key points>
+Hashtags: <Include 8-12 relevant hashtags in one line>
+`,
 			label: "Format",
 		},
 	},
