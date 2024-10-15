@@ -1,22 +1,53 @@
-import { getPipelineByVideoId } from "@/models/pipeline";
+import { createClient } from "@/lib/supabase/server";
+import { decryptIgAccessToken, isAccessTokenExpiring } from "@/lib/utils";
+import { getIgAccessToken } from "@/models/ig_refresh_token";
+import { getPipelineByVideoId, updatePipeline } from "@/models/pipeline";
 import { openai } from "@ai-sdk/openai";
 import { Client } from "@upstash/qstash";
 import { verifySignatureAppRouter } from "@upstash/qstash/nextjs";
 import { generateText } from "ai";
 
 const IG_BUSINESS_ID = process.env.IG_BUSINESS_ID;
-const INSTAGRAM_ACCESS_TOKEN = process.env.INSTAGRAM_ACCESS_TOKEN;
+
+const client = new Client({
+	token: process.env.QSTASH_TOKEN as string,
+});
 
 export const POST = verifySignatureAppRouter(async (req: Request) => {
-	const body = await req.json();
-
-	const parsedPayload = JSON.parse(body);
-	const scheduleId = parsedPayload.scheduleId;
+	const requestBody = await req.json();
+	const supabase = createClient();
 
 	// responses from qstash are base64-encoded
-	const decoded = atob(parsedPayload.body);
+	const decoded = atob(requestBody?.body);
 	const parsedDecodedBody = JSON.parse(decoded);
-	const { videoId, videoUrl, callbackId } = parsedDecodedBody;
+	const { videoId } = parsedDecodedBody;
+	const scheduleId = requestBody?.scheduleId;
+	let INSTAGRAM_ACCESS_TOKEN = "";
+
+	const igAccessToken = await getIgAccessToken();
+	const isAccessTokenExpiringFlag = isAccessTokenExpiring(
+		igAccessToken?.expires_at as string,
+	);
+
+	if (isAccessTokenExpiringFlag) {
+		const refreshTokenResponse = await fetch(
+			"https://www.mangosqueezy.com/api/instagram/refresh_token",
+			{
+				method: "POST",
+				body: JSON.stringify({ access_token: igAccessToken?.token }),
+			},
+		);
+		const refreshTokenResult = await refreshTokenResponse.json();
+		const decryptedAccessToken = decryptIgAccessToken(
+			refreshTokenResult?.encryptedAccessToken,
+		);
+		INSTAGRAM_ACCESS_TOKEN = decryptedAccessToken;
+	} else {
+		const decryptedAccessToken = decryptIgAccessToken(
+			igAccessToken?.token as string,
+		);
+		INSTAGRAM_ACCESS_TOKEN = decryptedAccessToken;
+	}
 
 	const heygenResponse = await fetch(
 		`https://api.heygen.com/v1/video_status.get?video_id=${videoId}`,
@@ -30,7 +61,7 @@ export const POST = verifySignatureAppRouter(async (req: Request) => {
 
 	const heygenResult = await heygenResponse.json();
 
-	if (heygenResult?.data?.status === "success") {
+	if (heygenResult?.data?.status === "completed") {
 		const pipeline = await getPipelineByVideoId(videoId);
 
 		const { text } = await generateText({
@@ -42,66 +73,54 @@ export const POST = verifySignatureAppRouter(async (req: Request) => {
 
 		const encodedText = encodeURIComponent(text);
 
-		const response = await fetch(
-			`https://graph.instagram.com/v21.0/${IG_BUSINESS_ID}/media?media_type=REELS&video_url=http&access_token=${INSTAGRAM_ACCESS_TOKEN}&share_to_feed=true&caption=${encodedText}`,
-			{
+		const videoUrl = heygenResult?.data?.video_url;
+		const videoUrlResponse = await fetch(videoUrl);
+		const blob = await videoUrlResponse.blob();
+
+		const { data } = await supabase.storage
+			.from("mangosqueezy")
+			.upload(`videos/mangosqueezy-video-${videoId}`, blob, {
+				cacheControl: "3600",
+				contentType: "video/mp4",
+			});
+
+		if (data) {
+			const igVideoUrl = `https://lkjqkobxmgqedqtidcws.supabase.co/storage/v1/object/public/mangosqueezy/videos/${data?.path}`;
+
+			const mediaContainerResponse = await fetch(
+				`https://graph.instagram.com/v21.0/${IG_BUSINESS_ID}/media?media_type=REELS&video_url=${igVideoUrl}&access_token=${INSTAGRAM_ACCESS_TOKEN}&share_to_feed=true&caption=${encodedText}`,
+				{
+					method: "POST",
+				},
+			);
+			const mediaContainerResult = await mediaContainerResponse.json();
+			const mediaContainerId = mediaContainerResult?.id;
+
+			const pipeline = await getPipelineByVideoId(videoId);
+			if (pipeline) {
+				await updatePipeline(pipeline.id, {
+					ig_post_url: igVideoUrl,
+				});
+			}
+
+			await client.schedules.create({
+				destination: "https://www.mangosqueezy.com/api/qstash/schedules",
+				cron: "*/5 * * * *",
 				method: "POST",
-			},
-		);
+				headers: {
+					"content-type": "application/json",
+				},
+				body: JSON.stringify({
+					mediaContainerId,
+					videoId,
+				}),
+				callback: "https://www.mangosqueezy.com/api/callback/qstash/ig",
+			});
 
-		// await client.schedules.create({
-		// 	destination: "https://www.mangosqueezy.com/api/qstash/schedules",
-		// 	cron: "*/5 * * * *",
-		// 	method: "POST",
-		// 	headers: {
-		// 		"content-type": "application/json",
-		// 	},
-		// 	body: JSON.stringify({
-		// 		videoId: eventData.video_id,
-		// 		videoUrl: eventData.video_url,
-		// 		callbackId: eventData.callback_id,
-		// 	}),
-		// 	callback: "https://www.mangosqueezy.com/api/callback/qstash/ig",
-		// });
-
-		// 	const client = new Client({
-		// 		token: process.env.QSTASH_TOKEN as string,
-		// 	});
-		// 	const schedules = client.schedules;
-		// 	await schedules.delete(scheduleId);
+			const schedules = client.schedules;
+			await schedules.delete(scheduleId);
+		}
 	}
 
-	// const containerStatusResponse = await fetch(
-	// 	`https://graph.facebook.com/${mediaContainerId}?access_token=${profileKey}&fields=status_code`,
-	// 	{
-	// 		method: "GET",
-	// 	},
-	// );
-
-	// const containerStatusResult = await containerStatusResponse.json();
-
-	// if (containerStatusResult?.status_code === "FINISHED") {
-	// 	const response = await fetch(
-	// 		`https://graph.facebook.com/v19.0/${igBusinessId}/media_publish?access_token=${profileKey}&creation_id=${mediaContainerId}`,
-	// 		{
-	// 			method: "POST",
-	// 		},
-	// 	);
-
-	// 	const result = await response.json();
-
-	// 	if (userType === "creator") {
-	// 		// await updatePublishPost(publishPostId, result?.id);
-	// 	} else {
-	// 		// await updatePublishPostWithPaymentUpdate(publishPostId, result?.id);
-	// 	}
-
-	// 	const client = new Client({
-	// 		token: process.env.QSTASH_TOKEN as string,
-	// 	});
-	// 	const schedules = client.schedules;
-	// 	await schedules.delete(scheduleId);
-	// }
-
-	return new Response(JSON.stringify(body));
+	return new Response("Success!");
 });

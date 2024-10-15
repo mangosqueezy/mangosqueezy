@@ -40,3 +40,11 @@ export const isIgAssistEnabled = flag({
 		return value ?? false;
 	},
 });
+
+export const isHeygenVideoGenerationEnabled = flag({
+	key: "heygen_video_generation_enabled",
+	async decide() {
+		const value = await get("heygen_video_generation_enabled");
+		return value ?? false;
+	},
+});

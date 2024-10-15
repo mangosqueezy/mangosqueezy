@@ -1,53 +1,81 @@
-import { getPipelineByVideoId } from "@/models/pipeline";
-import { openai } from "@ai-sdk/openai";
+import { decryptIgAccessToken } from "@/lib/utils";
+import { isAccessTokenExpiring } from "@/lib/utils";
+import { getIgAccessToken } from "@/models/ig_refresh_token";
+import { getPipelineByVideoId, updatePipeline } from "@/models/pipeline";
 import { Client } from "@upstash/qstash";
 import { verifySignatureAppRouter } from "@upstash/qstash/nextjs";
-import { generateText } from "ai";
 
 const IG_BUSINESS_ID = process.env.IG_BUSINESS_ID;
 
 export const POST = verifySignatureAppRouter(async (req: Request) => {
-	const body = await req.json();
-
-	const parsedPayload = JSON.parse(body);
-	const scheduleId = parsedPayload.scheduleId;
+	const requestBody = await req.json();
 
 	// responses from qstash are base64-encoded
-	const decoded = atob(parsedPayload.body);
+	const decoded = atob(requestBody?.body);
 	const parsedDecodedBody = JSON.parse(decoded);
-	const { videoId, videoUrl, callbackId } = parsedDecodedBody;
+	const { mediaContainerId, videoId } = parsedDecodedBody;
+	const scheduleId = requestBody?.scheduleId;
 
-	// const containerStatusResponse = await fetch(
-	// 	`https://graph.facebook.com/${mediaContainerId}?access_token=${profileKey}&fields=status_code`,
-	// 	{
-	// 		method: "GET",
-	// 	},
-	// );
+	let INSTAGRAM_ACCESS_TOKEN = "";
 
-	// const containerStatusResult = await containerStatusResponse.json();
+	const igAccessToken = await getIgAccessToken();
+	const isAccessTokenExpiringFlag = isAccessTokenExpiring(
+		igAccessToken?.expires_at as string,
+	);
 
-	// if (containerStatusResult?.status_code === "FINISHED") {
-	// 	const response = await fetch(
-	// 		`https://graph.facebook.com/v19.0/${igBusinessId}/media_publish?access_token=${profileKey}&creation_id=${mediaContainerId}`,
-	// 		{
-	// 			method: "POST",
-	// 		},
-	// 	);
+	if (isAccessTokenExpiringFlag) {
+		const refreshTokenResponse = await fetch(
+			"https://www.mangosqueezy.com/api/instagram/refresh_token",
+			{
+				method: "POST",
+				body: JSON.stringify({ access_token: igAccessToken?.token }),
+			},
+		);
+		const refreshTokenResult = await refreshTokenResponse.json();
+		const decryptedAccessToken = decryptIgAccessToken(
+			refreshTokenResult?.encryptedAccessToken,
+		);
+		INSTAGRAM_ACCESS_TOKEN = decryptedAccessToken;
+	} else {
+		const decryptedAccessToken = decryptIgAccessToken(
+			igAccessToken?.token as string,
+		);
+		INSTAGRAM_ACCESS_TOKEN = decryptedAccessToken;
+	}
 
-	// 	const result = await response.json();
+	const containerStatusResponse = await fetch(
+		`https://graph.facebook.com/${mediaContainerId}?access_token=${INSTAGRAM_ACCESS_TOKEN}&fields=status_code`,
+		{
+			method: "GET",
+		},
+	);
 
-	// 	if (userType === "creator") {
-	// 		// await updatePublishPost(publishPostId, result?.id);
-	// 	} else {
-	// 		// await updatePublishPostWithPaymentUpdate(publishPostId, result?.id);
-	// 	}
+	const containerStatusResult = await containerStatusResponse.json();
 
-	// 	const client = new Client({
-	// 		token: process.env.QSTASH_TOKEN as string,
-	// 	});
-	// 	const schedules = client.schedules;
-	// 	await schedules.delete(scheduleId);
-	// }
+	if (containerStatusResult?.status_code === "FINISHED") {
+		const response = await fetch(
+			`https://graph.instagram.com/v21.0/${IG_BUSINESS_ID}/media_publish?access_token=${INSTAGRAM_ACCESS_TOKEN}&creation_id=${mediaContainerId}`,
+			{
+				method: "POST",
+			},
+		);
 
-	return new Response(JSON.stringify(body));
+		const result = await response.json();
+		const igPostId = result?.id;
+
+		const pipeline = await getPipelineByVideoId(videoId);
+		if (pipeline) {
+			await updatePipeline(pipeline.id, {
+				ig_post_id: igPostId,
+			});
+		}
+
+		const client = new Client({
+			token: process.env.QSTASH_TOKEN as string,
+		});
+		const schedules = client.schedules;
+		await schedules.delete(scheduleId);
+	}
+
+	return new Response("Success!");
 });

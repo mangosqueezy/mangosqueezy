@@ -24,9 +24,8 @@ export async function POST(request: Request) {
     `;
 	const { text } = await generateText({
 		model: openai("gpt-4o-2024-08-06"),
-		system:
-			"You are a video script improviser. Analyze the user's script and update the script for the video.",
-		prompt: `Analyze this script: ${script}. Provide the updated script, making it more engaging and interesting for the user, and also ensure it is short and concise.`,
+		system: `You are a script improviser. Analyze the user's script and update the script for the video. Do not add any emojis or hashtags in the final response just plain text.`,
+		prompt: `Analyze this script: ${script}. Provide the updated script in simple english, making it more engaging and interesting for the user, and also ensure it is short and concise.`,
 	});
 
 	const response = await fetch(
@@ -37,13 +36,10 @@ export async function POST(request: Request) {
 		},
 	);
 
-	const videoId = await response.json();
-
-	console.log(videoId);
-	console.log(business?.commission);
+	const videoData = await response.json();
 
 	await updatePipeline(pipeline_id, {
-		heygen_video_id: videoId as string,
+		heygen_video_id: videoData.data.video_id as string,
 	});
 
 	return new Response("Job started", { status: 200 });

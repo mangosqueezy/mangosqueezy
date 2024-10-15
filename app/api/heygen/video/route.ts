@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
 		}),
 	});
 
-	const data = await response.json();
+	const result = await response.json();
 
-	return NextResponse.json(data);
+	return NextResponse.json(result);
 }

@@ -18,7 +18,10 @@ import type { Products } from "@prisma/client";
 import { Loader, Play } from "lucide-react";
 import Link from "next/link";
 import toast, { Toaster } from "react-hot-toast";
-import { createPipelineAction } from "../actions";
+import {
+	createPipelineAction,
+	getPipelineByProductIdAndBusinessIdAction,
+} from "../actions";
 import type {
 	AppState,
 	AffiliatesNode as TAffiliatesNode,
@@ -101,28 +104,45 @@ function Flow({ products, business_id }: TFlowProps) {
 		const affiliate_count = Number.parseInt(affiliate.data.value);
 		const format = formatNode.data.value as string;
 		const location = locationNode.data.value as string;
-		const result = await createPipelineAction(
+
+		const isPipelineExists = await getPipelineByProductIdAndBusinessIdAction(
 			product_id,
-			prompt,
-			affiliate_count,
-			format,
-			location,
 			business_id as string,
 		);
-		if (result?.id) {
-			analytics?.track("pipeline_created", {
-				product_id: product?.id,
-				business_id: business_id,
-				prompt: prompt,
-			});
+
+		if (isPipelineExists) {
 			toast.custom((t) => (
 				<CustomToast
 					t={t}
-					message="Pipeline created successfully. Please check status page."
+					message="Pipeline already created. Please check status page."
 					variant="success"
 				/>
 			));
+		} else {
+			const result = await createPipelineAction(
+				product_id,
+				prompt,
+				affiliate_count,
+				format,
+				location,
+				business_id as string,
+			);
+			if (result?.id) {
+				analytics?.track("pipeline_created", {
+					product_id: product?.id,
+					business_id: business_id,
+					prompt: prompt,
+				});
+				toast.custom((t) => (
+					<CustomToast
+						t={t}
+						message="Pipeline created successfully. Please check status page."
+						variant="success"
+					/>
+				));
+			}
 		}
+
 		setIsLoading(false);
 	};
 

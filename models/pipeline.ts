@@ -53,3 +53,18 @@ export async function getPipelineByVideoId(videoId: string) {
 		console.error(err);
 	}
 }
+
+export async function getPipelineByProductIdAndBusinessId(
+	productId: number,
+	business_id: string,
+) {
+	try {
+		return await prisma.pipelines.findFirst({
+			where: {
+				AND: [{ product_id: productId }, { business_id: business_id }],
+			},
+		});
+	} catch (err) {
+		console.error(err);
+	}
+}

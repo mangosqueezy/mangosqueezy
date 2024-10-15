@@ -224,6 +224,16 @@ model resources {
   @@schema("public")
 }
 
+model ig_access_token {
+  id         String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  token      String
+  expires_at String
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+
+  @@schema("public")
+}
+
 enum PaymentPreference {
   FullCrypto
   HalfCryptoHalfFiat
