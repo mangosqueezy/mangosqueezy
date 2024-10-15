@@ -67,6 +67,7 @@ export const POST = verifySignatureAppRouter(async (req: Request) => {
 		if (pipeline) {
 			await updatePipeline(pipeline.id, {
 				ig_post_id: igPostId,
+				remark: "video has been posted to instagram",
 			});
 		}
 
