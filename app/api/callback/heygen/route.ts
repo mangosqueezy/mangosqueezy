@@ -26,7 +26,7 @@ export async function POST(request: Request) {
 	if (eventType === "avatar_video.success") {
 		await client.schedules.create({
 			destination: "https://www.mangosqueezy.com/api/qstash/schedules",
-			cron: "*/10 * * * *",
+			cron: "*/5 * * * *",
 			method: "POST",
 			headers: {
 				"content-type": "application/json",

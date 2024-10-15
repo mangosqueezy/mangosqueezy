@@ -94,7 +94,7 @@ export const POST = verifySignatureAppRouter(async (req: Request) => {
 			});
 
 		if (data) {
-			const igVideoUrl = `https://lkjqkobxmgqedqtidcws.supabase.co/storage/v1/object/public/mangosqueezy/videos/${data?.path}`;
+			const igVideoUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/mangosqueezy/${data?.path}`;
 
 			const mediaContainerResponse = await fetch(
 				`https://graph.instagram.com/v21.0/${IG_BUSINESS_ID}/media?media_type=REELS&video_url=${igVideoUrl}&access_token=${INSTAGRAM_ACCESS_TOKEN}&share_to_feed=true&caption=${encodedText}`,
