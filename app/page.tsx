@@ -20,10 +20,7 @@ import {
 } from "@/components/ui/form";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Intercom from "@intercom/messenger-js-sdk";
-import { IconBrandYoutube } from "@tabler/icons-react";
 import { motion } from "framer-motion";
-import Link from "next/link";
 import { useForm } from "react-hook-form";
 import toast, { Toaster } from "react-hot-toast";
 import { z } from "zod";
@@ -61,10 +58,6 @@ export default function Index() {
 		}
 	}
 
-	Intercom({
-		app_id: "kby3tvbo",
-	});
-
 	return (
 		<>
 			<Toaster position="top-right" />
@@ -89,24 +82,6 @@ export default function Index() {
 							}}
 							className="text-3xl px-4 md:text-4xl lg:text-6xl font-bold text-neutral-700 dark:text-white max-w-7xl leading-relaxed lg:leading-snug text-center mx-auto "
 						>
-							<div className="mb-8 flex justify-center">
-								<div className="relative flex rounded-full px-3 py-1 text-sm leading-6 text-gray-600 dark:text-white ring-1 ring-gray-900/10 hover:ring-gray-900/20">
-									<IconBrandYoutube className="size-5 mr-2 text-red-500 group-hover:animate-tilt" />
-									watch video demo
-									<a
-										href="https://youtu.be/o9rZcebHrls"
-										target="_blank"
-										rel="noreferrer"
-										className="font-semibold text-orange-600"
-									>
-										<span className="absolute inset-0" aria-hidden="true" />
-										<span aria-hidden="true" className="ml-2">
-											&rarr;
-										</span>
-										<span className="sr-only">Watch our video on YouTube</span>
-									</a>
-								</div>
-							</div>
 							Affiliate{" "}
 							<Highlight className="text-black dark:text-white">
 								marketing tool
