@@ -1,8 +1,8 @@
-import { createClient } from "@/lib/supabase/server";
 import { decryptIgAccessToken, isAccessTokenExpiring } from "@/lib/utils";
 import { getIgAccessToken } from "@/models/ig_refresh_token";
 import { getPipelineByVideoId, updatePipeline } from "@/models/pipeline";
 import { openai } from "@ai-sdk/openai";
+import { createClient } from "@supabase/supabase-js";
 import { Client } from "@upstash/qstash";
 import { verifySignatureAppRouter } from "@upstash/qstash/nextjs";
 import { generateText } from "ai";
@@ -15,7 +15,10 @@ const client = new Client({
 
 export const POST = verifySignatureAppRouter(async (req: Request) => {
 	const requestBody = await req.json();
-	const supabase = createClient();
+	const supabase = createClient(
+		process.env.NEXT_PUBLIC_SUPABASE_URL as string,
+		process.env.SUPABASE_KEY as string,
+	);
 
 	// responses from qstash are base64-encoded
 	const decoded = atob(requestBody?.body);
