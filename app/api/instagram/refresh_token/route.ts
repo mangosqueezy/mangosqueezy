@@ -19,11 +19,18 @@ export async function POST(request: NextRequest) {
 	const result = await response.json();
 
 	const accessToken = result.access_token;
-	const encryptedAccessToken = encryptIgAccessToken(accessToken);
+	const iv = globalThis.crypto.getRandomValues(new Uint8Array(16));
+	const ivHexString = Array.from(iv)
+		.map((byte) => byte.toString(16).padStart(2, "0"))
+		.join("");
+	const encryptedHexString = await encryptIgAccessToken(
+		accessToken,
+		ivHexString,
+	);
 
 	const expiresIn = result.expires_in;
 
-	await updateIgRefreshToken(encryptedAccessToken, expiresIn);
+	await updateIgRefreshToken(encryptedHexString, ivHexString, expiresIn);
 
-	return NextResponse.json({ encryptedAccessToken, expiresIn });
+	return NextResponse.json({ encryptedHexString, ivHexString, expiresIn });
 }

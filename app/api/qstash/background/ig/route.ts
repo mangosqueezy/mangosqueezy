@@ -4,7 +4,6 @@ import { getPipelineByVideoId, updatePipeline } from "@/models/pipeline";
 import { openai } from "@ai-sdk/openai";
 import { createClient } from "@supabase/supabase-js";
 import { Client } from "@upstash/qstash";
-import { verifySignatureAppRouter } from "@upstash/qstash/nextjs";
 import { generateText } from "ai";
 
 const IG_BUSINESS_ID = process.env.IG_BUSINESS_ID;
@@ -13,18 +12,14 @@ const client = new Client({
 	token: process.env.QSTASH_TOKEN as string,
 });
 
-export const POST = verifySignatureAppRouter(async (req: Request) => {
-	const requestBody = await req.json();
+export async function POST(request: Request) {
+	const body = await request.json();
+	const { videoId } = body;
 	const supabase = createClient(
 		process.env.NEXT_PUBLIC_SUPABASE_URL as string,
 		process.env.SUPABASE_KEY as string,
 	);
 
-	// responses from qstash are base64-encoded
-	const decoded = atob(requestBody?.body);
-	const parsedDecodedBody = JSON.parse(decoded);
-	const { videoId } = parsedDecodedBody;
-	const scheduleId = requestBody?.scheduleId;
 	let INSTAGRAM_ACCESS_TOKEN = "";
 
 	const igAccessToken = await getIgAccessToken();
@@ -41,13 +36,15 @@ export const POST = verifySignatureAppRouter(async (req: Request) => {
 			},
 		);
 		const refreshTokenResult = await refreshTokenResponse.json();
-		const decryptedAccessToken = decryptIgAccessToken(
-			refreshTokenResult?.encryptedAccessToken,
+		const decryptedAccessToken = await decryptIgAccessToken(
+			refreshTokenResult?.encryptedHexString,
+			refreshTokenResult?.ivHexString,
 		);
 		INSTAGRAM_ACCESS_TOKEN = decryptedAccessToken;
 	} else {
-		const decryptedAccessToken = decryptIgAccessToken(
+		const decryptedAccessToken = await decryptIgAccessToken(
 			igAccessToken?.token as string,
+			igAccessToken?.encryption_iv as string,
 		);
 		INSTAGRAM_ACCESS_TOKEN = decryptedAccessToken;
 	}
@@ -128,11 +125,8 @@ export const POST = verifySignatureAppRouter(async (req: Request) => {
 				}),
 				callback: "https://www.mangosqueezy.com/api/callback/qstash/ig",
 			});
-
-			const schedules = client.schedules;
-			await schedules.delete(scheduleId);
 		}
 	}
 
 	return new Response("Success!");
-});
+}

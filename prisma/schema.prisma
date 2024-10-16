@@ -227,6 +227,7 @@ model resources {
 model ig_access_token {
   id         String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   token      String
+  encryption_iv String
   expires_at String
   created_at DateTime   @default(now())
   updated_at DateTime   @updatedAt

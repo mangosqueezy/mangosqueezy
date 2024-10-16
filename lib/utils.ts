@@ -11,23 +11,72 @@ export function classNames(...classes: Array<string | boolean>) {
 	return classes.filter(Boolean).join(" ");
 }
 
-export function encryptIgAccessToken(token: string) {
-	const key = process.env.IG_ACCESS_TOKEN_ENCRYPTION_KEY!;
-	const iv = Buffer.from(process.env.IG_ACCESS_TOKEN_ENCRYPTION_IV!, "hex");
+export function convertHexToBuffer(hexString: string) {
+	const byteArray = new Uint8Array(hexString.length / 2);
 
-	const cipher = crypto.createCipheriv("aes-256-cbc", key, iv);
-	let encryptedToken = cipher.update(token, "utf8", "hex");
-	encryptedToken += cipher.final("hex");
-	return encryptedToken;
+	for (let i = 0; i < hexString.length; i += 2) {
+		byteArray[i / 2] = Number.parseInt(hexString.slice(i, i + 2), 16);
+	}
+
+	return byteArray.buffer;
 }
 
-export function decryptIgAccessToken(encryptedToken: string) {
-	const key = process.env.IG_ACCESS_TOKEN_ENCRYPTION_KEY!;
-	const iv = Buffer.from(process.env.IG_ACCESS_TOKEN_ENCRYPTION_IV!, "hex");
+export async function encryptIgAccessToken(token: string, ivHexString: string) {
+	const importedKey = await globalThis.crypto.subtle.importKey(
+		"jwk",
+		JSON.parse(process.env.IG_ACCESS_TOKEN_ENCRYPTION_KEY!),
+		{
+			name: "AES-CBC",
+			length: 256,
+		},
+		true,
+		["encrypt", "decrypt"],
+	);
 
-	const decipher = crypto.createDecipheriv("aes-256-cbc", key, iv);
-	let decryptedToken = decipher.update(encryptedToken, "hex", "utf8");
-	decryptedToken += decipher.final("utf8");
+	// The iv must never be reused with a given key.
+	const encryptedAccessToken = await globalThis.crypto.subtle.encrypt(
+		{
+			name: "AES-CBC",
+			iv: convertHexToBuffer(ivHexString),
+		},
+		importedKey,
+		new TextEncoder().encode(token),
+	);
+
+	const encryptedArrayBuffer = new Uint8Array(encryptedAccessToken);
+	const encryptedHexString = Array.from(encryptedArrayBuffer)
+		.map((byte) => byte.toString(16).padStart(2, "0"))
+		.join("");
+
+	return encryptedHexString;
+}
+
+export async function decryptIgAccessToken(
+	encryptedHexString: string,
+	ivHexString: string,
+) {
+	const importedKey = await globalThis.crypto.subtle.importKey(
+		"jwk",
+		JSON.parse(process.env.IG_ACCESS_TOKEN_ENCRYPTION_KEY!),
+		{
+			name: "AES-CBC",
+			length: 256,
+		},
+		true,
+		["encrypt", "decrypt"],
+	);
+	const decrypted = await globalThis.crypto.subtle.decrypt(
+		{
+			name: "AES-CBC",
+			iv: convertHexToBuffer(ivHexString),
+		},
+		importedKey,
+		convertHexToBuffer(encryptedHexString),
+	);
+
+	const decoder = new TextDecoder();
+	const decryptedToken = decoder.decode(decrypted);
+
 	return decryptedToken;
 }
 

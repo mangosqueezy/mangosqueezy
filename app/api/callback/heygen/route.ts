@@ -24,17 +24,11 @@ export async function POST(request: Request) {
 		JSON.parse(contentStr);
 
 	if (eventType === "avatar_video.success") {
-		await client.schedules.create({
-			destination: "https://www.mangosqueezy.com/api/qstash/schedules",
-			cron: "*/5 * * * *",
-			method: "POST",
-			headers: {
-				"content-type": "application/json",
-			},
-			body: JSON.stringify({
+		await client.publishJSON({
+			url: "https://www.mangosqueezy.com/api/qstash/background/ig",
+			body: {
 				videoId: eventData.video_id,
-			}),
-			callback: "https://www.mangosqueezy.com/api/callback/qstash/heygen",
+			},
 		});
 	}
 

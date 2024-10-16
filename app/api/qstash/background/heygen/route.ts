@@ -18,7 +18,8 @@ export async function POST(request: Request) {
     Hi there! I'm reaching out to share the benefits of joining our affiliate program.
     You will earn ${business?.commission}% commission on every sale.
 
-    The product is ${product?.name} - ${product?.description}
+    product name: ${product?.name}
+	product description: ${product?.description}
 
     Please let me know if you're interested in joining the program.
     `;

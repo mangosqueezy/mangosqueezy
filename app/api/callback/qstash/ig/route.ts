@@ -32,13 +32,15 @@ export const POST = verifySignatureAppRouter(async (req: Request) => {
 			},
 		);
 		const refreshTokenResult = await refreshTokenResponse.json();
-		const decryptedAccessToken = decryptIgAccessToken(
-			refreshTokenResult?.encryptedAccessToken,
+		const decryptedAccessToken = await decryptIgAccessToken(
+			refreshTokenResult?.encryptedHexString,
+			refreshTokenResult?.ivHexString,
 		);
 		INSTAGRAM_ACCESS_TOKEN = decryptedAccessToken;
 	} else {
-		const decryptedAccessToken = decryptIgAccessToken(
+		const decryptedAccessToken = await decryptIgAccessToken(
 			igAccessToken?.token as string,
+			igAccessToken?.encryption_iv as string,
 		);
 		INSTAGRAM_ACCESS_TOKEN = decryptedAccessToken;
 	}

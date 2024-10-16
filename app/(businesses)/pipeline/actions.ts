@@ -35,7 +35,7 @@ export async function createPipelineAction(
 		(await isHeygenVideoGenerationEnabled()) as boolean;
 	if (isHeygenVideoGenerationEnabledFlag) {
 		await qstashClient.publishJSON({
-			url: "https://www.mangosqueezy.com/api/qstash/background",
+			url: "https://www.mangosqueezy.com/api/qstash/background/heygen",
 			body: {
 				business_id,
 				product_id,
@@ -47,7 +47,7 @@ export async function createPipelineAction(
 		await resend.emails.send({
 			from: "mangosqueezy <amit@tapasom.com>",
 			to: ["amit@tapasom.com"],
-			subject: "Pipeline created",
+			subject: `Pipeline created with id ${pipeline?.id}`,
 			react: EmailTemplate({
 				firstName: "there",
 				text: "The user has created the Pipeline job",

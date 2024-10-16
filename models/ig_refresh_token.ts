@@ -3,6 +3,7 @@ import { format } from "date-fns";
 
 export async function updateIgRefreshToken(
 	access_token: string,
+	ivHexString: string,
 	expires_in: number,
 ) {
 	const igAccessTokenId = process.env.IG_ACCESS_TOKEN_ID!;
@@ -15,6 +16,7 @@ export async function updateIgRefreshToken(
 		},
 		data: {
 			token: access_token,
+			encryption_iv: ivHexString,
 			expires_at: formattedExpiresDate,
 		},
 	});
