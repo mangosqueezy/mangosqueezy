@@ -48,12 +48,11 @@ Based on your product description and location, generate 8-12 relevant hashtags 
 		data: {
 			value: `Desired format:
 
-Hook (First Line): <Start with a question or attention-grabbing statement>
-Main Content (Tell a Story or Share Value): <Describe the benefits of the product, service, or promotion in an engaging way>
-Call-to-Action (CTA): <End with a clear call to action>
-Emojis: <Use emojis to enhance the post and highlight key points>
-Hashtags: <Include 8-12 relevant hashtags in one line>
-`,
+<Start with a question or attention-grabbing statement>
+<Describe the benefits of the product, service, or promotion in an engaging way>
+<End with a clear call to action>
+<Use emojis to enhance the post and highlight key points>
+<Include 8-12 relevant hashtags in one line>`,
 			label: "Format",
 		},
 	},

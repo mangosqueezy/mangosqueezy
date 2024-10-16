@@ -78,8 +78,7 @@ export const POST = verifySignatureAppRouter(async (req: Request) => {
 			model: openai("gpt-4o-2024-08-06"),
 			system: `You are a Instagram caption generator. Provide a short and engaging caption for the Instagram Reel. 
 			${pipeline?.format}
-			Use line breaks for clarity. Maintain a visually appealing structure.	
-				`,
+			Use line breaks for clarity. Maintain a visually appealing structure.`,
 			prompt: prompt,
 		});
 
