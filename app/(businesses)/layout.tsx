@@ -14,12 +14,8 @@ import { classNames } from "@/lib/utils";
 import { CircleUser, Menu, Package2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import {
-	getShowInboxFeature,
-	getShowManualAffiliateFeature,
-	getUser,
-} from "./actions";
+import { useEffect } from "react";
+import { getUser } from "./actions";
 import { Providers } from "./providers";
 
 export default function DashboardLayout({
@@ -27,9 +23,6 @@ export default function DashboardLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const [showManualAffiliateFeature, setShowManualAffiliateFeature] =
-		useState<boolean>(false);
-	const [showInboxFeature, setShowInboxFeature] = useState<boolean>(false);
 	const router = useRouter();
 	const pathname = usePathname();
 	const analytics = useJune(process.env.NEXT_PUBLIC_JUNE_API_KEY!);
@@ -48,17 +41,6 @@ export default function DashboardLayout({
 
 		fetchUser();
 	}, [analytics]);
-
-	useEffect(() => {
-		const fetchFeatureFlags = async () => {
-			const showManualAffiliateFeature = await getShowManualAffiliateFeature();
-			const showInboxFeature = await getShowInboxFeature();
-			setShowManualAffiliateFeature(showManualAffiliateFeature as boolean);
-			setShowInboxFeature(showInboxFeature as boolean);
-		};
-
-		fetchFeatureFlags();
-	}, []);
 
 	const handleLogout = async () => {
 		const response = await fetch("https://www.mangosqueezy.com/api/logout", {
@@ -80,20 +62,6 @@ export default function DashboardLayout({
 						<Package2 className="h-6 w-6" />
 						<span className="sr-only">Acme Inc</span>
 					</Link>
-					{showInboxFeature && (
-						<Link
-							href="/inbox"
-							className={classNames(
-								pathname === "/inbox"
-									? "text-blue-400 hover:text-blue-500"
-									: "text-gray-400 hover:text-gray-500",
-								"font-medium",
-							)}
-						>
-							Inbox
-						</Link>
-					)}
-
 					<Link
 						href="/pipeline"
 						className={classNames(
@@ -138,19 +106,6 @@ export default function DashboardLayout({
 					>
 						Products
 					</Link>
-					{showManualAffiliateFeature && (
-						<Link
-							href="/affiliates"
-							className={classNames(
-								pathname.includes("/affiliates")
-									? "text-blue-400 hover:text-blue-500"
-									: "text-gray-400 hover:text-gray-500",
-								"font-medium",
-							)}
-						>
-							Affiliates
-						</Link>
-					)}
 				</nav>
 				<Sheet>
 					<SheetTrigger asChild>
@@ -172,20 +127,6 @@ export default function DashboardLayout({
 								<Package2 className="h-6 w-6" />
 								<span className="sr-only">Acme Inc</span>
 							</Link>
-							{showInboxFeature && (
-								<Link
-									href="/inbox"
-									className={classNames(
-										pathname === "/inbox"
-											? "text-blue-400 hover:text-blue-500"
-											: "text-gray-400 hover:text-gray-500",
-										"font-medium",
-									)}
-								>
-									Inbox
-								</Link>
-							)}
-
 							<Link
 								href="/pipeline"
 								className={classNames(
@@ -230,19 +171,6 @@ export default function DashboardLayout({
 							>
 								Products
 							</Link>
-							{showManualAffiliateFeature && (
-								<Link
-									href="/affiliates"
-									className={classNames(
-										pathname.includes("/affiliates")
-											? "text-blue-400 hover:text-blue-500"
-											: "text-gray-400 hover:text-gray-500",
-										"font-medium",
-									)}
-								>
-									Affiliates
-								</Link>
-							)}
 						</nav>
 					</SheetContent>
 				</Sheet>
