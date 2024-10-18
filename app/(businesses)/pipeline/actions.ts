@@ -34,7 +34,10 @@ export async function createPipelineAction(
 	});
 
 	const product = await getProductById(product_id);
-	await createResource({ content: product?.description as string });
+	await createResource({
+		content: product?.description as string,
+		productId: product_id,
+	});
 
 	const isHeygenVideoGenerationEnabledFlag =
 		(await isHeygenVideoGenerationEnabled()) as boolean;

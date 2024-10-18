@@ -22,13 +22,17 @@ export const generateEmbeddings = async (
 	return embeddings.map((e, i) => ({ content: chunks[i], embedding: e }));
 };
 
-export const createResource = async ({ content }: { content: string }) => {
+export const createResource = async ({
+	content,
+	productId,
+}: { content: string; productId: number }) => {
 	try {
 		const { text } = await generateText({
 			model: openai("gpt-4o-2024-08-06"),
-			system:
-				"You are a knowledge base writer. " +
-				"You write simple, clear, and concise content.",
+			system: `You are a knowledge base writer.
+				You write simple, clear, and concise content.
+				Always include the product ID in the summary, starting the summary with 
+				'The summary is about the product with the Product ID: ${productId}'`,
 			prompt: `Summarize the following content: ${content}`,
 		});
 
