@@ -109,7 +109,7 @@ export default function ElegantOnboarding({
 							name="description"
 							value={formData.description}
 							onChange={handleInputChange}
-							placeholder="Description"
+							placeholder="Tell us a little bit about your product, for example: mangosqueezy is an open-source platform for affiliate marketing. Stripe is a payment platform for online businesses."
 							rows={4}
 							className="resize-none"
 						/>
