@@ -47,17 +47,15 @@ export async function updateBusinessInfoById({
 	last_name,
 	description,
 	commission,
-	wallet_address,
-	store_name,
-	slug,
-}: Omit<
+	svix_consumer_app_id,
+}: Pick<
 	Business,
-	| "created_at"
-	| "updated_at"
-	| "affiliate_hub_description"
-	| "email"
-	| "url"
-	| "status"
+	| "id"
+	| "first_name"
+	| "last_name"
+	| "description"
+	| "commission"
+	| "svix_consumer_app_id"
 >) {
 	try {
 		return prisma.business.update({
@@ -67,9 +65,7 @@ export async function updateBusinessInfoById({
 				last_name,
 				description,
 				commission,
-				wallet_address,
-				store_name,
-				slug,
+				svix_consumer_app_id,
 			},
 		});
 	} catch (err) {

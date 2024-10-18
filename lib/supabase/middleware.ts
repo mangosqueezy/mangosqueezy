@@ -1,74 +1,53 @@
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
-import { NextResponse, type NextRequest } from "next/server";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
+import { type NextRequest, NextResponse } from "next/server";
 
 export async function updateSession(request: NextRequest) {
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  });
+	const response = NextResponse.next({
+		request: {
+			headers: request.headers,
+		},
+	});
+	const cookieStore = cookies();
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value;
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          request.cookies.set({
-            name,
-            value,
-            ...options,
-          });
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          });
-          response.cookies.set({
-            name,
-            value,
-            ...options,
-          });
-        },
-        remove(name: string, options: CookieOptions) {
-          request.cookies.set({
-            name,
-            value: "",
-            ...options,
-          });
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          });
-          response.cookies.set({
-            name,
-            value: "",
-            ...options,
-          });
-        },
-      },
-    },
-  );
+	const supabase = createServerClient(
+		process.env.NEXT_PUBLIC_SUPABASE_URL!,
+		process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+		{
+			cookies: {
+				getAll() {
+					return cookieStore.getAll();
+				},
+				setAll(cookiesToSet) {
+					try {
+						for (const { name, value, options } of cookiesToSet) {
+							cookieStore.set(name, value, options);
+						}
+					} catch {
+						// The `setAll` method was called from a Server Component.
+						// This can be ignored if you have middleware refreshing
+						// user sessions.
+					}
+				},
+			},
+		},
+	);
 
-  const result = await supabase.auth.getUser();
+	const result = await supabase.auth.getUser();
 
-  if (!result.data.user) {
-    return NextResponse.redirect(new URL("/login", request.url), {
-      headers: request.headers,
-    });
-  }
+	if (!result.data.user) {
+		return NextResponse.redirect(new URL("/login", request.url), {
+			headers: request.headers,
+		});
+	}
 
-  let { data } = await supabase.from("Business").select("status");
+	const { data } = await supabase.from("Business").select("commission");
 
-  if (data && data[0]?.status === "Inactive") {
-    return NextResponse.redirect(new URL("/login", request.url), {
-      headers: request.headers,
-    });
-  }
+	if (data && data[0]?.commission <= 0) {
+		return NextResponse.redirect(new URL("/onboarding", request.url), {
+			headers: request.headers,
+		});
+	}
 
-  return response;
+	return response;
 }

@@ -1,7 +1,6 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { getSlug } from "@/models/llm";
 
 export async function auth(_: null | string, formData: FormData) {
 	const supabase = createClient();
@@ -14,13 +13,11 @@ export async function auth(_: null | string, formData: FormData) {
 		return "Please enter your valid email id";
 	}
 
-	const slug = await getSlug(email);
-
 	const { error } = await supabase.auth.signInWithOtp({
 		email,
 		options: {
 			data: {
-				slug: slug.toLowerCase(),
+				slug: email,
 				provider: "magic link",
 			},
 		},

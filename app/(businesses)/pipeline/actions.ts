@@ -6,6 +6,8 @@ import {
 	createPipeline,
 	getPipelineByProductIdAndBusinessId,
 } from "@/models/pipeline";
+import { getProductById } from "@/models/products";
+import { createResource } from "@/services/createResource";
 import { Client } from "@upstash/qstash";
 import { revalidatePath } from "next/cache";
 import { Resend } from "resend";
@@ -30,6 +32,9 @@ export async function createPipelineAction(
 		location,
 		business_id,
 	});
+
+	const product = await getProductById(product_id);
+	await createResource({ content: product?.description as string });
 
 	const isHeygenVideoGenerationEnabledFlag =
 		(await isHeygenVideoGenerationEnabled()) as boolean;

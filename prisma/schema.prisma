@@ -20,12 +20,12 @@ model Business {
   url                       String?
   wallet_address            String?
   commission                Int?
-  status                    String               @default("Inactive")
+  status                    String               @default("Active")
   created_at                DateTime             @default(now())
   updated_at                DateTime             @updatedAt
   affiliate_hub_description String?
   svix_consumer_app_id      String?
-  payment_preference        PaymentPreference    @default(FullCrypto)
+  payment_preference        PaymentPreference    @default(FullFiat)
   affiliate_business        Affiliate_Business[]
   messages                  Messages[]
   orders                    Orders[]
