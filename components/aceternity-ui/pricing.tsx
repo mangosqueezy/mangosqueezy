@@ -1,8 +1,5 @@
 import Meteors from "@/components/magicui/meteors";
-import { Button } from "@/components/ui/button";
 import { CheckIcon } from "@heroicons/react/20/solid";
-import { IconBrandYoutube } from "@tabler/icons-react";
-import Link from "next/link";
 
 const includedFeatures = [
 	"Instantly pay the affiliate commissions",
@@ -58,25 +55,6 @@ export default function Pricing() {
 										/month
 									</span>
 								</p>
-								<form
-									className="mx-auto mt-10 flex max-w-md space-y-4 flex-col"
-									action="/"
-									method="POST"
-								>
-									<label htmlFor="email" className="sr-only">
-										Email address
-									</label>
-									<input
-										id="email"
-										name="email"
-										type="email"
-										autoComplete="email"
-										required
-										className="min-w-0 flex-auto rounded-md border-0 bg-white/5 px-3.5 py-2 text-black shadow-sm ring-1 ring-inset ring-black/10 focus:ring-2 focus:ring-inset focus:ring-black sm:text-sm sm:leading-6"
-										placeholder="Enter your email"
-									/>
-									<Button type="submit">Notify me</Button>
-								</form>
 								<p className="mt-6 text-xs leading-5 text-black">
 									Free while in beta. There will also be a freemium plan for all
 									our users.
