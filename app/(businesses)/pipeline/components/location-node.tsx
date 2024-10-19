@@ -5,13 +5,13 @@ import useStore from "@/app/store/store";
 import { Handle, type NodeProps, Position } from "@xyflow/react";
 import { MapPin } from "lucide-react";
 import type { LocationNode as LocationNodeProps } from "../types/appNode";
+import { CountrySelector } from "./country-selector";
 
 export default function LocationNode({
 	id,
 	isConnectable,
 }: NodeProps<LocationNodeProps>) {
 	const updateNodeData = useStore((state) => state.updateNodeData);
-	const [location, setLocation] = useState("global");
 
 	return (
 		<div className="h-full border border-gray-300 rounded bg-white">
@@ -28,7 +28,7 @@ export default function LocationNode({
 				>
 					Location:
 				</label>
-				<input
+				{/* <input
 					id="location"
 					name="location"
 					type="text"
@@ -38,6 +38,12 @@ export default function LocationNode({
 						updateNodeData(id, e.target.value);
 					}}
 					className="nodrag w-full p-1.5 border border-gray-300 rounded"
+				/> */}
+				<CountrySelector
+					defaultValue={"EARTH"}
+					onSelect={(countryName) => {
+						updateNodeData(id, countryName);
+					}}
 				/>
 			</div>
 			<Handle

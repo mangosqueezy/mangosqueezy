@@ -1,5 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
 import { openai } from "@ai-sdk/openai";
+import { createClient } from "@supabase/supabase-js";
 import { embedMany, generateText } from "ai";
 
 const embeddingModel = openai.embedding("text-embedding-ada-002");
@@ -37,7 +37,10 @@ export const createResource = async ({
 		});
 
 		const embeddings = await generateEmbeddings(text);
-		const supabase = createClient();
+		const supabase = createClient(
+			process.env.NEXT_PUBLIC_SUPABASE_URL!,
+			process.env.SUPABASE_KEY!,
+		);
 
 		const { data: existingResource } = await supabase
 			.from("resources")
