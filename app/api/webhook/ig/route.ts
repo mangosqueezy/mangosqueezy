@@ -25,22 +25,23 @@ export async function POST(request: Request) {
 	const appUsersIgUserId = jsonBody?.entry[0]?.id;
 	const messaging = jsonBody?.entry[0].messaging;
 
-	const message = messaging[0];
-
-	console.log("/api/webhook/ig/ POST => ", { message, appUsersIgUserId });
-
 	const igAssistEnabled = (await isIgAssistEnabled()) as boolean;
-	if (message.sender.id !== IG_BUSINESS_ID && igAssistEnabled) {
-		await fetch("https://mangosqueezy-hono-app.vercel.app/api/workflow", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({
-				text: message.message.text,
-				recipientId: message.sender.id,
-			}),
-		});
+
+	for (const message of messaging) {
+		console.log("/api/webhook/ig/ POST => ", { message, appUsersIgUserId });
+
+		if (message.sender.id !== IG_BUSINESS_ID && igAssistEnabled) {
+			await fetch("https://mangosqueezy-hono-app.vercel.app/api/workflow", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					text: message.message.text,
+					recipientId: message.sender.id,
+				}),
+			});
+		}
 	}
 
 	return new Response("Received", { status: 200 });
