@@ -1,9 +1,9 @@
-import { isMoonpayEnabled } from "@/config/flags";
+import { isMoonpayEnabled, isRealTimePaymentsEnabled } from "@/config/flags";
 import { getAffiliateByEmail } from "@/models/affiliates";
 import { getProductById } from "@/models/products";
-import BuyForm from "./components/form";
+import Checkout from "./components/checkout";
 
-export default async function Checkout({
+export default async function CheckoutPage({
 	params,
 }: { params: { slug: Array<string> } }) {
 	const email = decodeURIComponent(params.slug[0]);
@@ -15,13 +15,16 @@ export default async function Checkout({
 		currency: "USD",
 	}).format(Number(product?.price || "0"));
 	const moonpayEnabled = (await isMoonpayEnabled()) as boolean;
+	const realTimePaymentsEnabled =
+		(await isRealTimePaymentsEnabled()) as boolean;
 
 	return (
-		<BuyForm
+		<Checkout
 			product={product}
 			formattedAmount={formattedAmount}
 			affiliateId={user?.id}
 			moonpayEnabled={moonpayEnabled}
+			realTimePaymentsEnabled={realTimePaymentsEnabled}
 		/>
 	);
 }

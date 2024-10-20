@@ -79,7 +79,9 @@ export async function POST(request: Request) {
 			prompt: prompt,
 		});
 
-		const encodedText = encodeURIComponent(text);
+		const encodedText = encodeURIComponent(
+			`Product ID: ${pipeline?.products?.id} ${text}`,
+		);
 
 		const videoUrl = heygenResult?.data?.video_url;
 		const videoUrlResponse = await fetch(videoUrl);

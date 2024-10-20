@@ -1,10 +1,12 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { classNames, cn } from "@/lib/utils";
 import type { Pipelines } from "@prisma/client";
-import { CircleCheck, Dot, Loader } from "lucide-react";
+import { ChevronLeft, CircleCheck, Dot, Loader } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import placeholder from "../../../../../public/placeholder.svg";
 
@@ -112,7 +114,15 @@ export default function Overview({
 
 	return (
 		<div className="max-w-7xl mx-auto">
-			<h1 className="text-xl font-semibold text-gray-900">Pipelines</h1>
+			<div className="flex justify-between items-center">
+				<h1 className="text-xl font-semibold text-gray-900">Pipelines</h1>
+				<Button asChild variant="ghost">
+					<Link href="/pipeline">
+						<ChevronLeft className="w-4 h-4" />
+						Back
+					</Link>
+				</Button>
+			</div>
 			<div
 				className={cn(
 					pipelines?.length === 0 && "w-96",

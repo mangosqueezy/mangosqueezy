@@ -39,8 +39,8 @@ export default function Index() {
 							marketing tool
 						</Highlight>
 						<p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-300">
-							A tool that takes care of all your affiliate marketing needs for
-							your business.
+							mangosqueezy helps SaaS companies find affiliates and measure
+							their progress.
 						</p>
 					</motion.h1>
 				</HeroHighlight>

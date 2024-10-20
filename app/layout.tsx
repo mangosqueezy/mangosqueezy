@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 	openGraph: {
 		title: "mangosqueezy | Affiliates marketing tool",
 		description:
-			"A tool that takes care of all your affiliate marketing needs for your business.",
+			"mangosqueezy helps SaaS companies find affiliates and measure their progress.",
 		url: "https://mangosqueezy.com",
 		siteName: "mangosqueezy | Affiliates marketing tool",
 		locale: "en_US",
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
 	twitter: {
 		title: "mangosqueezy | Affiliates marketing tool",
 		description:
-			"A tool that takes care of all your affiliate marketing needs for your business.",
+			"mangosqueezy helps SaaS companies find affiliates and measure their progress.",
 		images: [
 			{
 				url: "https://lkjqkobxmgqedqtidcws.supabase.co/storage/v1/object/public/mangosqueezy/twitter-image.jpg",
