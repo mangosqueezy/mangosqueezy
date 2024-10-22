@@ -1,3 +1,4 @@
+import dashboard from "@/assets/dashboard.jpeg";
 import { Button as MovingBorder } from "@/components/ui/moving-border";
 import {
 	BriefcaseIcon,
@@ -67,7 +68,7 @@ export default function Feature() {
 					className="bg-white dark:bg-slate-900 text-black dark:text-white border-neutral-200 dark:border-slate-800 h-full w-full"
 				>
 					<Image
-						src="/dashboard.jpeg"
+						src={dashboard}
 						alt="App screenshot"
 						className="rounded-[inherit] border object-contain shadow-lg dark:hidden"
 						width={2432}

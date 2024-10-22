@@ -1,5 +1,6 @@
 "use client";
 
+import placeholder from "@/assets/placeholder.svg";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { classNames, cn } from "@/lib/utils";
@@ -155,7 +156,7 @@ export default function Overview({
 										/>
 									) : (
 										<Image
-											src="/placeholder.svg"
+											src={placeholder}
 											alt="Image placeholder"
 											className="rounded-xl h-96 w-full"
 											width={100}

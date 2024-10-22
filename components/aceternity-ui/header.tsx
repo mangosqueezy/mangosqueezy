@@ -1,5 +1,6 @@
 "use client";
 import { getUser } from "@/app/(businesses)/actions";
+import mangosqueezy from "@/assets/mangosqueezy-primary-logo.svg";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
@@ -23,7 +24,7 @@ export function Navigation() {
 			<Link href="/" className="actionable flex h-8 items-center gap-1">
 				<span className="text-base font-medium text-gray-600 dark:text-gray-400">
 					<Image
-						src="/mangosqueezy-primary-logo.svg"
+						src={mangosqueezy}
 						priority={false}
 						width={100}
 						height={100}
