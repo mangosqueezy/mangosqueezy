@@ -8,7 +8,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, CircleCheck, Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import toast, { Toaster } from "react-hot-toast";
+import toast, { Toaster, type Toast } from "react-hot-toast";
 import { updateOnboardingAction } from "../actions";
 
 const steps = ["Personal Info", "Commission", "Description", "Summary"];
@@ -50,11 +50,11 @@ export default function ElegantOnboarding({
 		});
 
 		if (!user) {
-			toast.custom((t) => (
+			toast.custom((t: Toast) => (
 				<CustomToast t={t} message="Something went wrong" variant="error" />
 			));
 		} else if ("error" in user) {
-			toast.custom((t) => (
+			toast.custom((t: Toast) => (
 				<CustomToast t={t} message={user.error} variant="error" />
 			));
 		} else {

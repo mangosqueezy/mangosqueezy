@@ -2,16 +2,17 @@
 
 import { useCallback, useEffect, useState } from "react";
 import {
+	Area,
+	AreaChart,
 	Bar,
 	BarChart,
 	CartesianGrid,
 	LabelList,
-	Line,
-	LineChart,
 	XAxis,
 	YAxis,
 } from "recharts";
 
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
 	type ChartConfig,
@@ -25,33 +26,35 @@ import type {
 	AnalyticsReferers,
 	AnalyticsTimeseries,
 } from "dub/models/components";
+import { ChevronLeft } from "lucide-react";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { getAnalytics } from "../actions";
 
 const chartConfig = {
 	clicks: {
 		label: "Clicks",
-		color: "hsl(var(--chart-4))",
+		color: "hsl(var(--chart-7))",
 	},
 } satisfies ChartConfig;
 
 const countryChartConfig = {
 	country: {
 		label: "Country",
-		color: "hsl(var(--chart-3))",
+		color: "hsl(var(--chart-5))",
 	},
 	label: {
-		color: "hsl(var(--background))",
+		color: "hsl(var(--label))",
 	},
 } satisfies ChartConfig;
 
 const referrerChartConfig = {
 	referrer: {
 		label: "Referrer",
-		color: "hsl(var(--chart-2))",
+		color: "hsl(var(--chart-6))",
 	},
 	label: {
-		color: "hsl(var(--background))",
+		color: "hsl(var(--label))",
 	},
 } satisfies ChartConfig;
 
@@ -90,158 +93,185 @@ export default function Analytics() {
 	}, [getLinkAnalytics]);
 
 	return (
-		<>
-			<div className="bg-gray-50 py-10 rounded-lg">
-				<div className="mx-auto grid max-w-screen-xl gap-5 px-2.5 lg:px-20">
-					<Card>
-						<CardHeader>
-							<CardTitle>Clicks</CardTitle>
-						</CardHeader>
-						<CardContent>
-							<ChartContainer config={chartConfig} className="w-full h-80">
-								<LineChart
-									accessibilityLayer
-									data={chartData}
-									className="w-full h-full"
-									margin={{
-										left: 12,
-										right: 12,
-									}}
-								>
-									<CartesianGrid vertical={false} />
-									<XAxis
-										dataKey="start"
-										tickLine={false}
-										axisLine={false}
-										tickMargin={8}
-										tickFormatter={(value) => value.slice(0, 3)}
-									/>
-									<ChartTooltip
-										cursor={false}
-										content={<ChartTooltipContent hideLabel />}
-									/>
-									<Line
-										dataKey="clicks"
-										type="linear"
-										stroke="var(--color-clicks)"
-										strokeWidth={2}
-										dot={false}
-									/>
-								</LineChart>
-							</ChartContainer>
-						</CardContent>
-					</Card>
-					<div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-						<div className="flex flex-col gap-2">
-							<Card>
-								<CardHeader>
-									<CardTitle>Countries</CardTitle>
-								</CardHeader>
-								<CardContent>
-									<ChartContainer
-										config={countryChartConfig}
-										className="w-full h-80"
-									>
-										<BarChart
-											accessibilityLayer
-											data={countryChartData}
-											layout="vertical"
-											margin={{
-												right: 16,
-											}}
-										>
-											<CartesianGrid horizontal={false} />
-											<YAxis
-												dataKey="country"
-												type="category"
-												tickLine={false}
-												tickMargin={10}
-												axisLine={false}
-												tickFormatter={(value) => value.slice(0, 3)}
-												hide
-											/>
-											<XAxis dataKey="clicks" type="number" hide />
-											<ChartTooltip
-												cursor={false}
-												content={<ChartTooltipContent indicator="line" />}
-											/>
-											<Bar
-												dataKey="clicks"
-												layout="vertical"
-												fill="var(--color-country)"
-												radius={4}
-												className="h-20"
-											>
-												<LabelList
-													dataKey="country"
-													position="insideLeft"
-													offset={8}
-													className="fill-[--color-label]"
-													fontSize={12}
-												/>
-											</Bar>
-										</BarChart>
-									</ChartContainer>
-								</CardContent>
-							</Card>
-						</div>
+		<div>
+			<div className="mx-auto grid max-w-screen-xl gap-5 px-2.5 lg:px-20">
+				<div>
+					<Button asChild variant="ghost">
+						<Link href="/metrics">
+							<ChevronLeft className="w-4 h-4" />
+							Back to Metrics
+						</Link>
+					</Button>
+				</div>
 
-						<div className="flex flex-col gap-2">
-							<Card>
-								<CardHeader>
-									<CardTitle>Referrers</CardTitle>
-								</CardHeader>
-								<CardContent>
-									<ChartContainer
-										config={referrerChartConfig}
-										className="w-full h-80"
+				<Card>
+					<CardHeader>
+						<CardTitle>
+							<div className="flex items-center gap-2">
+								<span className="font-semibold">Clicks</span>
+								<span className="text-sm text-muted-foreground">1 Year</span>
+							</div>
+						</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<ChartContainer config={chartConfig} className="w-full h-80">
+							<AreaChart
+								accessibilityLayer
+								data={chartData}
+								margin={{
+									left: 12,
+									right: 12,
+								}}
+							>
+								<CartesianGrid vertical={false} />
+								<XAxis
+									dataKey="start"
+									tickLine={false}
+									axisLine={false}
+									tickMargin={8}
+									tickFormatter={(value) => value.slice(0, 3)}
+								/>
+								<ChartTooltip
+									cursor={false}
+									content={<ChartTooltipContent hideLabel />}
+								/>
+								<Area
+									dataKey="clicks"
+									type="natural"
+									fill="var(--color-clicks)"
+									fillOpacity={0.4}
+									stroke="var(--color-clicks)"
+								/>
+							</AreaChart>
+						</ChartContainer>
+					</CardContent>
+				</Card>
+				<div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+					<div className="flex flex-col gap-2">
+						<Card>
+							<CardHeader>
+								<CardTitle>
+									<div className="flex items-center gap-2">
+										<span className="font-semibold text-lg">Countries</span>
+										<span className="text-sm text-muted-foreground">
+											Top 5 Only
+										</span>
+									</div>
+								</CardTitle>
+							</CardHeader>
+							<CardContent>
+								<ChartContainer
+									config={countryChartConfig}
+									className="w-full h-80"
+								>
+									<BarChart
+										accessibilityLayer
+										data={countryChartData}
+										layout="vertical"
+										className="w-full h-full"
+										margin={{
+											right: 16,
+										}}
 									>
-										<BarChart
-											accessibilityLayer
-											data={referrerChartData}
+										<CartesianGrid horizontal={false} />
+										<YAxis
+											dataKey="country"
+											type="category"
+											tickLine={false}
+											tickMargin={10}
+											axisLine={false}
+											tickFormatter={(value) => value.slice(0, 3)}
+											hide
+										/>
+										<XAxis dataKey="clicks" type="number" hide />
+										<ChartTooltip
+											cursor={false}
+											content={<ChartTooltipContent indicator="line" />}
+										/>
+										<Bar
+											dataKey="clicks"
 											layout="vertical"
-											margin={{
-												right: 16,
-											}}
+											fill="var(--color-country)"
+											radius={4}
+											className="h-20"
 										>
-											<CartesianGrid horizontal={false} />
-											<YAxis
+											<LabelList
+												dataKey="country"
+												position="insideLeft"
+												offset={8}
+												className="fill-[--color-label]"
+												fontSize={12}
+											/>
+										</Bar>
+									</BarChart>
+								</ChartContainer>
+							</CardContent>
+						</Card>
+					</div>
+
+					<div className="flex flex-col gap-2">
+						<Card>
+							<CardHeader>
+								<CardTitle>
+									<div className="flex items-center gap-2">
+										<span className="font-semibold text-lg">Referrers</span>
+										<span className="text-sm text-muted-foreground">
+											Top 5 Only
+										</span>
+									</div>
+								</CardTitle>
+							</CardHeader>
+							<CardContent>
+								<ChartContainer
+									config={referrerChartConfig}
+									className="w-full h-80"
+								>
+									<BarChart
+										accessibilityLayer
+										data={referrerChartData}
+										layout="vertical"
+										className="w-full h-full"
+										margin={{
+											right: 16,
+										}}
+									>
+										<CartesianGrid horizontal={false} />
+										<YAxis
+											dataKey="referer"
+											type="category"
+											tickLine={false}
+											tickMargin={10}
+											axisLine={false}
+											tickFormatter={(value) => value.slice(0, 3)}
+											hide
+										/>
+										<XAxis dataKey="clicks" type="number" hide />
+										<ChartTooltip
+											cursor={false}
+											content={<ChartTooltipContent indicator="line" />}
+										/>
+										<Bar
+											dataKey="clicks"
+											layout="vertical"
+											fill="var(--color-referrer)"
+											radius={4}
+											className="h-20"
+										>
+											<LabelList
 												dataKey="referer"
-												type="category"
-												tickLine={false}
-												tickMargin={10}
-												axisLine={false}
-												tickFormatter={(value) => value.slice(0, 3)}
-												hide
+												position="insideLeft"
+												offset={8}
+												className="fill-[--color-label]"
+												fontSize={12}
 											/>
-											<XAxis dataKey="clicks" type="number" hide />
-											<ChartTooltip
-												cursor={false}
-												content={<ChartTooltipContent indicator="line" />}
-											/>
-											<Bar
-												dataKey="clicks"
-												layout="vertical"
-												fill="var(--color-referrer)"
-												radius={4}
-												className="h-20"
-											>
-												<LabelList
-													dataKey="referer"
-													position="insideLeft"
-													offset={8}
-													className="fill-[--color-label]"
-													fontSize={12}
-												/>
-											</Bar>
-										</BarChart>
-									</ChartContainer>
-								</CardContent>
-							</Card>
-						</div>
+										</Bar>
+									</BarChart>
+								</ChartContainer>
+							</CardContent>
+						</Card>
 					</div>
 				</div>
 			</div>
-		</>
+		</div>
 	);
 }

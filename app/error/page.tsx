@@ -1,4 +1,4 @@
-export default function ErrorPage() {
+export default function Page() {
 	return (
 		<>
 			<main className="grid my-12 place-items-center bg-white px-6 lg:px-8">

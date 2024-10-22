@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 import type { Products } from "@prisma/client";
 import { Loader, Play } from "lucide-react";
 import Link from "next/link";
-import toast, { Toaster } from "react-hot-toast";
+import toast, { Toaster, type Toast } from "react-hot-toast";
 import {
 	createPipelineAction,
 	getPipelineByProductIdAndBusinessIdAction,
@@ -111,7 +111,7 @@ function Flow({ products, business_id }: TFlowProps) {
 		);
 
 		if (isPipelineExists) {
-			toast.custom((t) => (
+			toast.custom((t: Toast) => (
 				<CustomToast
 					t={t}
 					message="Pipeline already created. Please check status page."
@@ -133,7 +133,7 @@ function Flow({ products, business_id }: TFlowProps) {
 					business_id: business_id,
 					prompt: prompt,
 				});
-				toast.custom((t) => (
+				toast.custom((t: Toast) => (
 					<CustomToast
 						t={t}
 						message="Pipeline created successfully. Please check status page."

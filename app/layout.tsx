@@ -5,7 +5,7 @@ import { PHProvider } from "./providers";
 import "./tailwind.css";
 
 const PostHogPageView = dynamic(() => import("./posthog-pageview"), {
-	ssr: false,
+	ssr: true,
 });
 
 import { cn } from "@/lib/utils";

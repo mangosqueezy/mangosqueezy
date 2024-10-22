@@ -19,7 +19,7 @@ import type { Orders } from "@prisma/client";
 import Menu from "./components/menu";
 
 export default async function OrdersPage() {
-	const supabase = createClient();
+	const supabase = await createClient();
 	const { data } = await supabase.auth.getUser();
 	const userId = data?.user?.id as string;
 	const user = await getUserById(userId);

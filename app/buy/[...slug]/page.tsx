@@ -3,9 +3,10 @@ import { getAffiliateByEmail } from "@/models/affiliates";
 import { getProductById } from "@/models/products";
 import Checkout from "./components/checkout";
 
-export default async function CheckoutPage({
-	params,
-}: { params: { slug: Array<string> } }) {
+export default async function Page(props: {
+	params: Promise<{ slug: Array<string> }>;
+}) {
+	const params = await props.params;
 	const email = decodeURIComponent(params.slug[0]);
 	const user = await getAffiliateByEmail(email as string);
 	const productId = Number.parseInt(params.slug[1] as string);

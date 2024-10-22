@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 
 export async function auth(_: null | string, formData: FormData) {
-	const supabase = createClient();
+	const supabase = await createClient();
 
 	const email = formData.get("email") as string;
 	const isvalidEmail =

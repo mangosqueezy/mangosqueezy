@@ -58,10 +58,9 @@ import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Business, Products } from "@prisma/client";
 import { MoreHorizontal, PlusCircle } from "lucide-react";
-import { useState } from "react";
-import { useFormState } from "react-dom";
+import { useActionState, useState } from "react";
 import { useForm } from "react-hook-form";
-import toast, { Toaster } from "react-hot-toast";
+import toast, { Toaster, type Toast } from "react-hot-toast";
 import { z } from "zod";
 import {
 	createProductAction,
@@ -139,11 +138,11 @@ export default function Product({
 }) {
 	const analytics = useJune(process.env.NEXT_PUBLIC_JUNE_API_KEY!);
 	const [open, setOpen] = useState(false);
-	const [updateFormState, updateAction] = useFormState(
+	const [updateFormState, updateAction] = useActionState(
 		updateProductAction,
 		initialState,
 	);
-	const [deleteFormState, deleteAction] = useFormState(
+	const [deleteFormState, deleteAction] = useActionState(
 		deleteProductAction,
 		initialState,
 	);
@@ -193,7 +192,7 @@ export default function Product({
 	}
 
 	if (updateFormState?.success === "updated successfully") {
-		toast.custom((t) => (
+		toast.custom((t: Toast) => (
 			<CustomToast
 				t={t}
 				message="Product updated successfully!"
@@ -202,7 +201,7 @@ export default function Product({
 		));
 		updateFormState.success = "";
 	} else if (deleteFormState?.success === "deleted successfully") {
-		toast.custom((t) => (
+		toast.custom((t: Toast) => (
 			<CustomToast
 				t={t}
 				message="Product deleted successfully!"
@@ -214,7 +213,7 @@ export default function Product({
 		updateFormState?.errors?.message ||
 		deleteFormState?.errors?.message
 	) {
-		toast.custom((t) => (
+		toast.custom((t: Toast) => (
 			<CustomToast
 				t={t}
 				message="Something went wrong. Please try again later!"

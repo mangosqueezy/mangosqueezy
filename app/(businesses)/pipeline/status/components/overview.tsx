@@ -8,7 +8,6 @@ import { ChevronLeft, CircleCheck, Dot, Loader } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import placeholder from "../../../../../public/placeholder.svg";
 
 const steps = [
 	"mangosqueezy is working on this",
@@ -156,7 +155,7 @@ export default function Overview({
 										/>
 									) : (
 										<Image
-											src={placeholder}
+											src="/placeholder.svg"
 											alt="Image placeholder"
 											className="rounded-xl h-96 w-full"
 											width={100}

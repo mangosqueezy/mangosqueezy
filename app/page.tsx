@@ -11,7 +11,7 @@ import { HighlightHub } from "@/components/magicui/highlight-hub";
 import Faq from "@/components/mango-ui/faq";
 import { motion } from "framer-motion";
 
-export default function Index() {
+export default function Page() {
 	return (
 		<div className="flex flex-col h-fit mx-auto">
 			<div className="flex flex-col w-full mx-auto max-w-7xl">

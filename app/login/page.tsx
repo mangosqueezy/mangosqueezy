@@ -6,13 +6,12 @@ import { Input } from "@/components/aceternity-ui/input";
 import { Label } from "@/components/aceternity-ui/label";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { useFormState } from "react-dom";
+import { useActionState, useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { auth } from "./actions";
 
-export default function Login() {
-	const [state, loginAction] = useFormState(auth, null);
+export default function Page() {
+	const [state, loginAction] = useActionState(auth, null);
 	const router = useRouter();
 
 	useEffect(() => {

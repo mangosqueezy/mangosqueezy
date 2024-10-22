@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getUserById } from "@/models/business";
 
 export async function getUser() {
-	const supabase = createClient();
+	const supabase = await createClient();
 
 	const { data } = await supabase.auth.getUser();
 

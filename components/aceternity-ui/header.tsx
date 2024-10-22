@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import mangoImg from "../../public/mangosqueezy-primary-logo.svg";
 
 export function Navigation() {
 	const [userId, setUserId] = useState<string | null>(null);
@@ -24,8 +23,10 @@ export function Navigation() {
 			<Link href="/" className="actionable flex h-8 items-center gap-1">
 				<span className="text-base font-medium text-gray-600 dark:text-gray-400">
 					<Image
-						src={mangoImg}
+						src="/mangosqueezy-primary-logo.svg"
 						priority={false}
+						width={100}
+						height={100}
 						className="h-6 w-full"
 						alt=""
 					/>

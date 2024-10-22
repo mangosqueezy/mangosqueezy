@@ -41,7 +41,7 @@ export default function Settings() {
 								<Input
 									disabled
 									type="email"
-									value={loggedInUser?.email}
+									value={loggedInUser?.email || ""}
 									id="email"
 									className="cursor-not-allowed"
 								/>
