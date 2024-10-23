@@ -36,12 +36,13 @@ export default function AnimatedHeroV0() {
 			<div className="relative container mx-auto px-6 py-16 md:py-24 lg:px-8 lg:py-32 min-h-screen flex items-center justify-center">
 				<div className="grid gap-12 lg:grid-cols-2 lg:gap-8 items-center h-full">
 					<div className="max-w-2xl">
-						<h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl mb-6 animate-fade-in-up">
-							Affiliate marketing tool
+						<h1 className="text-4xl font-bold tracking-normal text-gray-900 sm:text-6xl mb-6 animate-fade-in-up">
+							Find and onboard affiliates automatically
 						</h1>
-						<p className="mt-6 text-lg leading-8 text-gray-600 animate-fade-in-up animation-delay-200">
-							mangosqueezy helps SaaS companies find affiliates and measure
-							their progress.
+						<p className="mt-6 text-md leading-8 text-gray-600 animate-fade-in-up animation-delay-200">
+							We help SaaS businesses by finding affiliates, creating links, and
+							tracking results for you. Just pick a product to promote, and we
+							handle everything, so you can focus on growing your business.
 						</p>
 						<div className="mt-10 flex items-center gap-x-6 animate-fade-in-up animation-delay-400">
 							<Button className="bg-orange-600 text-white hover:bg-orange-700">
