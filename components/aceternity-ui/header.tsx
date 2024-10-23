@@ -44,7 +44,7 @@ export function Navigation() {
 							<Link href="/pipeline">Pipeline</Link>
 						</Button>
 					) : (
-						<Button asChild>
+						<Button asChild className="bg-orange-600 hover:bg-orange-500">
 							<Link href="/login">Login</Link>
 						</Button>
 					)}

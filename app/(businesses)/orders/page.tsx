@@ -32,36 +32,40 @@ export default async function OrdersPage() {
 					<CardDescription>Manage your orders.</CardDescription>
 				</CardHeader>
 				<CardContent>
-					<Table>
-						<TableHeader>
-							<TableRow>
-								<TableHead>Customer Name</TableHead>
-								<TableHead>Product Name</TableHead>
-								<TableHead>
-									<span className="sr-only">Actions</span>
-								</TableHead>
-							</TableRow>
-						</TableHeader>
-						<TableBody>
-							{user?.orders.map((order: Orders) => (
-								<TableRow key={order?.id}>
-									<TableCell className="font-medium">
-										{order.customer_email}
-									</TableCell>
-									<TableCell>
-										{
-											user.products.find(
-												(product) => product.id === order?.product_id,
-											)?.name
-										}
-									</TableCell>
-									<TableCell>
-										<Menu orderId={order.id} />
-									</TableCell>
+					{user?.orders.length === 0 ? (
+						<div className="text-center text-gray-500">No data available</div>
+					) : (
+						<Table>
+							<TableHeader>
+								<TableRow>
+									<TableHead>Customer Name</TableHead>
+									<TableHead>Product Name</TableHead>
+									<TableHead>
+										<span className="sr-only">Actions</span>
+									</TableHead>
 								</TableRow>
-							))}
-						</TableBody>
-					</Table>
+							</TableHeader>
+							<TableBody>
+								{user?.orders.map((order: Orders) => (
+									<TableRow key={order?.id}>
+										<TableCell className="font-medium">
+											{order.customer_email}
+										</TableCell>
+										<TableCell>
+											{
+												user.products.find(
+													(product) => product.id === order?.product_id,
+												)?.name
+											}
+										</TableCell>
+										<TableCell>
+											<Menu orderId={order.id} />
+										</TableCell>
+									</TableRow>
+								))}
+							</TableBody>
+						</Table>
+					)}
 				</CardContent>
 			</Card>
 		</div>

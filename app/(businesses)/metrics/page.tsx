@@ -26,37 +26,43 @@ export default async function OrdersPage() {
 					<CardTitle>Metrics</CardTitle>
 				</CardHeader>
 				<CardContent>
-					<Table>
-						<TableHeader>
-							<TableRow>
-								<TableHead>Link</TableHead>
-								<TableHead>
-									<span className="sr-only">Actions</span>
-								</TableHead>
-							</TableRow>
-						</TableHeader>
-						<TableBody>
-							{user?.affiliate_business.map(
-								(affiliate: Affiliate_Business) =>
-									affiliate.affiliate_link && (
-										<TableRow key={`table-row-${affiliate.affiliate_link_key}`}>
-											<TableCell className="font-medium">
-												{affiliate.affiliate_link}
-											</TableCell>
-											<TableCell className="flex justify-end">
-												<Button asChild>
-													<Link
-														href={`/metrics/${affiliate.affiliate_link_key}`}
-													>
-														View
-													</Link>
-												</Button>
-											</TableCell>
-										</TableRow>
-									),
-							)}
-						</TableBody>
-					</Table>
+					{user?.affiliate_business.length === 0 ? (
+						<div className="text-center text-gray-500">No data available</div>
+					) : (
+						<Table>
+							<TableHeader>
+								<TableRow>
+									<TableHead>Link</TableHead>
+									<TableHead>
+										<span className="sr-only">Actions</span>
+									</TableHead>
+								</TableRow>
+							</TableHeader>
+							<TableBody>
+								{user?.affiliate_business.map(
+									(affiliate: Affiliate_Business) =>
+										affiliate.affiliate_link && (
+											<TableRow
+												key={`table-row-${affiliate.affiliate_link_key}`}
+											>
+												<TableCell className="font-medium">
+													{affiliate.affiliate_link}
+												</TableCell>
+												<TableCell className="flex justify-end">
+													<Button asChild>
+														<Link
+															href={`/metrics/${affiliate.affiliate_link_key}`}
+														>
+															View
+														</Link>
+													</Button>
+												</TableCell>
+											</TableRow>
+										),
+								)}
+							</TableBody>
+						</Table>
+					)}
 				</CardContent>
 			</Card>
 		</div>

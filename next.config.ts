@@ -28,6 +28,10 @@ const nextConfig: NextConfig = {
 				protocol: "https",
 				hostname: "xumm.app",
 			},
+			{
+				protocol: "https",
+				hostname: "youtu.be",
+			},
 		],
 	},
 };

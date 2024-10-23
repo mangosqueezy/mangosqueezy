@@ -5,13 +5,14 @@ import { Navigation } from "@/components/aceternity-ui/header";
 import { Input } from "@/components/aceternity-ui/input";
 import { Label } from "@/components/aceternity-ui/label";
 import { cn } from "@/lib/utils";
+import { Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { auth } from "./actions";
 
 export default function Page() {
-	const [state, loginAction] = useActionState(auth, null);
+	const [state, loginAction, isPending] = useActionState(auth, null);
 	const router = useRouter();
 
 	useEffect(() => {
@@ -60,9 +61,19 @@ export default function Page() {
 
 							<button
 								type="submit"
-								className="inline-flex items-center justify-center bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
+								disabled={isPending}
+								className="inline-flex items-center justify-center bg-gradient-to-br relative group/btn from-orange-600 to-yellow-600 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset]"
 							>
-								Sign in &rarr;
+								{isPending ? (
+									<span className="flex items-center gap-2">
+										<Loader className="w-4 h-4 animate-spin" />
+										Sign in &rarr;
+									</span>
+								) : (
+									<span className="flex items-center gap-2">
+										Sign in &rarr;
+									</span>
+								)}
 								<BottomGradient />
 							</button>
 

@@ -378,94 +378,100 @@ export default function Product({
 						<CardDescription>Manage your products.</CardDescription>
 					</CardHeader>
 					<CardContent>
-						<Table>
-							<TableHeader>
-								<TableRow>
-									<TableHead>Name</TableHead>
-									<TableHead>Status</TableHead>
-									<TableHead>Description</TableHead>
-									<TableHead className="hidden md:table-cell">Price</TableHead>
-									<TableHead className="hidden md:table-cell">
-										Image Url
-									</TableHead>
-									<TableHead>
-										<span className="sr-only">Actions</span>
-									</TableHead>
-								</TableRow>
-							</TableHeader>
-							<TableBody>
-								{user?.products.map((product: Products) => (
-									<TableRow key={product.id}>
-										<TableCell className="font-medium">
-											{product.name}
-										</TableCell>
-										<TableCell className="font-medium">
-											<Badge variant="outline" className="text-green-500">
-												{product.status}
-											</Badge>
-										</TableCell>
-										<TableCell>{product.description}</TableCell>
-										<TableCell className="hidden md:table-cell">
-											{product.price}
-										</TableCell>
-										<TableCell className="hidden md:table-cell">
-											<a
-												href={product.image_url || ""}
-												className="text-orange-500 flex"
-												target="_blank"
-												rel="noreferrer"
-											>
-												product image
-												<ArrowTopRightOnSquareIcon className="ml-2 h-5 w-5" />
-											</a>
-										</TableCell>
-										<TableCell>
-											<DropdownMenu>
-												<DropdownMenuTrigger asChild>
-													<Button
-														aria-haspopup="true"
-														size="icon"
-														variant="ghost"
-													>
-														<MoreHorizontal className="h-4 w-4" />
-														<span className="sr-only">Toggle menu</span>
-													</Button>
-												</DropdownMenuTrigger>
-												<DropdownMenuContent align="end">
-													<DropdownMenuLabel>Actions</DropdownMenuLabel>
-													<DropdownMenuItem
-														onClick={() => {
-															setEditProductInfo({
-																id: product.id,
-																name: product.name,
-																description: product.description,
-																price: product.price.toString(),
-																imageUrl: product.image_url || "",
-															});
-															setOpenEditProductDialog(true);
-														}}
-													>
-														Edit
-													</DropdownMenuItem>
-													<DropdownMenuItem
-														onClick={async () => {
-															const formData = new FormData();
-															formData.append(
-																"product-id",
-																product.id.toString(),
-															);
-															deleteAction(formData);
-														}}
-													>
-														Delete
-													</DropdownMenuItem>
-												</DropdownMenuContent>
-											</DropdownMenu>
-										</TableCell>
+						{user?.products.length === 0 ? (
+							<div className="text-center text-gray-500">No data available</div>
+						) : (
+							<Table>
+								<TableHeader>
+									<TableRow>
+										<TableHead>Name</TableHead>
+										<TableHead>Status</TableHead>
+										<TableHead>Description</TableHead>
+										<TableHead className="hidden md:table-cell">
+											Price
+										</TableHead>
+										<TableHead className="hidden md:table-cell">
+											Image Url
+										</TableHead>
+										<TableHead>
+											<span className="sr-only">Actions</span>
+										</TableHead>
 									</TableRow>
-								))}
-							</TableBody>
-						</Table>
+								</TableHeader>
+								<TableBody>
+									{user?.products.map((product: Products) => (
+										<TableRow key={product.id}>
+											<TableCell className="font-medium">
+												{product.name}
+											</TableCell>
+											<TableCell className="font-medium">
+												<Badge variant="outline" className="text-green-500">
+													{product.status}
+												</Badge>
+											</TableCell>
+											<TableCell>{product.description}</TableCell>
+											<TableCell className="hidden md:table-cell">
+												{product.price}
+											</TableCell>
+											<TableCell className="hidden md:table-cell">
+												<a
+													href={product.image_url || ""}
+													className="text-orange-500 flex"
+													target="_blank"
+													rel="noreferrer"
+												>
+													product image
+													<ArrowTopRightOnSquareIcon className="ml-2 h-5 w-5" />
+												</a>
+											</TableCell>
+											<TableCell>
+												<DropdownMenu>
+													<DropdownMenuTrigger asChild>
+														<Button
+															aria-haspopup="true"
+															size="icon"
+															variant="ghost"
+														>
+															<MoreHorizontal className="h-4 w-4" />
+															<span className="sr-only">Toggle menu</span>
+														</Button>
+													</DropdownMenuTrigger>
+													<DropdownMenuContent align="end">
+														<DropdownMenuLabel>Actions</DropdownMenuLabel>
+														<DropdownMenuItem
+															onClick={() => {
+																setEditProductInfo({
+																	id: product.id,
+																	name: product.name,
+																	description: product.description,
+																	price: product.price.toString(),
+																	imageUrl: product.image_url || "",
+																});
+																setOpenEditProductDialog(true);
+															}}
+														>
+															Edit
+														</DropdownMenuItem>
+														<DropdownMenuItem
+															onClick={async () => {
+																const formData = new FormData();
+																formData.append(
+																	"product-id",
+																	product.id.toString(),
+																);
+																deleteAction(formData);
+															}}
+														>
+															Delete
+														</DropdownMenuItem>
+													</DropdownMenuContent>
+												</DropdownMenu>
+											</TableCell>
+										</TableRow>
+									))}
+								</TableBody>
+							</Table>
+						)}
 					</CardContent>
 				</Card>
 			</div>
