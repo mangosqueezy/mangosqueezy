@@ -1,6 +1,6 @@
 import { decryptIgAccessToken, isAccessTokenExpiring } from "@/lib/utils";
 import { getIgAccessToken } from "@/models/ig_refresh_token";
-import { getPipelineByVideoId, updatePipeline } from "@/models/pipeline";
+import { getPipelineByVideoId } from "@/models/pipeline";
 import { openai } from "@ai-sdk/openai";
 import { createClient } from "@supabase/supabase-js";
 import { Client } from "@upstash/qstash";
@@ -108,10 +108,14 @@ export async function POST(request: Request) {
 
 			const pipeline = await getPipelineByVideoId(videoId);
 			if (pipeline) {
-				await updatePipeline(pipeline.id, {
-					ig_post_url: igVideoUrl,
-					remark: "video has been processed for Instagram upload",
-				});
+				await supabase
+					.from("Pipelines")
+					.update({
+						ig_post_url: igVideoUrl,
+						remark: "video has been processed for Instagram upload",
+					})
+					.eq("id", pipeline.id)
+					.select();
 			}
 
 			await client.schedules.create({

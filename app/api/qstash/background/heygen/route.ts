@@ -1,12 +1,15 @@
 import { getUserById } from "@/models/business";
-import { updatePipeline } from "@/models/pipeline";
-
 import { openai } from "@ai-sdk/openai";
+import { createClient } from "@supabase/supabase-js";
 import { generateText } from "ai";
 
 export async function POST(request: Request) {
 	const body = await request.json();
 	const { business_id, product_id, pipeline_id } = body;
+	const supabase = createClient(
+		process.env.NEXT_PUBLIC_SUPABASE_URL as string,
+		process.env.SUPABASE_KEY as string,
+	);
 
 	const business = await getUserById(business_id);
 
@@ -39,10 +42,14 @@ export async function POST(request: Request) {
 
 	const videoData = await response.json();
 
-	await updatePipeline(pipeline_id, {
-		heygen_video_id: videoData.data.video_id as string,
-		remark: "video has been generated",
-	});
+	await supabase
+		.from("Pipelines")
+		.update({
+			heygen_video_id: videoData.data.video_id as string,
+			remark: "video has been generated",
+		})
+		.eq("id", pipeline_id)
+		.select();
 
 	return new Response("Job started", { status: 200 });
 }

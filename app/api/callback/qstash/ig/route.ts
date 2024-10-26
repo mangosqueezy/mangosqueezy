@@ -1,7 +1,8 @@
 import { decryptIgAccessToken } from "@/lib/utils";
 import { isAccessTokenExpiring } from "@/lib/utils";
 import { getIgAccessToken } from "@/models/ig_refresh_token";
-import { getPipelineByVideoId, updatePipeline } from "@/models/pipeline";
+import { getPipelineByVideoId } from "@/models/pipeline";
+import { createClient } from "@supabase/supabase-js";
 import { Client } from "@upstash/qstash";
 import { verifySignatureAppRouter } from "@upstash/qstash/nextjs";
 
@@ -9,6 +10,10 @@ const IG_BUSINESS_ID = process.env.IG_BUSINESS_ID;
 
 export const POST = verifySignatureAppRouter(async (req: Request) => {
 	const requestBody = await req.json();
+	const supabase = createClient(
+		process.env.NEXT_PUBLIC_SUPABASE_URL as string,
+		process.env.SUPABASE_KEY as string,
+	);
 
 	// responses from qstash are base64-encoded
 	const decoded = atob(requestBody?.body);
@@ -67,10 +72,14 @@ export const POST = verifySignatureAppRouter(async (req: Request) => {
 
 		const pipeline = await getPipelineByVideoId(videoId);
 		if (pipeline) {
-			await updatePipeline(pipeline.id, {
-				ig_post_id: igPostId,
-				remark: "video has been posted to instagram",
-			});
+			await supabase
+				.from("Pipelines")
+				.update({
+					ig_post_id: igPostId,
+					remark: "video has been processed for Instagram upload",
+				})
+				.eq("id", pipeline.id)
+				.select();
 		}
 
 		const client = new Client({
