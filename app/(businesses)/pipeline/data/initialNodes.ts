@@ -38,7 +38,7 @@ Based on your product description and location, generate 8-12 relevant hashtags 
 		type: "inputLocation",
 		position: { x: 550, y: 0 },
 		targetPosition: "top",
-		data: { value: "global", label: "Location" },
+		data: { value: "EARTH", label: "Location" },
 	},
 	{
 		id: "node-6",

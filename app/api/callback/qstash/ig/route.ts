@@ -76,7 +76,7 @@ export const POST = verifySignatureAppRouter(async (req: Request) => {
 				.from("Pipelines")
 				.update({
 					ig_post_id: igPostId,
-					remark: "video has been processed for Instagram upload",
+					remark: "video has been posted to instagram",
 				})
 				.eq("id", pipeline.id)
 				.select();

@@ -32,6 +32,9 @@ export async function getAffiliateById(id: Affiliates["id"]) {
 		where: {
 			id,
 		},
+		include: {
+			affiliate_business: true,
+		},
 	});
 }
 

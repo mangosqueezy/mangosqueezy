@@ -21,6 +21,7 @@ export async function createProductAction(formData: FormData) {
 			"image-reference-file-name",
 		) as string;
 		const businessId = formData.get("business-id") as string;
+		const htmlDescription = formData.get("html-description") as string;
 
 		const supabase = createClient(
 			process.env.NEXT_PUBLIC_SUPABASE_URL as string,
@@ -40,7 +41,14 @@ export async function createProductAction(formData: FormData) {
 
 		const parsedImageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/mangosqueezy/${data?.path}`;
 
-		await createProduct(name, price, description, parsedImageUrl, businessId);
+		await createProduct(
+			name,
+			price,
+			description,
+			parsedImageUrl,
+			businessId,
+			htmlDescription,
+		);
 
 		revalidatePath("/products");
 
@@ -60,7 +68,9 @@ export async function updateProductAction(
 		const productDescription = formData.get("product-description") as string;
 		const productPrice = formData.get("product-price") as string;
 		const productImageUrl = formData.get("product-image-url") as string;
-
+		const productHtmlDescription = formData.get(
+			"product-html-description",
+		) as string;
 		const parsedProductPrice = Number.parseFloat(productPrice);
 		await updateProductById(
 			Number.parseInt(productId),
@@ -68,6 +78,7 @@ export async function updateProductAction(
 			parsedProductPrice,
 			productDescription,
 			productImageUrl,
+			productHtmlDescription,
 		);
 
 		revalidatePath("/products");
@@ -79,6 +90,7 @@ export async function updateProductAction(
 				price: null,
 				description: null,
 				productImage: null,
+				htmlDescription: null,
 			},
 		};
 	} catch (error) {
@@ -90,6 +102,7 @@ export async function updateProductAction(
 				price: null,
 				description: null,
 				productImage: null,
+				htmlDescription: null,
 			},
 		};
 	}
@@ -113,6 +126,7 @@ export async function deleteProductAction(
 				price: null,
 				description: null,
 				productImage: null,
+				htmlDescription: null,
 			},
 		};
 	} catch (error) {
@@ -124,6 +138,7 @@ export async function deleteProductAction(
 				price: null,
 				description: null,
 				productImage: null,
+				htmlDescription: null,
 			},
 		};
 	}

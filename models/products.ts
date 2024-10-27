@@ -11,6 +11,7 @@ export async function createProduct(
 	description: string,
 	imageUrl: string,
 	businessId: string,
+	htmlDescription: string,
 ) {
 	try {
 		const parsedPrice = Number.parseFloat(price);
@@ -36,6 +37,7 @@ export async function createProduct(
 					name: PrismaVectorStore.ContentColumn,
 					price: PrismaVectorStore.ContentColumn,
 					description: PrismaVectorStore.ContentColumn,
+					html_description: PrismaVectorStore.ContentColumn,
 					image_url: PrismaVectorStore.ContentColumn,
 					business_id: PrismaVectorStore.ContentColumn,
 					metadata: PrismaVectorStore.ContentColumn,
@@ -48,6 +50,7 @@ export async function createProduct(
 				name,
 				price: parsedPrice,
 				description,
+				htmlDescription,
 				imageUrl: imageUrl,
 				businessId: businessId,
 				metadata: { price: parsedPrice },
@@ -62,6 +65,7 @@ export async function createProduct(
 							name: product.name,
 							price: parsedPrice,
 							description: product.description,
+							html_description: product.htmlDescription,
 							image_url: product.imageUrl,
 							business_id: product.businessId,
 							metadata: product.metadata,
@@ -89,6 +93,7 @@ export async function updateProductById(
 	price: Products["price"],
 	description: Products["description"],
 	imageUrl: Products["image_url"],
+	htmlDescription: Products["html_description"],
 ) {
 	return prisma.products.update({
 		where: {
@@ -99,6 +104,7 @@ export async function updateProductById(
 			price,
 			description,
 			image_url: imageUrl,
+			html_description: htmlDescription,
 		},
 	});
 }

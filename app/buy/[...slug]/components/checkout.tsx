@@ -41,6 +41,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { createOrderAction, navigate } from "../actions";
 
+import { Editor } from "@/components/mango-ui/editor";
 import { Label } from "@/components/ui/label";
 
 const formDefaultValues = {
@@ -307,8 +308,10 @@ export default function Checkout({
 										<p
 											className={`text-gray-600 ${isExpanded ? "" : "line-clamp-3"}`}
 										>
-											{product?.description}
-											daily life.
+											<Editor
+												content={product?.html_description as string}
+												disabled={true}
+											/>
 										</p>
 										<Button
 											variant="link"

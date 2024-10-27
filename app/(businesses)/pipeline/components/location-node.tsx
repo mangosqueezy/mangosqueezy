@@ -1,5 +1,4 @@
 "use client";
-import { useState } from "react";
 
 import useStore from "@/app/store/store";
 import { Handle, type NodeProps, Position } from "@xyflow/react";
@@ -28,17 +27,6 @@ export default function LocationNode({
 				>
 					Location:
 				</label>
-				{/* <input
-					id="location"
-					name="location"
-					type="text"
-					value={location}
-					onChange={(e) => {
-						setLocation(e.target.value);
-						updateNodeData(id, e.target.value);
-					}}
-					className="nodrag w-full p-1.5 border border-gray-300 rounded"
-				/> */}
 				<CountrySelector
 					defaultValue={"EARTH"}
 					onSelect={(countryName) => {

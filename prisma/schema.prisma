@@ -115,6 +115,7 @@ model Orders {
 model Products {
   name               String
   description        String
+  html_description   String?
   image_url          String?
   price              Float
   created_at         DateTime               @default(now())

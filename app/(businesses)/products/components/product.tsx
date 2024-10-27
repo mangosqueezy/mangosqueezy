@@ -1,5 +1,6 @@
 "use client";
 import { CustomToast } from "@/components/mango-ui/custom-toast";
+import { Editor } from "@/components/mango-ui/editor";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -34,6 +35,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
 	Sheet,
 	SheetClose,
@@ -52,13 +54,12 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
-import { Textarea } from "@/components/ui/textarea";
 import { useJune } from "@/hooks/useJune";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Business, Products } from "@prisma/client";
 import { MoreHorizontal, PlusCircle } from "lucide-react";
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import toast, { Toaster, type Toast } from "react-hot-toast";
 import { z } from "zod";
@@ -67,6 +68,8 @@ import {
 	deleteProductAction,
 	updateProductAction,
 } from "../actions";
+
+const defaultContent = "<h2>Find and onboard affiliates automatically</h2>";
 
 const FormSchema = z.object({
 	name: z.string().min(1, {
@@ -78,6 +81,7 @@ const FormSchema = z.object({
 	description: z.string().min(1, {
 		message: "Please enter the description.",
 	}),
+	htmlDescription: z.string().nullable(),
 	picture: z
 		.object({
 			name: z.string().min(1, {
@@ -112,6 +116,7 @@ const initialStateSchema = z.object({
 		name: z.string().nullable(),
 		price: z.string().nullable(),
 		description: z.string().nullable(),
+		htmlDescription: z.string().nullable(),
 		productImage: z.string().nullable(),
 	}),
 });
@@ -128,6 +133,7 @@ const initialState: TFormInitialState = {
 		price: null,
 		description: null,
 		productImage: null,
+		htmlDescription: null,
 	},
 };
 
@@ -138,11 +144,11 @@ export default function Product({
 }) {
 	const analytics = useJune(process.env.NEXT_PUBLIC_JUNE_API_KEY!);
 	const [open, setOpen] = useState(false);
-	const [updateFormState, updateAction] = useActionState(
+	const [updateFormState, updateAction, isPendingUpdate] = useActionState(
 		updateProductAction,
 		initialState,
 	);
-	const [deleteFormState, deleteAction] = useActionState(
+	const [deleteFormState, deleteAction, isPendingDelete] = useActionState(
 		deleteProductAction,
 		initialState,
 	);
@@ -151,8 +157,10 @@ export default function Product({
 		name: "",
 		price: "",
 		description: "",
+		htmlDescription: "",
 		imageUrl: "",
 	});
+	const [isPending, startTransition] = useTransition();
 	const [openEditProductDialog, setOpenEditProductDialog] = useState(false);
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
@@ -160,6 +168,7 @@ export default function Product({
 			name: "",
 			price: "",
 			description: "",
+			htmlDescription: "",
 			picture: {
 				name: "",
 				fileDetails: "",
@@ -173,6 +182,7 @@ export default function Product({
 		formData.append("name", data.name);
 		formData.append("price", data.price);
 		formData.append("description", data.description);
+		formData.append("html-description", data.htmlDescription || "");
 		formData.append("image-reference-file", data.picture.fileDetails);
 		formData.append("image-reference-file-name", data.picture.name);
 		formData.append("business-id", user?.id as string);
@@ -191,38 +201,54 @@ export default function Product({
 		}
 	}
 
-	if (updateFormState?.success === "updated successfully") {
-		toast.custom((t: Toast) => (
-			<CustomToast
-				t={t}
-				message="Product updated successfully!"
-				variant="success"
-			/>
-		));
-		updateFormState.success = "";
-	} else if (deleteFormState?.success === "deleted successfully") {
-		toast.custom((t: Toast) => (
-			<CustomToast
-				t={t}
-				message="Product deleted successfully!"
-				variant="success"
-			/>
-		));
-		deleteFormState.success = "";
-	} else if (
-		updateFormState?.errors?.message ||
-		deleteFormState?.errors?.message
-	) {
-		toast.custom((t: Toast) => (
-			<CustomToast
-				t={t}
-				message="Something went wrong. Please try again later!"
-				variant="error"
-			/>
-		));
-		updateFormState.errors.message = "";
-		deleteFormState.errors.message = "";
-	}
+	useEffect(() => {
+		if (
+			updateFormState?.success === "updated successfully" &&
+			!isPendingUpdate &&
+			!isPending
+		) {
+			toast.custom((t: Toast) => (
+				<CustomToast
+					t={t}
+					message="Product updated successfully!"
+					variant="success"
+				/>
+			));
+			updateFormState.success = "";
+		} else if (
+			deleteFormState?.success === "deleted successfully" &&
+			!isPendingDelete &&
+			!isPending
+		) {
+			toast.custom((t: Toast) => (
+				<CustomToast
+					t={t}
+					message="Product deleted successfully!"
+					variant="success"
+				/>
+			));
+			deleteFormState.success = "";
+		} else if (
+			updateFormState?.errors?.message ||
+			deleteFormState?.errors?.message
+		) {
+			toast.custom((t: Toast) => (
+				<CustomToast
+					t={t}
+					message="Something went wrong. Please try again later!"
+					variant="error"
+				/>
+			));
+			updateFormState.errors.message = "";
+			deleteFormState.errors.message = "";
+		}
+	}, [
+		updateFormState,
+		deleteFormState,
+		isPendingUpdate,
+		isPendingDelete,
+		isPending,
+	]);
 
 	const uploadProductPhoto = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const reader = new FileReader();
@@ -246,6 +272,11 @@ export default function Product({
 		};
 
 		reader.readAsDataURL(event.target.files?.[0] as File);
+	};
+
+	const updateDescription = (htmlContent: string, text: string) => {
+		form.setValue("description", text);
+		form.setValue("htmlDescription", htmlContent);
 	};
 
 	return (
@@ -315,18 +346,19 @@ export default function Product({
 											<FormField
 												control={form.control}
 												name="description"
-												render={({ field }) => (
+												render={() => (
 													<>
 														<FormItem>
 															<FormLabel className="truncate text-black">
 																Description
 															</FormLabel>
 															<FormControl>
-																<Textarea
-																	placeholder="open source affiliate marketing platform"
-																	className="min-h-32"
-																	{...field}
-																/>
+																<ScrollArea className="h-72 text-sm rounded-md border">
+																	<Editor
+																		content={defaultContent}
+																		updateDescription={updateDescription}
+																	/>
+																</ScrollArea>
 															</FormControl>
 															<FormMessage />
 														</FormItem>
@@ -409,7 +441,12 @@ export default function Product({
 													{product.status}
 												</Badge>
 											</TableCell>
-											<TableCell>{product.description}</TableCell>
+											<TableCell>
+												<Editor
+													content={product.html_description as string}
+													disabled={true}
+												/>
+											</TableCell>
 											<TableCell className="hidden md:table-cell">
 												{product.price}
 											</TableCell>
@@ -444,6 +481,8 @@ export default function Product({
 																	id: product.id,
 																	name: product.name,
 																	description: product.description,
+																	htmlDescription:
+																		product.html_description || "",
 																	price: product.price.toString(),
 																	imageUrl: product.image_url || "",
 																});
@@ -459,7 +498,9 @@ export default function Product({
 																	"product-id",
 																	product.id.toString(),
 																);
-																deleteAction(formData);
+																startTransition(async () => {
+																	await deleteAction(formData);
+																});
 															}}
 														>
 															Delete
@@ -481,98 +522,102 @@ export default function Product({
 				onOpenChange={() => setOpenEditProductDialog(!openEditProductDialog)}
 			>
 				<DialogContent className="sm:max-w-[425px]">
-					<DialogHeader>
-						<DialogTitle>Edit profile</DialogTitle>
-						<DialogDescription>
-							{`Make changes to your profile here. Click save when you're done.`}
-						</DialogDescription>
-					</DialogHeader>
-					<div className="grid gap-4 py-4">
-						<div className="grid grid-cols-4 items-center gap-4">
-							<Label htmlFor="name" className="text-right">
-								Name
-							</Label>
-							<Input
-								id="name"
-								value={editProductInfo.name}
-								onChange={(event) => {
-									setEditProductInfo({
-										...editProductInfo,
-										name: event.target.value,
-									});
-								}}
-								className="col-span-3"
-							/>
-						</div>
-						<div className="grid grid-cols-4 items-center gap-4">
-							<Label htmlFor="description" className="text-right">
-								Description
-							</Label>
-							<Input
-								id="description"
-								value={editProductInfo.description}
-								onChange={(event) => {
-									setEditProductInfo({
-										...editProductInfo,
-										description: event.target.value,
-									});
-								}}
-								className="col-span-3"
-							/>
-						</div>
+					<ScrollArea className="h-96 md:h-full">
+						<DialogHeader>
+							<DialogTitle>Edit profile</DialogTitle>
+							<DialogDescription>
+								{`Make changes to your profile here. Click save when you're done.`}
+							</DialogDescription>
+						</DialogHeader>
+						<div className="grid gap-4 py-4">
+							<div className="grid grid-cols-4 items-center gap-4">
+								<Label htmlFor="name">Name</Label>
+								<Input
+									id="name"
+									value={editProductInfo.name}
+									onChange={(event) => {
+										setEditProductInfo({
+											...editProductInfo,
+											name: event.target.value,
+										});
+									}}
+									className="col-span-4"
+								/>
+							</div>
+							<div className="grid grid-cols-4 items-center gap-4">
+								<Label htmlFor="description">Description</Label>
+								<ScrollArea className="h-64 col-span-4 text-sm rounded-md border">
+									<Editor
+										content={editProductInfo.htmlDescription}
+										updateDescription={(htmlContent, text) => {
+											setEditProductInfo({
+												...editProductInfo,
+												description: text,
+												htmlDescription: htmlContent,
+											});
+										}}
+									/>
+								</ScrollArea>
+							</div>
 
-						<div className="grid grid-cols-4 items-center gap-4">
-							<Label htmlFor="price" className="text-right">
-								Price
-							</Label>
-							<Input
-								id="price"
-								value={editProductInfo.price}
-								onChange={(event) => {
-									setEditProductInfo({
-										...editProductInfo,
-										price: event.target.value,
+							<div className="grid grid-cols-4 items-center gap-4">
+								<Label htmlFor="price">Price</Label>
+								<Input
+									id="price"
+									value={editProductInfo.price}
+									onChange={(event) => {
+										setEditProductInfo({
+											...editProductInfo,
+											price: event.target.value,
+										});
+									}}
+									className="col-span-4"
+								/>
+							</div>
+
+							<div className="grid grid-cols-4 items-center gap-4">
+								<Label htmlFor="picture">Picture</Label>
+								<Input
+									id="picture"
+									type="file"
+									className="col-span-4"
+									onChange={(event) => {
+										uploadProductPhoto(event);
+									}}
+								/>
+							</div>
+						</div>
+						<DialogFooter>
+							<Button
+								type="submit"
+								onClick={async () => {
+									const formData = new FormData();
+									formData.append("product-id", editProductInfo.id.toString());
+									formData.append("product-name", editProductInfo.name);
+									formData.append(
+										"product-description",
+										editProductInfo.description,
+									);
+									formData.append("product-price", editProductInfo.price);
+									formData.append(
+										"product-image-url",
+										editProductInfo.imageUrl,
+									);
+									formData.append(
+										"product-html-description",
+										editProductInfo.htmlDescription,
+									);
+
+									startTransition(async () => {
+										await updateAction(formData);
 									});
+									setOpenEditProductDialog(false);
 								}}
-								className="col-span-3"
-							/>
-						</div>
-
-						<div className="grid grid-cols-4 items-center gap-4">
-							<Label htmlFor="picture" className="text-right">
-								Picture
-							</Label>
-							<Input
-								id="picture"
-								type="file"
-								className="col-span-3"
-								onChange={(event) => {
-									uploadProductPhoto(event);
-								}}
-							/>
-						</div>
-					</div>
-					<DialogFooter>
-						<Button
-							type="submit"
-							onClick={async () => {
-								const formData = new FormData();
-								formData.append("product-id", editProductInfo.id.toString());
-								formData.append("product-name", editProductInfo.name);
-								formData.append(
-									"product-description",
-									editProductInfo.description,
-								);
-								formData.append("product-price", editProductInfo.price);
-								formData.append("product-image-url", editProductInfo.imageUrl);
-
-								updateAction(formData);
-								setOpenEditProductDialog(false);
-							}}
-						>
-							Save changes
-						</Button>
-					</DialogFooter>
+							>
+								Save changes
+							</Button>
+						</DialogFooter>
+					</ScrollArea>
 				</DialogContent>
 			</Dialog>
 		</>

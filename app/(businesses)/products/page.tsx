@@ -2,6 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 import { getUserById } from "@/models/business";
 import Product, { type TBusiness } from "./components/product";
 
+export const revalidate = 0;
+
 export default async function ProductsPage() {
 	const supabase = await createClient();
 	const { data } = await supabase.auth.getUser();
