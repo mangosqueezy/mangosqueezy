@@ -69,14 +69,18 @@ export async function POST(request: Request) {
 		const prompt = `
 		${pipeline?.prompt}
 	
-		product description: ${pipeline?.products?.description}. Earn a ${productPrice} USD commission by partnering with us. DM us to learn more.
+		product description: ${pipeline?.products?.description}. Earn a ${productPrice} USD commission by partnering with us. 
+		includes:
+		- Get paid to share a product you love and No experience needed
+		- Share with friends, make ${productPrice} USD per sale!
+		DM us to learn more.
 		
 		location: ${pipeline?.location}
 		`;
 
 		const { text } = await generateText({
 			model: openai("gpt-4o-2024-08-06"),
-			system: `You are a Instagram caption generator. Provide a short and engaging caption for the Instagram Reel. 
+			system: `You are a Instagram caption generator. Provide a short and engaging caption for the Instagram Reel in simple language, do not use jargons or complex words. 
 			${pipeline?.format}
 			Use line breaks for clarity. Maintain a visually appealing structure.`,
 			prompt: prompt,

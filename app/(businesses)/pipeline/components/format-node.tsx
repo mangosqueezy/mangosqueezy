@@ -12,11 +12,21 @@ export default function FormatNode({
 }: NodeProps<FormatNodeProps>) {
 	const updateNodeData = useStore((state) => state.updateNodeData);
 	const [format, setFormat] = useState(`Desired format:
+<💰 Start with Product ID or Offer Statement>
+<Briefly state the commission or earning opportunity>
 
-<Start with a question or attention-grabbing statement>
-<Describe the benefits of the product, service, or promotion in an engaging way>
-<End with a clear call to action>
-<Use emojis to enhance the post and highlight key points>
+<Why Join Us?>
+<✨ Highlight primary benefit 1>
+<✨ Highlight primary benefit 2>
+
+<How It Works?>
+<Explain the earning process in simple terms and highlight key earnings with emoji>
+
+<🚀 Introduce any additional product or service, like SaaS, if applicable>
+<Describe additional product/service value briefly with an emoji for emphasis>
+
+<👉 Finish with a clear call to action, eg DM us to learn more and start your journey today! 📩>
+
 <Include 8-12 relevant hashtags in one line>`);
 
 	return (
