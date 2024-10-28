@@ -63,10 +63,13 @@ export async function POST(request: Request) {
 
 	if (heygenResult?.data?.status === "completed") {
 		const pipeline = await getPipelineByVideoId(videoId);
+		const productPrice =
+			(pipeline?.products?.price as number) *
+			((pipeline?.business?.commission as number) / 100);
 		const prompt = `
 		${pipeline?.prompt}
 	
-		product description: ${pipeline?.products?.description}
+		product description: ${pipeline?.products?.description}. Earn a ${productPrice} USD commission by partnering with us. DM us to learn more.
 		
 		location: ${pipeline?.location}
 		`;

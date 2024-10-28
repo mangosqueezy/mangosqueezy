@@ -17,14 +17,17 @@ export async function POST(request: Request) {
 		(product) => product.id === product_id,
 	);
 
+	const productPrice =
+		(product?.price as number) * ((business?.commission as number) / 100);
 	const script = `
-    Hi there! I'm reaching out to share the benefits of joining our affiliate program.
-    You will earn ${business?.commission}% commission on every sale.
+    Hi there! earn ${productPrice} USD commission on every sale.
 
     product name: ${product?.name}
-	product description: ${product?.description}
+	Benefits: This includes:
+	- Get paid to share a product you love and No experience needed
+	- Share with friends, make ${productPrice} USD per sale!
 
-    Please let me know if you're interested in joining the program.
+    Please "DM US" if you're interested in joining the program.
     `;
 	const { text } = await generateText({
 		model: openai("gpt-4o-2024-08-06"),

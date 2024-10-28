@@ -50,6 +50,7 @@ export async function getPipelineByVideoId(videoId: string) {
 			where: { heygen_video_id: videoId },
 			include: {
 				products: true,
+				business: true,
 			},
 		});
 	} catch (err) {
