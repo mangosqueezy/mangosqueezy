@@ -3,48 +3,47 @@ import { Button as MovingBorder } from "@/components/ui/moving-border";
 import {
 	BriefcaseIcon,
 	ChartBarIcon,
-	CurrencyDollarIcon,
+	ClockIcon,
 	GlobeAltIcon,
-	LinkIcon,
+	MagnifyingGlassIcon,
 	RocketLaunchIcon,
 } from "@heroicons/react/20/solid";
 import Image from "next/image";
 
 const featuresList = [
 	{
-		name: "Real time payment settlement",
+		name: "Automatic Affiliate Finding",
 		description:
-			"Make payment settlements fast for your affiliates. You can easily make cross-border payments via crypto in a few seconds.",
-		icon: CurrencyDollarIcon,
+			"We find affiliates who are a great fit for your brand, so you don’t have to search for them yourself.",
+		icon: MagnifyingGlassIcon,
 	},
 	{
-		name: "Build your audience quickly",
+		name: "Real-Time Performance Tracking",
 		description:
-			"Grow your audience quickly with the help of affiliates. They can help you reach your money goals faster without needing extra tools or complicated setups.",
-		icon: RocketLaunchIcon,
-	},
-	{
-		name: "See affiliate data right away",
-		description:
-			"Get real-time info on how your affiliates are doing. Our all-in-one platform shows you what's working well and what's not, so you know where to focus",
+			"See how your affiliates are performing and track results as they happen.",
 		icon: ChartBarIcon,
 	},
 	{
-		name: "Make endless referral links",
+		name: "Grow Quickly, Effortlessly",
 		description:
-			"Make as many referral links as you want. Create simple codes and programs for affiliates to help you find the best way to grow your business together.",
-		icon: LinkIcon,
+			"Perfect for businesses of any size, helping you grow without a big marketing team.",
+		icon: RocketLaunchIcon,
 	},
 	{
-		name: "Manage affiliates easily",
+		name: "Targeted Matches for Your Brand",
 		description:
-			"Keep an eye on your affiliates' progress. Tell them about their earnings and when they'll get paid. Take care of and build good relationships with your affiliates.",
+			"Connect with affiliates who truly match your brand and audience.",
 		icon: BriefcaseIcon,
 	},
 	{
-		name: "Reach more customers",
+		name: "Save Time with Simple Affiliate Management",
 		description:
-			"Get more customers by using affiliate marketing. This helps you make more money, get more people buying from you, and build lasting relationships with your partners' followers.",
+			"Spend less time on affiliate tasks and more time on your business—we handle the rest.",
+		icon: ClockIcon,
+	},
+	{
+		name: "Reach more customers",
+		description: "Get more customers by using affiliate marketing.",
 		icon: GlobeAltIcon,
 	},
 ];
@@ -80,16 +79,14 @@ export default function Feature() {
 				<dl className="mx-auto grid max-w-2xl grid-cols-1 gap-x-6 gap-y-10 text-base leading-7 text-gray-300 sm:grid-cols-2 lg:mx-0 lg:max-w-none lg:grid-cols-3 lg:gap-x-8 lg:gap-y-16">
 					{featuresList.map((feature) => (
 						<div key={feature.name} className="relative pl-9">
-							<dt className="inline font-semibold text-black dark:text-white">
+							<dt className="inline font-semibold text-orange-600">
 								<feature.icon
-									className="absolute left-1 top-1 h-5 w-5 text-gray-950 dark:text-white"
+									className="absolute left-1 top-1 h-5 w-5 text-orange-600"
 									aria-hidden="true"
 								/>
 								{feature.name}
 							</dt>{" "}
-							<dd className="inline text-gray-600 dark:text-gray-300">
-								{feature.description}
-							</dd>
+							<dd className="inline text-gray-600">{feature.description}</dd>
 						</div>
 					))}
 				</dl>
