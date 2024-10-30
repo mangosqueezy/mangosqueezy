@@ -27,20 +27,22 @@ export async function POST(request: Request) {
 
 	const igAssistEnabled = (await isIgAssistEnabled()) as boolean;
 
-	for (const message of messaging) {
-		console.log("/api/webhook/ig/ POST => ", { message, appUsersIgUserId });
+	if (messaging && messaging?.length > 0) {
+		for (const message of messaging) {
+			console.log("/api/webhook/ig/ POST => ", { message, appUsersIgUserId });
 
-		if (message.sender.id !== IG_BUSINESS_ID && igAssistEnabled) {
-			await fetch("https://mangosqueezy-hono-app.vercel.app/api/workflow", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					text: message.message.text,
-					recipientId: message.sender.id,
-				}),
-			});
+			if (message.sender.id !== IG_BUSINESS_ID && igAssistEnabled) {
+				await fetch("https://mangosqueezy-hono-app.vercel.app/api/workflow", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						text: message.message.text,
+						recipientId: message.sender.id,
+					}),
+				});
+			}
 		}
 	}
 

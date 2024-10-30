@@ -80,7 +80,7 @@ export async function POST(request: Request) {
 
 		const { text } = await generateText({
 			model: openai("gpt-4o-2024-08-06"),
-			system: `You are a Instagram caption generator. Provide a short and engaging caption for the Instagram Reel in simple language, do not use jargons or complex words. 
+			system: `You are a Instagram caption generator. Provide a short and engaging caption for the Instagram Reel in simple language, do not use jargons or complex words, all hashtags must be in lowercase. 
 			${pipeline?.format}
 			Use line breaks for clarity. Maintain a visually appealing structure.`,
 			prompt: prompt,
