@@ -1,29 +1,3 @@
-.ProseMirror-focused {
-	@apply outline-none;
-}
-
-.tiptap {
-	@apply text-sm leading-loose;
-}
-
-.tiptap h2 {
-	@apply text-2xl;
-	@apply font-sans;
-	margin-bottom: 1.5rem;
-}
-
-.tiptap .bubble-menu {
-	@apply flex gap-2;
-}
-
-.tiptap p.is-empty::before {
-	color: #404040;
-	content: attr(data-placeholder);
-	float: left;
-	height: 0;
-	pointer-events: none;
-}
-
 .tippy-box {
 	@apply bg-transparent ring-0 ring-white !important;
 }
