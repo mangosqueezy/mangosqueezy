@@ -19,8 +19,8 @@ export function BubbleMenuButton({
 			onClick={action}
 			className={`px-2.5 py-1.5 text-[11px] font-mono transition-colors ${className} ${
 				isActive
-					? "bg-transparent text-primary"
-					: "bg-transparent hover:bg-muted"
+					? "bg-transparent text-orange-600"
+					: "bg-transparent hover:bg-orange-100"
 			}`}
 		>
 			{children}
