@@ -26,12 +26,6 @@ export function Editor({
 }: EditorProps) {
 	const editor = useEditor({
 		extensions: extensions as AnyExtension[],
-		editorProps: {
-			attributes: {
-				class:
-					"prose prose-sm sm:prose-base lg:prose-lg xl:prose-2xl p-3 focus:outline-none rounded-md",
-			},
-		},
 		content,
 		onUpdate: ({ editor }) => {
 			onChange?.(editor.getJSON());

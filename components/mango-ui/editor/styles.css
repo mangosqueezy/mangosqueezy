@@ -25,5 +25,5 @@
 }
 
 .tippy-box {
-	@apply bg-transparent ring-0 ring-white;
+	@apply bg-transparent ring-0 ring-white !important;
 }
