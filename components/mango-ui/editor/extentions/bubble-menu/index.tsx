@@ -24,11 +24,7 @@ export function BubbleMenu({
 	}
 
 	return (
-		<TiptapBubbleMenu
-			editor={editor}
-			tippyOptions={tippyOptions}
-			className="bg-transparent ring-0 ring-white"
-		>
+		<TiptapBubbleMenu editor={editor} tippyOptions={tippyOptions}>
 			<div className="flex w-fit max-w-[90vw] overflow-hidden rounded-full border border-border bg-orange-50 text-gray-600 ring-1 ring-orange-600 text-mono font-regular">
 				{showAI ? (
 					<AIMenu onOpenChange={setShowAI} editor={editor} />

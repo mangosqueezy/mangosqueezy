@@ -46,7 +46,11 @@ export function Editor({
 
 	return (
 		<>
-			<EditorContent editor={editor} disabled={disabled} />
+			<EditorContent
+				editor={editor}
+				disabled={disabled}
+				className="bg-transparent ring-0 ring-white"
+			/>
 			<BubbleMenu editor={editor} />
 		</>
 	);
