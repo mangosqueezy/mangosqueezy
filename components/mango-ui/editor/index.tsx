@@ -1,5 +1,6 @@
 "use client";
 
+import "./styles.css";
 import {
 	type AnyExtension,
 	EditorContent,
