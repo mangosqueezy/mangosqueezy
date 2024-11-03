@@ -7,6 +7,7 @@ import Pricing from "@/components/aceternity-ui/pricing";
 import { HighlightHub } from "@/components/magicui/highlight-hub";
 import AnimatedHeroV0 from "@/components/mango-ui/animated-hero";
 import Faq from "@/components/mango-ui/faq";
+import HowItWorks from "@/components/mango-ui/how-it-works";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
@@ -64,7 +65,7 @@ export default function Page() {
 								<Button
 									variant="outline"
 									asChild
-									className="bg-orange-600 hover:bg-orange-500"
+									className="bg-orange-600 hover:bg-orange-500 text-white"
 								>
 									<Link href="/pipeline">Pipeline</Link>
 								</Button>
@@ -138,6 +139,7 @@ export default function Page() {
 			</div>
 
 			<Feature />
+			<HowItWorks />
 			<HighlightHub />
 			<Pricing />
 			<Faq />

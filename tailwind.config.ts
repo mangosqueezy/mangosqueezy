@@ -12,13 +12,13 @@ export default {
 		"./pages/**/*.{js,ts,jsx,tsx,mdx}",
 		"./components/**/*.{js,ts,jsx,tsx,mdx}",
 	],
-	darkMode: "class",
+	darkMode: ["class", "class"],
 	theme: {
 		fontFamily: {
 			sans: ["var(--font-sans)", ...fontFamily.sans],
 		},
 		container: {
-			center: true,
+			center: "true",
 			padding: "2rem",
 			screens: {
 				"2xl": "1400px",
@@ -71,16 +71,28 @@ export default {
 			},
 			keyframes: {
 				"accordion-down": {
-					from: { height: "0" },
-					to: { height: "var(--radix-accordion-content-height)" },
+					from: {
+						height: "0",
+					},
+					to: {
+						height: "var(--radix-accordion-content-height)",
+					},
 				},
 				"accordion-up": {
-					from: { height: "var(--radix-accordion-content-height)" },
-					to: { height: "0" },
+					from: {
+						height: "var(--radix-accordion-content-height)",
+					},
+					to: {
+						height: "0",
+					},
 				},
 				tilt: {
-					"0%, 100%": { transform: "rotate(0deg)" },
-					"50%": { transform: "rotate(10deg)" },
+					"0%, 100%": {
+						transform: "rotate(0deg)",
+					},
+					"50%": {
+						transform: "rotate(10deg)",
+					},
 				},
 				"border-beam": {
 					"100%": {
@@ -99,20 +111,33 @@ export default {
 					},
 				},
 				meteor: {
-					"0%": { transform: "rotate(215deg) translateX(0)", opacity: "1" },
-					"70%": { opacity: "1" },
+					"0%": {
+						transform: "rotate(215deg) translateX(0)",
+						opacity: "1",
+					},
+					"70%": {
+						opacity: "1",
+					},
 					"100%": {
 						transform: "rotate(215deg) translateX(-500px)",
 						opacity: "0",
 					},
 				},
 				marquee: {
-					from: { transform: "translateX(0)" },
-					to: { transform: "translateX(calc(-100% - var(--gap)))" },
+					from: {
+						transform: "translateX(0)",
+					},
+					to: {
+						transform: "translateX(calc(-100% - var(--gap)))",
+					},
 				},
 				"marquee-vertical": {
-					from: { transform: "translateY(0)" },
-					to: { transform: "translateY(calc(-100% - var(--gap)))" },
+					from: {
+						transform: "translateY(0)",
+					},
+					to: {
+						transform: "translateY(calc(-100% - var(--gap)))",
+					},
 				},
 				"fade-in-up": {
 					"0%": {
@@ -124,6 +149,14 @@ export default {
 						transform: "translateY(0)",
 					},
 				},
+				"background-position-spin": {
+					"0%": {
+						backgroundPosition: "top center",
+					},
+					"100%": {
+						backgroundPosition: "bottom center",
+					},
+				},
 			},
 			animation: {
 				"accordion-down": "accordion-down 0.2s ease-out",
@@ -131,9 +164,11 @@ export default {
 				meteor: "meteor 5s linear infinite",
 				tilt: "tilt 0.3s ease-in-out infinite",
 				"border-beam": "border-beam calc(var(--duration)*1s) infinite linear",
-				marquee: "marquee var(--duration) linear infinite",
+				marquee: "marquee var(--duration) infinite linear",
 				"marquee-vertical": "marquee-vertical var(--duration) linear infinite",
 				"fade-in-up": "fade-in-up 0.5s ease-out forwards",
+				"background-position-spin":
+					"background-position-spin 3000ms infinite alternate",
 			},
 		},
 	},
