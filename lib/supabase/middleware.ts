@@ -41,9 +41,13 @@ export async function updateSession(request: NextRequest) {
 		});
 	}
 
-	const { data } = await supabase.from("Business").select("commission");
+	const { data } = await supabase
+		.from("Business")
+		.select("commission")
+		.eq("id", result.data.user?.id);
 
-	if (data && data[0]?.commission <= 0) {
+	const pathname = new URL(request.url).pathname;
+	if (data && data[0]?.commission <= 0 && pathname !== "/onboarding") {
 		return NextResponse.redirect(new URL("/onboarding", request.url), {
 			headers: request.headers,
 		});
