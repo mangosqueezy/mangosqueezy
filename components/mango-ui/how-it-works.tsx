@@ -48,7 +48,9 @@ const FeatureSection = ({
 				}}
 				transition={{ duration: 1, ease: "easeOut" }}
 			>
-				<h3 className={`text-2xl font-bold mb-4 ${textColor}`}>{title}</h3>
+				<h3 className={`text-2xl sm:text-4xl font-bold mb-4 ${textColor}`}>
+					{title}
+				</h3>
 				<p className={"text-lg text-gray-600"}>{description}</p>
 			</motion.div>
 			<motion.div
