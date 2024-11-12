@@ -236,6 +236,15 @@ model ig_access_token {
   @@schema("public")
 }
 
+model ig_scope_identifiers {
+  id                   String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ig_scope_identifier  String
+  created_at           DateTime   @default(now())
+  updated_at           DateTime   @updatedAt
+
+  @@schema("public")
+}
+
 enum PaymentPreference {
   FullCrypto
   HalfCryptoHalfFiat

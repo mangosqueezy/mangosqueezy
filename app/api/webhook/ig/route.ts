@@ -22,6 +22,8 @@ export async function POST(request: Request) {
 
 	const jsonBody = JSON.parse(body);
 
+	console.log("jsonBody POST => ", jsonBody);
+
 	const appUsersIgUserId = jsonBody?.entry[0]?.id;
 	const messaging = jsonBody?.entry[0].messaging;
 
