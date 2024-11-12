@@ -22,10 +22,11 @@ export async function POST(request: Request) {
 
 	const jsonBody = JSON.parse(body);
 
-	console.log("jsonBody POST => ", jsonBody);
-
 	const appUsersIgUserId = jsonBody?.entry[0]?.id;
-	const messaging = jsonBody?.entry[0].messaging;
+	const messaging = jsonBody?.entry[0]?.messaging;
+	const changes = jsonBody?.entry[0]?.changes;
+
+	console.log("jsonBody POST => ", { jsonBody, changes });
 
 	const igAssistEnabled = (await isIgAssistEnabled()) as boolean;
 
