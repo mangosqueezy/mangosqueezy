@@ -26,7 +26,11 @@ export async function POST(request: Request) {
 	const messaging = jsonBody?.entry[0]?.messaging;
 	const changes = jsonBody?.entry[0]?.changes;
 
-	console.log("jsonBody POST => ", { jsonBody, changes });
+	console.log("jsonBody POST => ", {
+		jsonBody,
+		changes: JSON.stringify(changes),
+		entry: JSON.stringify(jsonBody.entry),
+	});
 
 	const igAssistEnabled = (await isIgAssistEnabled()) as boolean;
 
