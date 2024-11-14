@@ -40,9 +40,10 @@ export default function AnimatedHeroV0() {
 							Find and onboard affiliates automatically
 						</h1>
 						<p className="mt-6 text-md leading-8 text-gray-600 animate-fade-in-up animation-delay-200">
-							We help SaaS businesses by finding affiliates, creating links, and
-							tracking results for you. Just pick a product to promote, and we
-							handle everything, so you can focus on growing your business.
+							We help B2B and B2C businesses by finding affiliates, creating
+							links, and tracking results for you. Just pick a product to
+							promote, and we handle everything, so you can focus on growing
+							your business.
 						</p>
 						<div className="mt-10 flex items-center gap-x-6 animate-fade-in-up animation-delay-400">
 							<Button className="bg-orange-600 text-white hover:bg-orange-700">
