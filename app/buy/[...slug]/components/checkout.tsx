@@ -233,6 +233,7 @@ export default function Checkout({
 			formData.append("business_id", product?.business_id as string);
 			formData.append("product_id", productId.toString());
 			formData.append("affiliate_id", parsedAffiliateId.toString());
+			formData.append("price_type", product?.price_type as string);
 
 			const quantity = form.getValues("quantity");
 			if (quantity !== undefined) {

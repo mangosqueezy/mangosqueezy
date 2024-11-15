@@ -12,21 +12,33 @@ export async function POST(request: Request) {
 	const productId: string = body.get("product_id") as string;
 	const quantity: string = body.get("quantity") as string;
 	const customer_address: string = body.get("customer_address") as string;
+	const price_type: string = body.get("price_type") as string;
 
-	const price = await stripe.prices.create({
+	let priceObject: Stripe.PriceCreateParams = {
 		currency: "usd",
 		unit_amount: Number.parseFloat(amount) * 100,
 		product_data: {
 			name: productName,
 		},
-	});
+	};
+
+	if (price_type === "Subscription") {
+		priceObject = {
+			...priceObject,
+			recurring: {
+				interval: "month",
+			},
+		} as Stripe.PriceCreateParams;
+	}
+
+	const price = await stripe.prices.create(priceObject);
 
 	const session = await stripe.checkout.sessions.create({
 		customer_email: email,
 		line_items: [
 			{
 				price: price.id,
-				quantity: 1,
+				quantity: quantity ? Number(quantity) : 1,
 			},
 		],
 		automatic_tax: {
