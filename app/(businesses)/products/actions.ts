@@ -5,6 +5,7 @@ import {
 	deleteProductById,
 	updateProductById,
 } from "@/models/products";
+import type { PriceType } from "@prisma/client";
 import { createClient } from "@supabase/supabase-js";
 import { decode } from "base64-arraybuffer";
 import { revalidatePath } from "next/cache";
@@ -22,6 +23,8 @@ export async function createProductAction(formData: FormData) {
 		) as string;
 		const businessId = formData.get("business-id") as string;
 		const htmlDescription = formData.get("html-description") as string;
+		const priceType = formData.get("price-type") as string;
+		const isShippable = formData.get("is-shippable") as string;
 
 		const supabase = createClient(
 			process.env.NEXT_PUBLIC_SUPABASE_URL as string,
@@ -48,6 +51,8 @@ export async function createProductAction(formData: FormData) {
 			parsedImageUrl,
 			businessId,
 			htmlDescription,
+			priceType,
+			isShippable,
 		);
 
 		revalidatePath("/products");
@@ -72,6 +77,9 @@ export async function updateProductAction(
 			"product-html-description",
 		) as string;
 		const parsedProductPrice = Number.parseFloat(productPrice);
+		const productPriceType = formData.get("product-price-type") as string;
+		const productIsShippable = formData.get("product-is-shippable") as string;
+
 		await updateProductById(
 			Number.parseInt(productId),
 			productName,
@@ -79,6 +87,8 @@ export async function updateProductAction(
 			productDescription,
 			productImageUrl,
 			productHtmlDescription,
+			productPriceType as PriceType,
+			productIsShippable === "true",
 		);
 
 		revalidatePath("/products");
@@ -91,6 +101,8 @@ export async function updateProductAction(
 				description: null,
 				productImage: null,
 				htmlDescription: null,
+				priceType: null,
+				isShippable: null,
 			},
 		};
 	} catch (error) {
@@ -103,6 +115,8 @@ export async function updateProductAction(
 				description: null,
 				productImage: null,
 				htmlDescription: null,
+				priceType: null,
+				isShippable: null,
 			},
 		};
 	}
@@ -127,6 +141,8 @@ export async function deleteProductAction(
 				description: null,
 				productImage: null,
 				htmlDescription: null,
+				priceType: null,
+				isShippable: null,
 			},
 		};
 	} catch (error) {
@@ -139,6 +155,8 @@ export async function deleteProductAction(
 				description: null,
 				productImage: null,
 				htmlDescription: null,
+				priceType: null,
+				isShippable: null,
 			},
 		};
 	}

@@ -46,12 +46,26 @@ import { Label } from "@/components/ui/label";
 
 const formDefaultValues = {
 	email: "",
+	quantity: 1,
+	customer_address: "",
 };
 
 const FormSchema = z.object({
 	email: z.string().min(1, {
 		message: "Please enter the email.",
 	}),
+	quantity: z
+		.number()
+		.min(1, {
+			message: "Please enter the quantity.",
+		})
+		.optional(),
+	customer_address: z
+		.string()
+		.min(1, {
+			message: "Please enter the customer address.",
+		})
+		.optional(),
 	"action-type": z.string(),
 });
 
@@ -140,6 +154,18 @@ export default function Checkout({
 		formData.append("affiliate_id", parsedAffiliateId.toString());
 		formData.append("amount", product?.price.toString() as string);
 
+		const quantity = form.getValues("quantity");
+		if (quantity !== undefined) {
+			formData.append("quantity", quantity.toString());
+		}
+
+		if (form.getValues("customer_address")) {
+			formData.append(
+				"customer_address",
+				form.getValues("customer_address") as string,
+			);
+		}
+
 		const result = await createOrderAction(formData);
 
 		if (result) {
@@ -207,6 +233,16 @@ export default function Checkout({
 			formData.append("business_id", product?.business_id as string);
 			formData.append("product_id", productId.toString());
 			formData.append("affiliate_id", parsedAffiliateId.toString());
+
+			const quantity = form.getValues("quantity");
+			if (quantity !== undefined) {
+				formData.append("quantity", quantity.toString());
+			}
+
+			const customer_address = form.getValues("customer_address");
+			if (customer_address !== undefined) {
+				formData.append("customer_address", customer_address as string);
+			}
 
 			const response = await fetch("https://www.mangosqueezy.com/api/stripe", {
 				method: "POST",
@@ -360,6 +396,58 @@ export default function Checkout({
 														</>
 													)}
 												/>
+
+												{product?.is_shippable && (
+													<>
+														<FormField
+															control={form.control}
+															name="quantity"
+															render={({ field }) => (
+																<FormItem>
+																	<FormControl>
+																		<div className="space-y-2 my-2">
+																			<Label htmlFor="quantity">Quantity</Label>
+																			<div className="relative">
+																				<Input
+																					type="number"
+																					id="quantity"
+																					placeholder="Enter quantity"
+																					{...field}
+																				/>
+																			</div>
+																		</div>
+																	</FormControl>
+																	<FormMessage />
+																</FormItem>
+															)}
+														/>
+
+														<FormField
+															control={form.control}
+															name="customer_address"
+															render={({ field }) => (
+																<FormItem>
+																	<FormControl>
+																		<div className="space-y-2">
+																			<Label htmlFor="customer_address">
+																				Address
+																			</Label>
+																			<div className="relative">
+																				<Input
+																					type="text"
+																					id="customer_address"
+																					placeholder="Enter customer address"
+																					{...field}
+																				/>
+																			</div>
+																		</div>
+																	</FormControl>
+																	<FormMessage />
+																</FormItem>
+															)}
+														/>
+													</>
+												)}
 											</div>
 										</div>
 										<motion.div

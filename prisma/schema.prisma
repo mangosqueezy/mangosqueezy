@@ -99,6 +99,7 @@ model Orders {
   customer_email   String
   customer_address String?
   invoice_url      String?
+  order_quantity   Int?
   status           String?
   created_at       DateTime    @default(now())
   updated_at       DateTime    @updatedAt
@@ -118,6 +119,9 @@ model Products {
   html_description   String?
   image_url          String?
   price              Float
+  price_currency     String?
+  is_shippable       Boolean?               @default(false)
+  price_type         PriceType?             @default(OneTime)
   created_at         DateTime               @default(now())
   updated_at         DateTime               @updatedAt
   status             String                 @default("Published")
@@ -249,6 +253,13 @@ enum PaymentPreference {
   FullCrypto
   HalfCryptoHalfFiat
   FullFiat
+
+  @@schema("public")
+}
+
+enum PriceType {
+  Subscription
+  OneTime
 
   @@schema("public")
 }

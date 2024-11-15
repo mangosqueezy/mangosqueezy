@@ -18,6 +18,8 @@ export async function createOrderAction(formData: FormData) {
 	const product_id = formData.get("product_id") as string;
 	const affiliate_id = formData.get("affiliate_id") as string;
 	const amount = formData.get("amount") as string;
+	const quantity = formData.get("quantity") as string;
+	const customer_address = formData.get("customer_address") as string;
 	const realTimePaymentsEnabled = await isRealTimePaymentsEnabled();
 
 	try {
@@ -26,6 +28,8 @@ export async function createOrderAction(formData: FormData) {
 			business_id,
 			product_id,
 			affiliate_id,
+			quantity: quantity ? Number(quantity) : 0,
+			customer_address: customer_address || "",
 		});
 
 		const information = await getAffiliateBusinessInfoById(

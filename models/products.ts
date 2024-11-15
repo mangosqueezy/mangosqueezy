@@ -2,7 +2,7 @@
 import prisma from "@/lib/prisma";
 import { PrismaVectorStore } from "@langchain/community/vectorstores/prisma";
 import { OpenAIEmbeddings } from "@langchain/openai";
-import type { Products } from "@prisma/client";
+import type { PriceType, Products } from "@prisma/client";
 import { Prisma } from "@prisma/client";
 
 export async function createProduct(
@@ -12,6 +12,8 @@ export async function createProduct(
 	imageUrl: string,
 	businessId: string,
 	htmlDescription: string,
+	priceType: string,
+	isShippable: string,
 ) {
 	try {
 		const parsedPrice = Number.parseFloat(price);
@@ -41,6 +43,8 @@ export async function createProduct(
 					image_url: PrismaVectorStore.ContentColumn,
 					business_id: PrismaVectorStore.ContentColumn,
 					metadata: PrismaVectorStore.ContentColumn,
+					price_type: PrismaVectorStore.ContentColumn,
+					is_shippable: PrismaVectorStore.ContentColumn,
 				},
 			},
 		);
@@ -54,6 +58,8 @@ export async function createProduct(
 				imageUrl: imageUrl,
 				businessId: businessId,
 				metadata: { price: parsedPrice },
+				priceType: priceType as PriceType,
+				isShippable: isShippable === "true",
 			},
 		];
 
@@ -69,6 +75,8 @@ export async function createProduct(
 							image_url: product.imageUrl,
 							business_id: product.businessId,
 							metadata: product.metadata,
+							price_type: product.priceType,
+							is_shippable: product.isShippable,
 						},
 					}),
 				),
@@ -94,6 +102,8 @@ export async function updateProductById(
 	description: Products["description"],
 	imageUrl: Products["image_url"],
 	htmlDescription: Products["html_description"],
+	priceType: Products["price_type"],
+	isShippable: Products["is_shippable"],
 ) {
 	return prisma.products.update({
 		where: {
@@ -105,6 +115,8 @@ export async function updateProductById(
 			description,
 			image_url: imageUrl,
 			html_description: htmlDescription,
+			price_type: priceType,
+			is_shippable: isShippable,
 		},
 	});
 }

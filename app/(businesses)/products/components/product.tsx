@@ -10,6 +10,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
 	Dialog,
 	DialogContent,
@@ -28,6 +29,7 @@ import {
 import {
 	Form,
 	FormControl,
+	FormDescription,
 	FormField,
 	FormItem,
 	FormLabel,
@@ -36,6 +38,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import {
 	Sheet,
 	SheetClose,
@@ -71,6 +81,11 @@ import {
 
 const defaultContent = "<h2>Find and onboard affiliates automatically</h2>";
 
+enum PriceType {
+	Subscription = "Subscription",
+	OneTime = "OneTime",
+}
+
 const FormSchema = z.object({
 	name: z.string().min(1, {
 		message: "Please enter the name.",
@@ -82,6 +97,8 @@ const FormSchema = z.object({
 		message: "Please enter the description.",
 	}),
 	htmlDescription: z.string().nullable(),
+	priceType: z.nativeEnum(PriceType),
+	isShippable: z.boolean(),
 	picture: z
 		.object({
 			name: z.string().min(1, {
@@ -118,6 +135,8 @@ const initialStateSchema = z.object({
 		description: z.string().nullable(),
 		htmlDescription: z.string().nullable(),
 		productImage: z.string().nullable(),
+		priceType: z.nativeEnum(PriceType).nullable(),
+		isShippable: z.boolean().nullable(),
 	}),
 });
 
@@ -134,6 +153,8 @@ const initialState: TFormInitialState = {
 		description: null,
 		productImage: null,
 		htmlDescription: null,
+		priceType: null,
+		isShippable: null,
 	},
 };
 
@@ -159,6 +180,8 @@ export default function Product({
 		description: "",
 		htmlDescription: "",
 		imageUrl: "",
+		priceType: PriceType.OneTime,
+		isShippable: true,
 	});
 	const [isPending, startTransition] = useTransition();
 	const [openEditProductDialog, setOpenEditProductDialog] = useState(false);
@@ -174,6 +197,8 @@ export default function Product({
 				fileDetails: "",
 				url: "",
 			},
+			priceType: PriceType.OneTime,
+			isShippable: true,
 		},
 	});
 
@@ -186,6 +211,8 @@ export default function Product({
 		formData.append("image-reference-file", data.picture.fileDetails);
 		formData.append("image-reference-file-name", data.picture.name);
 		formData.append("business-id", user?.id as string);
+		formData.append("price-type", data.priceType);
+		formData.append("is-shippable", data.isShippable.toString());
 
 		const result = await createProductAction(formData);
 		if (result === "success") {
@@ -295,111 +322,175 @@ export default function Product({
 							</Button>
 						</SheetTrigger>
 						<SheetContent>
-							<Form {...form}>
-								<form onSubmit={form.handleSubmit(onSubmit)}>
-									<SheetHeader>
-										<SheetTitle>Product details</SheetTitle>
-										<SheetDescription>
-											{`Add product details. Click save when you're done.`}
-										</SheetDescription>
-									</SheetHeader>
-									<div className="grid gap-4 py-4">
-										<div>
-											<FormField
-												control={form.control}
-												name="name"
-												render={({ field }) => (
-													<>
-														<FormItem>
-															<FormLabel className="truncate text-black">
-																Name
-															</FormLabel>
-															<FormControl>
-																<Input placeholder="mangosqueezy" {...field} />
-															</FormControl>
-															<FormMessage />
-														</FormItem>
-													</>
-												)}
-											/>
-										</div>
-										<div>
-											<FormField
-												control={form.control}
-												name="price"
-												render={({ field }) => (
-													<>
-														<FormItem>
-															<FormLabel className="truncate text-black">
-																Price
-															</FormLabel>
-															<FormControl>
-																<Input placeholder="0.00" {...field} />
-															</FormControl>
-															<FormMessage />
-														</FormItem>
-													</>
-												)}
-											/>
-										</div>
-										<div>
-											<FormField
-												control={form.control}
-												name="description"
-												render={() => (
-													<>
-														<FormItem>
-															<FormLabel className="truncate text-black">
-																Description
-															</FormLabel>
-															<FormControl>
-																<ScrollArea className="h-72 text-sm rounded-md border">
-																	<Editor
-																		content={defaultContent}
-																		updateDescription={updateDescription}
+							<ScrollArea className="h-96 md:h-full">
+								<Form {...form}>
+									<form onSubmit={form.handleSubmit(onSubmit)}>
+										<SheetHeader>
+											<SheetTitle>Product details</SheetTitle>
+											<SheetDescription>
+												{`Add product details. Click save when you're done.`}
+											</SheetDescription>
+										</SheetHeader>
+										<div className="grid gap-4 py-4">
+											<div>
+												<FormField
+													control={form.control}
+													name="name"
+													render={({ field }) => (
+														<>
+															<FormItem>
+																<FormLabel className="truncate text-black">
+																	Name
+																</FormLabel>
+																<FormControl>
+																	<Input
+																		placeholder="mangosqueezy"
+																		{...field}
 																	/>
-																</ScrollArea>
-															</FormControl>
-															<FormMessage />
-														</FormItem>
-													</>
-												)}
-											/>
-										</div>
-										<div>
-											<FormField
-												control={form.control}
-												name="picture"
-												render={() => (
-													<>
+																</FormControl>
+																<FormMessage />
+															</FormItem>
+														</>
+													)}
+												/>
+											</div>
+											<div>
+												<FormField
+													control={form.control}
+													name="price"
+													render={({ field }) => (
+														<>
+															<FormItem>
+																<FormLabel className="truncate text-black">
+																	Price
+																</FormLabel>
+																<FormControl>
+																	<Input placeholder="0.00" {...field} />
+																</FormControl>
+																<FormMessage />
+															</FormItem>
+														</>
+													)}
+												/>
+											</div>
+											<div>
+												<FormField
+													control={form.control}
+													name="priceType"
+													render={({ field }) => (
 														<FormItem>
-															<FormLabel className="truncate text-black">
-																Front Picture
-															</FormLabel>
-
-															<FormControl>
-																<Input
-																	id="picture"
-																	type="file"
-																	onChange={(event) => {
-																		uploadProductPhoto(event);
-																	}}
-																/>
-															</FormControl>
+															<FormLabel>Price Type</FormLabel>
+															<Select
+																onValueChange={field.onChange}
+																defaultValue={field.value as PriceType}
+															>
+																<FormControl>
+																	<SelectTrigger>
+																		<SelectValue placeholder="Select a price type" />
+																	</SelectTrigger>
+																</FormControl>
+																<SelectContent>
+																	<SelectItem value={PriceType.OneTime}>
+																		{PriceType.OneTime}
+																	</SelectItem>
+																	<SelectItem value={PriceType.Subscription}>
+																		{PriceType.Subscription}
+																	</SelectItem>
+																</SelectContent>
+															</Select>
+															<FormDescription>
+																Select the price type for the product.
+															</FormDescription>
 															<FormMessage />
 														</FormItem>
-													</>
-												)}
-											/>
+													)}
+												/>
+											</div>
+											<div>
+												<FormField
+													control={form.control}
+													name="description"
+													render={() => (
+														<>
+															<FormItem>
+																<FormLabel className="truncate text-black">
+																	Description
+																</FormLabel>
+																<FormControl>
+																	<ScrollArea className="h-72 text-sm rounded-md border">
+																		<Editor
+																			content={defaultContent}
+																			updateDescription={updateDescription}
+																		/>
+																	</ScrollArea>
+																</FormControl>
+																<FormMessage />
+															</FormItem>
+														</>
+													)}
+												/>
+											</div>
+											<div>
+												<FormField
+													control={form.control}
+													name="isShippable"
+													render={({ field }) => (
+														<>
+															<FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+																<FormControl>
+																	<Checkbox
+																		checked={field.value}
+																		onCheckedChange={field.onChange}
+																	/>
+																</FormControl>
+																<div className="space-y-1 leading-none">
+																	<FormLabel>Is Shippable</FormLabel>
+																	<FormDescription>
+																		Do you want to collect a shipping address
+																		from the customer?
+																	</FormDescription>
+																</div>
+																<FormMessage />
+															</FormItem>
+														</>
+													)}
+												/>
+											</div>
+											<div>
+												<FormField
+													control={form.control}
+													name="picture"
+													render={() => (
+														<>
+															<FormItem>
+																<FormLabel className="truncate text-black">
+																	Front Picture
+																</FormLabel>
+
+																<FormControl>
+																	<Input
+																		id="picture"
+																		type="file"
+																		onChange={(event) => {
+																			uploadProductPhoto(event);
+																		}}
+																	/>
+																</FormControl>
+																<FormMessage />
+															</FormItem>
+														</>
+													)}
+												/>
+											</div>
 										</div>
-									</div>
-									<SheetFooter>
-										<SheetClose asChild>
-											<Button type="submit">Save changes</Button>
-										</SheetClose>
-									</SheetFooter>
-								</form>
-							</Form>
+										<SheetFooter>
+											<SheetClose asChild>
+												<Button type="submit">Save changes</Button>
+											</SheetClose>
+										</SheetFooter>
+									</form>
+								</Form>
+							</ScrollArea>
 						</SheetContent>
 					</Sheet>
 				</div>
@@ -485,6 +576,8 @@ export default function Product({
 																		product.html_description || "",
 																	price: product.price.toString(),
 																	imageUrl: product.image_url || "",
+																	priceType: product.price_type as PriceType,
+																	isShippable: product.is_shippable ?? true,
 																});
 																setOpenEditProductDialog(true);
 															}}
@@ -549,7 +642,7 @@ export default function Product({
 								<ScrollArea className="h-64 col-span-4 text-sm rounded-md border">
 									<Editor
 										content={editProductInfo.htmlDescription}
-										updateDescription={(htmlContent, text) => {
+										updateDescription={(htmlContent: string, text: string) => {
 											setEditProductInfo({
 												...editProductInfo,
 												description: text,
@@ -572,6 +665,49 @@ export default function Product({
 										});
 									}}
 									className="col-span-4"
+								/>
+							</div>
+
+							<div className="grid grid-cols-4 items-center gap-4">
+								<Label htmlFor="priceType">Price Type</Label>
+								<Select
+									value={editProductInfo.priceType}
+									onValueChange={(value) => {
+										setEditProductInfo({
+											...editProductInfo,
+											priceType: value as PriceType,
+										});
+									}}
+								>
+									<SelectTrigger className="w-[180px]">
+										<SelectValue placeholder="Select a price type" />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectGroup>
+											<SelectItem value={PriceType.OneTime}>
+												{PriceType.OneTime}
+											</SelectItem>
+											<SelectItem value={PriceType.Subscription}>
+												{PriceType.Subscription}
+											</SelectItem>
+										</SelectGroup>
+									</SelectContent>
+								</Select>
+							</div>
+
+							<div className="grid grid-cols-4 items-center gap-4">
+								<Label htmlFor="isShippable" className="col-span-3 text-sm">
+									Do you want to collect a shipping address from the customer?
+								</Label>
+								<Checkbox
+									id="isShippable"
+									checked={editProductInfo.isShippable}
+									onCheckedChange={(value) => {
+										setEditProductInfo({
+											...editProductInfo,
+											isShippable: !!value,
+										});
+									}}
 								/>
 							</div>
 
@@ -606,6 +742,14 @@ export default function Product({
 									formData.append(
 										"product-html-description",
 										editProductInfo.htmlDescription,
+									);
+									formData.append(
+										"product-is-shippable",
+										editProductInfo.isShippable.toString(),
+									);
+									formData.append(
+										"product-price-type",
+										editProductInfo.priceType,
 									);
 
 									startTransition(async () => {
