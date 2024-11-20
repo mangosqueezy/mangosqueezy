@@ -1,4 +1,5 @@
 import { isIgAssistEnabled } from "@/config/flags";
+import { createIgScopeIdentifier } from "@/models/ig_scope_id";
 
 export async function GET(request: Request) {
 	const { searchParams } = new URL(request.url);
@@ -37,6 +38,12 @@ export async function POST(request: Request) {
 	if (messaging && messaging?.length > 0) {
 		for (const message of messaging) {
 			console.log("/api/webhook/ig/ POST => ", { message, appUsersIgUserId });
+
+			if (message.recipient.id !== IG_BUSINESS_ID) {
+				await createIgScopeIdentifier({
+					recipient_id: message.recipient.id,
+				});
+			}
 
 			if (message.sender.id !== IG_BUSINESS_ID && igAssistEnabled) {
 				await fetch("https://mangosqueezy-hono-app.vercel.app/api/workflow", {

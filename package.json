@@ -32,7 +32,7 @@
 		"@langchain/openai": "^0.2.7",
 		"@moonpay/moonpay-node": "^0.2.6",
 		"@moonpay/moonpay-react": "^1.7.3",
-		"@prisma/client": "^5.21.1",
+		"@prisma/client": "^5.22.0",
 		"@radix-ui/react-alert-dialog": "^1.1.1",
 		"@radix-ui/react-avatar": "^1.1.0",
 		"@radix-ui/react-checkbox": "^1.1.1",

@@ -242,7 +242,7 @@ model ig_access_token {
 
 model ig_scope_identifiers {
   id                   String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  ig_scope_identifier  String
+  ig_scope_identifier  String     @unique
   created_at           DateTime   @default(now())
   updated_at           DateTime   @updatedAt
 
