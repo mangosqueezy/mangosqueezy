@@ -5,14 +5,12 @@ export async function createPipeline({
 	product_id,
 	prompt,
 	affiliate_count,
-	format,
 	location,
 	business_id,
 }: {
 	product_id: number;
 	prompt: string;
 	affiliate_count: number;
-	format: string;
 	location: string;
 	business_id: string;
 }) {
@@ -23,7 +21,6 @@ export async function createPipeline({
 				business_id,
 				prompt,
 				affiliate_count,
-				format,
 				location,
 				remark: "mangosqueezy is working on this",
 			},
@@ -66,6 +63,42 @@ export async function getPipelineByProductIdAndBusinessId(
 		return await prisma.pipelines.findFirst({
 			where: {
 				AND: [{ product_id: productId }, { business_id: business_id }],
+			},
+		});
+	} catch (err) {
+		console.error(err);
+	}
+}
+
+export async function getPipelineById(id: number) {
+	try {
+		return await prisma.pipelines.findUnique({
+			where: { id },
+			include: {
+				products: true,
+				business: true,
+			},
+		});
+	} catch (err) {
+		console.error(err);
+	}
+}
+
+export async function getLatestPipeline() {
+	try {
+		return await prisma.pipelines.findFirst({
+			where: {
+				AND: [
+					{
+						created_at: {
+							gte: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5),
+						},
+						ig_post_id: null,
+					},
+				],
+			},
+			orderBy: {
+				created_at: "desc",
 			},
 		});
 	} catch (err) {

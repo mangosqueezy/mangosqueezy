@@ -20,9 +20,14 @@ export const initialNodes = [
 		targetPosition: "top",
 		position: { x: 550, y: 200 },
 		data: {
-			value: `Generate an engaging Instagram caption using the product description provided.
-Based on your product description and location, generate 8-12 relevant hashtags that target your audience and niche.
-				`,
+			value: `Generate an Instagram caption to propose an affiliate partnership using the given product description. The message should be written in simple and concise English, avoiding complex words. Ensure it is engaging, easy to understand, and formatted as follows:
+1.	Hi 👋🏽
+2.	Add the generated partnership offer script.
+3.	CTA: Encourage the recipient to DM us for more details.
+4.	Closing: End with a thank you note and include the sender’s name or business name:
+
+Thanks,
+mangosqueezy`,
 			label: "Ask AI",
 		},
 	},
@@ -30,7 +35,7 @@ Based on your product description and location, generate 8-12 relevant hashtags 
 		id: "node-4",
 		type: "output",
 		targetPosition: "top",
-		position: { x: 400, y: 860 },
+		position: { x: 400, y: 560 },
 		data: { label: "Output" },
 	},
 	{
@@ -39,31 +44,5 @@ Based on your product description and location, generate 8-12 relevant hashtags 
 		position: { x: 550, y: 0 },
 		targetPosition: "top",
 		data: { value: "EARTH", label: "Location" },
-	},
-	{
-		id: "node-6",
-		type: "inputFormat",
-		position: { x: 550, y: 500 },
-		targetPosition: "top",
-		data: {
-			value: `Desired format:
-<💰 Start with Product ID or Offer Statement>
-<Briefly state the commission or earning opportunity>
-
-<Why Join Us?>
-<✨ Highlight primary benefit 1>
-<✨ Highlight primary benefit 2>
-
-<How It Works?>
-<Explain the earning process in simple terms and highlight key earnings with emoji>
-
-<🚀 Introduce any additional product or service, like SaaS, if applicable>
-<Describe additional product/service value briefly with an emoji for emphasis>
-
-<👉 Finish with a clear call to action, eg DM us to learn more and start your journey today! 📩>
-
-<Include 8-12 relevant hashtags in one line>`,
-			label: "Format",
-		},
 	},
 ] as AppNode[];

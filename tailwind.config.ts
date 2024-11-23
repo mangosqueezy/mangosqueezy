@@ -159,8 +159,6 @@ export default {
 				},
 			},
 			animation: {
-				"accordion-down": "accordion-down 0.2s ease-out",
-				"accordion-up": "accordion-up 0.2s ease-out",
 				meteor: "meteor 5s linear infinite",
 				tilt: "tilt 0.3s ease-in-out infinite",
 				"border-beam": "border-beam calc(var(--duration)*1s) infinite linear",
@@ -169,6 +167,8 @@ export default {
 				"fade-in-up": "fade-in-up 0.5s ease-out forwards",
 				"background-position-spin":
 					"background-position-spin 3000ms infinite alternate",
+				"accordion-down": "accordion-down 0.2s ease-out",
+				"accordion-up": "accordion-up 0.2s ease-out",
 			},
 		},
 	},

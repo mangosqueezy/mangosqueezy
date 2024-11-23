@@ -1,7 +1,8 @@
 import { decryptIgAccessToken } from "@/lib/utils";
 import { isAccessTokenExpiring } from "@/lib/utils";
 import { getIgAccessToken } from "@/models/ig_refresh_token";
-import { getPipelineByVideoId } from "@/models/pipeline";
+import { getAvailableIgScopeIdentifier } from "@/models/ig_scope_id";
+import { getPipelineById } from "@/models/pipeline";
 import { createClient } from "@supabase/supabase-js";
 import { Client } from "@upstash/qstash";
 import { verifySignatureAppRouter } from "@upstash/qstash/nextjs";
@@ -18,7 +19,7 @@ export const POST = verifySignatureAppRouter(async (req: Request) => {
 	// responses from qstash are base64-encoded
 	const decoded = atob(requestBody?.body);
 	const parsedDecodedBody = JSON.parse(decoded);
-	const { mediaContainerId, videoId } = parsedDecodedBody;
+	const { mediaContainerId, pipelineId } = parsedDecodedBody;
 	const scheduleId = requestBody?.scheduleId;
 
 	let INSTAGRAM_ACCESS_TOKEN = "";
@@ -70,17 +71,34 @@ export const POST = verifySignatureAppRouter(async (req: Request) => {
 		const result = await response.json();
 		const igPostId = result?.id;
 
-		const pipeline = await getPipelineByVideoId(videoId);
-		if (pipeline) {
-			await supabase
-				.from("Pipelines")
-				.update({
-					ig_post_id: igPostId,
-					remark: "video has been posted to instagram",
-				})
-				.eq("id", pipeline.id)
-				.select();
-		}
+		const pipelineData = await getPipelineById(pipelineId);
+		const availableIgScopeIdentifier = await getAvailableIgScopeIdentifier(
+			pipelineData?.affiliate_count ?? 3,
+		);
+
+		const igUsername = availableIgScopeIdentifier
+			.map((identifier) => `@${identifier.ig_username}`)
+			.join(",");
+
+		const encodedCommentText = encodeURIComponent(
+			`Hi ${igUsername}, We would love to invite you to check out our affiliate program—earn commissions by promoting amazing products! DM us for details. 💼✨`,
+		);
+
+		await fetch(
+			`https://graph.instagram.com/v21.0/${igPostId}/comments?message=${encodedCommentText}&access_token=${INSTAGRAM_ACCESS_TOKEN}&media_id=${igPostId}`,
+			{
+				method: "POST",
+			},
+		);
+
+		await supabase
+			.from("Pipelines")
+			.update({
+				ig_post_id: igPostId,
+				remark: "notified affiliates",
+			})
+			.eq("id", pipelineId)
+			.select();
 
 		const client = new Client({
 			token: process.env.QSTASH_TOKEN as string,

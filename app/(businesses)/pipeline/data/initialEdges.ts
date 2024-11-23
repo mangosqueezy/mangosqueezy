@@ -26,22 +26,8 @@ export const initialEdges = [
 	{
 		id: "edge-3",
 		source: "node-3",
-		target: "node-6",
-		sourceHandle: "e",
-		animated: true,
-	},
-	{
-		id: "edge-4",
-		source: "node-5",
-		target: "node-3",
-		sourceHandle: "g",
-		animated: true,
-	},
-	{
-		id: "edge-5",
-		source: "node-6",
 		target: "node-4",
-		sourceHandle: "m",
+		sourceHandle: "e",
 		markerEnd: {
 			type: MarkerType.Arrow,
 			width: 20,
@@ -50,6 +36,13 @@ export const initialEdges = [
 		style: {
 			strokeWidth: 2,
 		},
+		animated: true,
+	},
+	{
+		id: "edge-4",
+		source: "node-5",
+		target: "node-3",
+		sourceHandle: "g",
 		animated: true,
 	},
 ] as Edge[];

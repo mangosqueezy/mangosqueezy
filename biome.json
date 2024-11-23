@@ -11,5 +11,8 @@
 				"noNonNullAssertion": "off"
 			}
 		}
+	},
+	"files": {
+		"ignore": ["node_modules", ".vscode/*"]
 	}
 }

@@ -13,3 +13,33 @@ export const createIgScopeIdentifier = async ({
 		},
 	});
 };
+
+export const getAvailableIgScopeIdentifier = async (take = 3) => {
+	return prisma.ig_scope_identifiers.findMany({
+		where: {
+			pipelines: {
+				none: {},
+			},
+		},
+		include: {
+			pipelines: true,
+		},
+		take,
+	});
+};
+
+export const getCompletedPipelineAffiliates = async (take = 3) => {
+	return prisma.ig_scope_identifiers.findMany({
+		where: {
+			pipelines: {
+				some: {
+					status: "completed",
+				},
+			},
+		},
+		include: {
+			pipelines: true,
+		},
+		take,
+	});
+};

@@ -57,6 +57,7 @@ model Messages {
 }
 
 model Affiliates {
+  id                         Int                          @id @default(autoincrement())
   first_name                 String?
   last_name                  String?
   email                      String                       @unique
@@ -68,7 +69,6 @@ model Affiliates {
   embedding                  Unsupported("vector")?
   metadata                   Json?
   social_media_profiles      Json?
-  id                         Int                          @id @default(autoincrement())
   affiliate_business         Affiliate_Business[]
   orders                     Orders[]
   affiliate_pending_payments Affiliate_Pending_Payments[]
@@ -83,9 +83,11 @@ model Affiliate_Business {
   affiliate_link     String?
   affiliate_link_key String?
   product_id         Int?
+  pipeline_id        Int?
   affiliate          Affiliates @relation(fields: [affiliate_id], references: [id])
   business           Business   @relation(fields: [business_id], references: [id])
   products           Products?  @relation(fields: [product_id], references: [id])
+  pipelines          Pipelines? @relation(fields: [pipeline_id], references: [id])
 
   @@unique([business_id, affiliate_id])
   @@index([business_id], map: "business_id")
@@ -141,6 +143,7 @@ model Pipelines {
   id              Int       @id @default(autoincrement())
   prompt          String?
   remark          String?
+  status          String   @default("Pending")
   affiliate_count Int?
   business_id     String?   @db.Uuid
   product_id      Int?
@@ -149,9 +152,13 @@ model Pipelines {
   heygen_video_id String?
   ig_post_id      String?
   ig_post_url     String?
+  instagram_scope_identifier String?
+  created_at      DateTime @default(now())
 
   business        Business? @relation(fields: [business_id], references: [id])
   products        Products? @relation(fields: [product_id], references: [id])
+  affiliate_business Affiliate_Business[]
+  ig_scope_identifier ig_scope_identifiers? @relation(fields: [instagram_scope_identifier], references: [ig_scope_identifier])
 
   @@schema("public")
 }
@@ -243,9 +250,12 @@ model ig_access_token {
 model ig_scope_identifiers {
   id                   String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   ig_scope_identifier  String     @unique
+  ig_username          String?
   created_at           DateTime   @default(now())
   updated_at           DateTime   @updatedAt
-
+  
+  pipelines            Pipelines[]
+  
   @@schema("public")
 }
 

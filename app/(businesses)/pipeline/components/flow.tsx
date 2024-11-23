@@ -26,13 +26,11 @@ import type {
 	AppState,
 	AffiliatesNode as TAffiliatesNode,
 	AskAINode as TAskAINode,
-	FormatNode as TFormatNode,
 	InputNode as TInputNode,
 	LocationNode as TLocationNode,
 } from "../types/appNode";
 import AffiliatesNode from "./affiliates-node";
 import AskAINode from "./ask-ai-node";
-import FormatNode from "./format-node";
 import InputNode from "./input-node";
 import LocationNode from "./location-node";
 
@@ -60,7 +58,6 @@ const nodeTypes = {
 	inputProduct: InputNode,
 	inputAffiliate: AffiliatesNode,
 	inputAskAI: AskAINode,
-	inputFormat: FormatNode,
 	inputLocation: LocationNode,
 };
 
@@ -89,9 +86,6 @@ function Flow({ products, business_id }: TFlowProps) {
 			(node) => node.id === "node-2",
 		) as TAffiliatesNode;
 		const askAINode = nodes.find((node) => node.id === "node-3") as TAskAINode;
-		const formatNode = nodes.find(
-			(node) => node.id === "node-6",
-		) as TFormatNode;
 		const locationNode = nodes.find(
 			(node) => node.id === "node-5",
 		) as TLocationNode;
@@ -102,7 +96,6 @@ function Flow({ products, business_id }: TFlowProps) {
 		}
 		const prompt = askAINode.data.value;
 		const affiliate_count = Number.parseInt(affiliate.data.value);
-		const format = formatNode.data.value as string;
 		const location = locationNode.data.value as string;
 
 		const isPipelineExists = await getPipelineByProductIdAndBusinessIdAction(
@@ -123,7 +116,6 @@ function Flow({ products, business_id }: TFlowProps) {
 				product_id,
 				prompt,
 				affiliate_count,
-				format,
 				location,
 				business_id as string,
 			);

@@ -17,10 +17,15 @@ export default function AskAINode({
 	isConnectable,
 }: NodeProps<AskAINodeProps>) {
 	const updateNodeData = useStore((state) => state.updateNodeData);
-	const [prompt, setPrompt] = useState(
-		`Generate an engaging Instagram caption using the product description provided.
-Based on your product description and location, generate 8-12 relevant hashtags that target your audience and niche.`,
-	);
+	const [prompt, setPrompt] =
+		useState(`Generate an Instagram caption to propose an affiliate partnership using the given product description. The message should be written in simple and concise English, avoiding complex words. Ensure it is engaging, easy to understand, and formatted as follows:
+1.	Hi 👋🏽
+2.	Add the generated partnership offer script.
+3.	CTA: Encourage the recipient to DM us for more details.
+4.	Closing: End with a thank you note and include the sender’s name or business name:
+		
+Thanks,
+mangosqueezy`);
 
 	return (
 		<div className="h-full w-80 border border-gray-300 rounded bg-white">

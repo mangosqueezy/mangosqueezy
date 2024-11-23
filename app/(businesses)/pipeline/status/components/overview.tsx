@@ -1,29 +1,33 @@
 "use client";
 
-import placeholder from "@/assets/placeholder.svg";
+import {
+	Accordion,
+	AccordionContent,
+	AccordionItem,
+	AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { classNames, cn } from "@/lib/utils";
-import type { Pipelines } from "@prisma/client";
+import type { Pipelines, Products } from "@prisma/client";
 import { ChevronLeft, CircleCheck, Dot, Loader } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const steps = [
 	"mangosqueezy is working on this",
-	"video has been generated",
-	"video has been processed for instagram upload",
-	"video has been posted to instagram",
-	"working on to get affiliates",
+	"finding affiliates",
+	"notified affiliates",
+	"secured affiliates",
 ];
 
 const remarks = [
 	{
 		id: 1,
 		previousStep: null,
-		completed: "started working on this",
 		content: "mangosqueezy is working on this",
+		completed: "started working on this",
 		upcoming: "mangosqueezy is not working on this",
 		icon: CircleCheck,
 		iconBackground: "bg-gray-400",
@@ -31,45 +35,27 @@ const remarks = [
 	{
 		id: 2,
 		previousStep: "mangosqueezy is working on this",
-		content: "video generation is currently underway",
-		completed: "video has been generated",
-		upcoming: "video generation has not begun",
+		content: "finding affiliates",
+		completed: "found affiliates",
+		upcoming: "Affiliates have been found and now system is notifying them",
 		icon: CircleCheck,
 		iconBackground: "bg-blue-500",
 	},
 	{
 		id: 3,
-		previousStep: "video has been generated",
-		content: "Video is currently being processed for Instagram upload",
-		completed: "video has been processed for instagram upload",
-		upcoming: "Video has not been processed for Instagram upload",
-		icon: CircleCheck,
-		iconBackground: "bg-green-500",
-	},
-	{
-		id: 4,
-		previousStep: "video has been processed for Instagram upload",
-		content: "Instagram upload is currently in progress",
-		completed: "video has been posted to instagram",
-		upcoming: "Video has not been posted to Instagram",
+		previousStep: "finding affiliates",
+		content: "notifying affiliates",
+		completed: "affiliates have been notified",
+		upcoming: "system will notify affiliates",
 		icon: CircleCheck,
 		iconBackground: "bg-blue-500",
 	},
 	{
-		id: 5,
-		previousStep: "video has been posted to Instagram",
-		content: "Working on getting affiliates",
+		id: 4,
+		previousStep: "notified affiliates",
+		content: "affiliates have not been secured",
 		completed: "affiliates have been secured",
-		upcoming: "Affiliates have not been secured",
-		icon: CircleCheck,
-		iconBackground: "bg-green-500",
-	},
-	{
-		id: 6,
-		previousStep: "working on to get affiliates",
-		content: "Affiliates have been secured",
-		completed: "affiliates have been secured",
-		upcoming: "Affiliates have not been secured",
+		upcoming: "system will secure affiliates",
 		icon: CircleCheck,
 		iconBackground: "bg-green-500",
 	},
@@ -80,9 +66,11 @@ const supabase = createClient();
 export default function Overview({
 	pipelines: pipelinesData,
 	userId,
+	products,
 }: {
 	pipelines: Pipelines[];
 	userId: string | undefined;
+	products: Products[];
 }) {
 	const [pipelines, setPipelines] = useState<Pipelines[]>(pipelinesData);
 
@@ -114,7 +102,7 @@ export default function Overview({
 
 	return (
 		<div className="max-w-7xl mx-auto">
-			<div className="flex justify-between items-center">
+			<div className="flex justify-between items-center w-72 md:w-[600px]">
 				<h1 className="text-xl font-semibold text-gray-900">Pipelines</h1>
 				<Button asChild variant="ghost">
 					<Link href="/pipeline">
@@ -130,112 +118,115 @@ export default function Overview({
 				)}
 			>
 				<div className="text-md font-semibold text-gray-600 text-center w-full">
-					Content
+					Workflow
 				</div>
 				<div className="text-md font-semibold text-gray-600 text-center w-full">
-					Steps
+					Product
 				</div>
 			</div>
 			<ul className="divide-y divide-gray-100">
 				{pipelines?.length === 0 ? (
 					<div className="text-center text-gray-500">No data available</div>
 				) : (
-					pipelines?.map((pipeline: Pipelines) => (
-						<li
-							key={pipeline.id}
-							className="flex items-center justify-between gap-x-6 py-5 my-5"
-						>
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center justify-center">
-								<div className="w-96">
-									{pipeline.ig_post_url ? (
-										<iframe
-											className="rounded-xl h-96 w-full"
-											src={pipeline.ig_post_url}
-											allowFullScreen
-											title="Affiliate Video"
-										/>
-									) : (
-										<Image
-											src={placeholder}
-											alt="Image placeholder"
-											className="rounded-xl h-96 w-full"
-											width={100}
-											height={100}
-										/>
-									)}
-								</div>
-								<div className="w-96">
-									<div className="flow-root">
-										<ul className="-mb-8">
-											{remarks.map((event, eventIdx) => (
-												<li key={event.id}>
-													<div className="relative pb-8">
-														{eventIdx !== remarks.length - 1 ? (
-															<span
-																aria-hidden="true"
-																className="absolute left-3 top-4 -ml-px h-full w-0.5 bg-gray-200"
-															/>
-														) : null}
-														<div className="relative flex space-x-3">
-															<div>
+					<Accordion type="single" collapsible className="w-full">
+						{pipelines?.map((pipeline: Pipelines) => {
+							const product = products?.find(
+								(p) => p.id === pipeline.product_id,
+							);
+							return (
+								<AccordionItem key={pipeline.id} value={pipeline.id.toString()}>
+									<AccordionTrigger>
+										<div className="flex flex-row items-center justify-between w-full">
+											<Badge
+												variant="outline"
+												className={
+													pipeline.status.toLowerCase() === "pending"
+														? "bg-orange-100 border-orange-300 text-semibold"
+														: pipeline.status.toLowerCase() === "completed"
+															? "bg-green-100 border-green-300 text-semibold"
+															: ""
+												}
+											>
+												{pipeline.status}
+											</Badge>
+											<span className="text-sm text-gray-500 mr-2 truncate max-w-[200px]">
+												{product?.name}
+											</span>
+										</div>
+									</AccordionTrigger>
+									<AccordionContent>
+										<div className="flex justify-between items-center">
+											<ul className="-mb-8 mt-3">
+												{remarks.map((event, eventIdx) => (
+													<li key={event.id}>
+														<div className="relative pb-8">
+															{eventIdx !== remarks.length - 1 ? (
 																<span
-																	className={classNames(
-																		event.previousStep?.toLowerCase() ===
-																			pipeline.remark?.toLowerCase()
-																			? "bg-orange-100"
-																			: event.id <=
-																					steps.indexOf(
-																						pipeline.remark?.toLowerCase()!,
-																					) +
-																						2
-																				? "bg-green-600"
-																				: "bg-gray-100",
-																		"flex h-6 w-6 items-center justify-center rounded-full ring-4 ring-white",
-																	)}
-																>
-																	{event.previousStep?.toLowerCase() ===
-																	pipeline.remark?.toLowerCase() ? (
-																		<Loader className="h-3 w-3 text-gray-600 animate-spin" />
-																	) : event.id <=
-																		steps.indexOf(
-																			pipeline.remark?.toLowerCase()!,
-																		) +
-																			2 ? (
-																		<event.icon
-																			aria-hidden="true"
-																			className="h-3 w-3 text-white"
-																		/>
-																	) : (
-																		<Dot className="h-8 w-8 text-gray-500 animate-pulse" />
-																	)}
-																</span>
-															</div>
-															<div className="flex min-w-0 flex-1 justify-between space-x-4">
+																	aria-hidden="true"
+																	className="absolute left-3 top-4 -ml-px h-full w-0.5 bg-gray-200"
+																/>
+															) : null}
+															<div className="relative flex space-x-3">
 																<div>
-																	<p className="text-sm text-gray-600">
+																	<span
+																		className={classNames(
+																			event.previousStep?.toLowerCase() ===
+																				pipeline.remark?.toLowerCase()
+																				? "bg-orange-100"
+																				: event.id <=
+																						steps.indexOf(
+																							pipeline.remark?.toLowerCase()!,
+																						) +
+																							2
+																					? "bg-green-600"
+																					: "bg-gray-100",
+																			"flex h-6 w-6 items-center justify-center rounded-full ring-4 ring-white",
+																		)}
+																	>
 																		{event.previousStep?.toLowerCase() ===
-																		pipeline.remark?.toLowerCase()
-																			? event.content
-																			: event.id <=
-																					steps.indexOf(
-																						pipeline.remark?.toLowerCase()!,
-																					) +
-																						2
-																				? event.completed
-																				: event.upcoming}
-																	</p>
+																		pipeline.remark?.toLowerCase() ? (
+																			<Loader className="h-3 w-3 text-gray-600 animate-spin" />
+																		) : event.id <=
+																			steps.indexOf(
+																				pipeline.remark?.toLowerCase()!,
+																			) +
+																				2 ? (
+																			<event.icon
+																				aria-hidden="true"
+																				className="h-3 w-3 text-white"
+																			/>
+																		) : (
+																			<Dot className="h-8 w-8 text-gray-500 animate-pulse" />
+																		)}
+																	</span>
+																</div>
+																<div className="flex min-w-0 flex-1 justify-between space-x-4">
+																	<div>
+																		<p className="text-sm text-gray-600">
+																			{event.previousStep?.toLowerCase() ===
+																			pipeline.remark?.toLowerCase()
+																				? event.content
+																				: event.id <=
+																						steps.indexOf(
+																							pipeline.remark?.toLowerCase()!,
+																						) +
+																							2
+																					? event.completed
+																					: event.upcoming}
+																		</p>
+																	</div>
 																</div>
 															</div>
 														</div>
-													</div>
-												</li>
-											))}
-										</ul>
-									</div>
-								</div>
-							</div>
-						</li>
-					))
+													</li>
+												))}
+											</ul>
+										</div>
+									</AccordionContent>
+								</AccordionItem>
+							);
+						})}
+					</Accordion>
 				)}
 			</ul>
 		</div>
