@@ -2,7 +2,8 @@ import prisma from "@/lib/prisma";
 
 export const createIgScopeIdentifier = async ({
 	recipient_id,
-}: { recipient_id: string }) => {
+	ig_username,
+}: { recipient_id: string; ig_username: string }) => {
 	return prisma.ig_scope_identifiers.upsert({
 		where: {
 			ig_scope_identifier: recipient_id,
@@ -10,6 +11,7 @@ export const createIgScopeIdentifier = async ({
 		update: {},
 		create: {
 			ig_scope_identifier: recipient_id,
+			ig_username,
 		},
 	});
 };
@@ -17,12 +19,18 @@ export const createIgScopeIdentifier = async ({
 export const getAvailableIgScopeIdentifier = async (take = 3) => {
 	return prisma.ig_scope_identifiers.findMany({
 		where: {
-			pipelines: {
-				none: {},
+			affiliate_business: {
+				some: {
+					pipelines: {
+						status: {
+							equals: undefined,
+						},
+					},
+				},
 			},
 		},
 		include: {
-			pipelines: true,
+			affiliate_business: true,
 		},
 		take,
 	});
@@ -31,14 +39,32 @@ export const getAvailableIgScopeIdentifier = async (take = 3) => {
 export const getCompletedPipelineAffiliates = async (take = 3) => {
 	return prisma.ig_scope_identifiers.findMany({
 		where: {
-			pipelines: {
+			affiliate_business: {
 				some: {
-					status: "completed",
+					pipelines: {
+						status: "completed",
+					},
 				},
 			},
 		},
 		include: {
-			pipelines: true,
+			affiliate_business: true,
+			_count: {
+				select: {
+					affiliate_business: {
+						where: {
+							pipelines: {
+								status: "completed",
+							},
+						},
+					},
+				},
+			},
+		},
+		orderBy: {
+			affiliate_business: {
+				_count: "asc",
+			},
 		},
 		take,
 	});

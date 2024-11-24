@@ -1,4 +1,7 @@
 import { isIgAssistEnabled } from "@/config/flags";
+import { decryptIgAccessToken } from "@/lib/utils";
+import { isAccessTokenExpiring } from "@/lib/utils";
+import { getIgAccessToken } from "@/models/ig_refresh_token";
 import { createIgScopeIdentifier } from "@/models/ig_scope_id";
 
 export async function GET(request: Request) {
@@ -40,8 +43,49 @@ export async function POST(request: Request) {
 			console.log("/api/webhook/ig/ POST => ", { message, appUsersIgUserId });
 
 			if (message.recipient.id !== IG_BUSINESS_ID) {
+				let INSTAGRAM_ACCESS_TOKEN = "";
+
+				const igAccessToken = await getIgAccessToken();
+				const isAccessTokenExpiringFlag = isAccessTokenExpiring(
+					igAccessToken?.expires_at as string,
+				);
+
+				if (isAccessTokenExpiringFlag) {
+					const refreshTokenResponse = await fetch(
+						"https://www.mangosqueezy.com/api/instagram/refresh_token",
+						{
+							method: "POST",
+							body: JSON.stringify({ access_token: igAccessToken?.token }),
+						},
+					);
+					const refreshTokenResult = await refreshTokenResponse.json();
+					const decryptedAccessToken = await decryptIgAccessToken(
+						refreshTokenResult?.encryptedHexString,
+						refreshTokenResult?.ivHexString,
+					);
+					INSTAGRAM_ACCESS_TOKEN = decryptedAccessToken;
+				} else {
+					const decryptedAccessToken = await decryptIgAccessToken(
+						igAccessToken?.token as string,
+						igAccessToken?.encryption_iv as string,
+					);
+					INSTAGRAM_ACCESS_TOKEN = decryptedAccessToken;
+				}
+
+				const recipientId = message.recipient.id;
+
+				const response = await fetch(
+					`https://graph.instagram.com/v21.0/${recipientId}?fields=name,username,profile_pic,follower_count,is_user_follow_business,is_business_follow_user&access_token=${INSTAGRAM_ACCESS_TOKEN}`,
+					{
+						method: "GET",
+					},
+				);
+
+				const result = await response.json();
+
 				await createIgScopeIdentifier({
-					recipient_id: message.recipient.id,
+					recipient_id: recipientId,
+					ig_username: result?.username,
 				});
 			}
 

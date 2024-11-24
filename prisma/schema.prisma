@@ -84,6 +84,10 @@ model Affiliate_Business {
   affiliate_link_key String?
   product_id         Int?
   pipeline_id        Int?
+  
+  instagram_scope_identifier String?
+  ig_scope_identifier      ig_scope_identifiers? @relation(fields: [instagram_scope_identifier], references: [ig_scope_identifier])
+
   affiliate          Affiliates @relation(fields: [affiliate_id], references: [id])
   business           Business   @relation(fields: [business_id], references: [id])
   products           Products?  @relation(fields: [product_id], references: [id])
@@ -152,13 +156,11 @@ model Pipelines {
   heygen_video_id String?
   ig_post_id      String?
   ig_post_url     String?
-  instagram_scope_identifier String?
   created_at      DateTime @default(now())
 
   business        Business? @relation(fields: [business_id], references: [id])
   products        Products? @relation(fields: [product_id], references: [id])
   affiliate_business Affiliate_Business[]
-  ig_scope_identifier ig_scope_identifiers? @relation(fields: [instagram_scope_identifier], references: [ig_scope_identifier])
 
   @@schema("public")
 }
@@ -254,7 +256,7 @@ model ig_scope_identifiers {
   created_at           DateTime   @default(now())
   updated_at           DateTime   @updatedAt
   
-  pipelines            Pipelines[]
+  affiliate_business   Affiliate_Business[]
   
   @@schema("public")
 }
