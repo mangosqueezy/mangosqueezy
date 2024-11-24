@@ -32,6 +32,7 @@ export default async function OrdersPage() {
 						<Table>
 							<TableHeader>
 								<TableRow>
+									<TableHead>Product Name</TableHead>
 									<TableHead>Link</TableHead>
 									<TableHead>
 										<span className="sr-only">Actions</span>
@@ -40,25 +41,36 @@ export default async function OrdersPage() {
 							</TableHeader>
 							<TableBody>
 								{user?.affiliate_business.map(
-									(affiliate: Affiliate_Business) =>
-										affiliate.affiliate_link && (
-											<TableRow
-												key={`table-row-${affiliate.affiliate_link_key}`}
-											>
-												<TableCell className="font-medium">
-													{affiliate.affiliate_link}
-												</TableCell>
-												<TableCell className="flex justify-end">
-													<Button asChild>
-														<Link
-															href={`/metrics/${affiliate.affiliate_link_key}`}
-														>
-															View
-														</Link>
-													</Button>
-												</TableCell>
-											</TableRow>
-										),
+									(affiliate: Affiliate_Business) => {
+										const productId = affiliate.product_id;
+										const productName = user?.products.find(
+											(p) => p.id === productId,
+										)?.name;
+
+										return (
+											affiliate.affiliate_link && (
+												<TableRow
+													key={`table-row-${affiliate.affiliate_link_key}`}
+												>
+													<TableCell className="font-medium">
+														{productName}
+													</TableCell>
+													<TableCell className="font-medium">
+														{affiliate.affiliate_link}
+													</TableCell>
+													<TableCell className="flex justify-end">
+														<Button asChild>
+															<Link
+																href={`/metrics/${affiliate.affiliate_link_key}`}
+															>
+																View
+															</Link>
+														</Button>
+													</TableCell>
+												</TableRow>
+											)
+										);
+									},
 								)}
 							</TableBody>
 						</Table>

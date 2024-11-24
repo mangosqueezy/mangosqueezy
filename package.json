@@ -111,14 +111,14 @@
 		"openai": "^4.73.0",
 		"posthog-js": "^1.188.0",
 		"react": "19.0.0-rc-69d4b800-20241021",
-		"react-day-picker": "^9.3.2",
+		"react-day-picker": "^8.10.1",
 		"react-dom": "19.0.0-rc-69d4b800-20241021",
 		"react-hook-form": "^7.53.2",
 		"react-hot-toast": "^2.4.1",
 		"react-icons": "^5.3.0",
 		"react-is": "19.0.0-rc-69d4b800-20241021",
 		"react-resizable-panels": "^2.1.7",
-		"recharts": "^2.13.3",
+		"recharts": "^2.13.0-alpha.5",
 		"remix-utils": "^7.7.0",
 		"resend": "^4.0.1",
 		"stripe": "^17.4.0",
@@ -146,8 +146,8 @@
 		"@types/canvas-confetti": "^1.6.4",
 		"@types/lodash": "^4.17.13",
 		"@types/node": "^22",
-		"@types/react": "npm:types-react@19.0.0-alpha.3",
-		"@types/react-dom": "npm:types-react-dom@19.0.0-alpha.3",
+		"@types/react": "npm:types-react@19.0.0-rc.1",
+		"@types/react-dom": "npm:types-react-dom@19.0.0-rc.1",
 		"eslint": "^9",
 		"eslint-config-next": "15.0.3",
 		"eslint-config-prettier": "^9.1.0",
@@ -161,8 +161,8 @@
 	},
 	"pnpm": {
 		"overrides": {
-			"@types/react": "npm:types-react@19.0.0-alpha.3",
-			"@types/react-dom": "npm:types-react-dom@19.0.0-alpha.3",
+			"@types/react": "npm:types-react@19.0.0-rc.1",
+			"@types/react-dom": "npm:types-react-dom@19.0.0-rc.1",
 			"recharts": "2.13.0-alpha.5",
 			"react-is": "$react-is"
 		}
