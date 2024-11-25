@@ -8,7 +8,15 @@ import { getLatestPipeline, getPipelineById } from "@/models/pipeline";
 import { openai } from "@ai-sdk/openai";
 import { createClient } from "@supabase/supabase-js";
 import { Client } from "@upstash/qstash";
-import { generateText } from "ai";
+
+import { initLogger, wrapAISDKModel } from "braintrust";
+
+initLogger({
+	projectName: "mangosqueezy",
+	apiKey: process.env.BRAINTRUST_API_KEY,
+});
+
+const model = wrapAISDKModel(openai.chat("o1-mini-2024-09-12"));
 
 const IG_BUSINESS_ID = process.env.IG_BUSINESS_ID;
 
@@ -121,9 +129,17 @@ export async function POST(request: Request) {
 		Note: Use line breaks for clarity. Maintain a visually appealing structure and all hashtags must be in lowercase.
 		`;
 
-		const { text } = await generateText({
-			model: openai("o1-mini"),
-			prompt: prompt,
+		const { text } = await model.doGenerate({
+			inputFormat: "messages",
+			mode: {
+				type: "regular",
+			},
+			prompt: [
+				{
+					role: "user",
+					content: [{ type: "text", text: prompt }],
+				},
+			],
 		});
 
 		const encodedText = encodeURIComponent(

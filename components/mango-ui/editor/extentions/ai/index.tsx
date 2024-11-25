@@ -2,7 +2,6 @@
 
 import type { Editor } from "@tiptap/react";
 import { useClickAway } from "@uidotdev/usehooks";
-import { readStreamableValue } from "ai/rsc";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import {
@@ -12,7 +11,7 @@ import {
 	MdOutlineWrapText,
 } from "react-icons/md";
 import { BubbleMenuButton } from "../bubble-menu/bubble-menu-button";
-import { generateEditorContent } from "./example-action";
+import { generateEditorContent } from "./editor-action";
 
 const selectors = [
 	{
@@ -31,7 +30,7 @@ const selectors = [
 		name: "Condense",
 		icon: MdOutlineCloseFullscreen,
 		instructions:
-			"Condense text: Remove any unnecessary text and only keep the invoice-related content and make it more concise.",
+			"Condense text: Remove any unnecessary text and only keep the related content and make it more concise.",
 	},
 ];
 
@@ -64,16 +63,22 @@ export function AIMenu({ onOpenChange, editor }: AIMenuProps) {
 		}
 
 		try {
-			const { output } = await generateEditorContent({
+			const output = await generateEditorContent({
 				input: selectedText,
 				context: instructions,
 			});
+			const reader = output.getReader();
 
 			let generatedContent = "";
-			for await (const delta of readStreamableValue(output)) {
-				generatedContent += delta;
-				editor?.commands.insertContent(formatEditorContent(delta ?? ""));
+			while (true) {
+				const { done, value } = await reader.read();
+				if (done) break;
+				if (value.type === "text-delta") {
+					generatedContent += value.textDelta;
+					editor?.commands.insertContent(formatEditorContent(value.textDelta));
+				}
 			}
+			reader.releaseLock();
 		} catch (error) {
 			console.error("Error generating content:", error);
 		} finally {
