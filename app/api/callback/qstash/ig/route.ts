@@ -1,7 +1,10 @@
 import { decryptIgAccessToken } from "@/lib/utils";
 import { isAccessTokenExpiring } from "@/lib/utils";
 import { getIgAccessToken } from "@/models/ig_refresh_token";
-import { getAvailableIgScopeIdentifier } from "@/models/ig_scope_id";
+import {
+	getAvailableIgScopeIdentifier,
+	getCompletedPipelineAffiliates,
+} from "@/models/ig_scope_id";
 import { getPipelineById } from "@/models/pipeline";
 import { createClient } from "@supabase/supabase-js";
 import { Client } from "@upstash/qstash";
@@ -75,8 +78,16 @@ export const POST = verifySignatureAppRouter(async (req: Request) => {
 		const availableIgScopeIdentifier = await getAvailableIgScopeIdentifier(
 			pipelineData?.affiliate_count ?? 3,
 		);
+		const completedPipelineAffiliates = await getCompletedPipelineAffiliates(
+			pipelineData?.affiliate_count ?? 3,
+		);
 
-		const igUsername = availableIgScopeIdentifier
+		const listOfIgScopeIdentifier =
+			availableIgScopeIdentifier.length > 0
+				? availableIgScopeIdentifier
+				: completedPipelineAffiliates;
+
+		const igUsername = listOfIgScopeIdentifier
 			.map((identifier) => `@${identifier.ig_username}`)
 			.join(",");
 
