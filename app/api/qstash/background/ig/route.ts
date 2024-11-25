@@ -96,8 +96,8 @@ export async function POST(request: Request) {
 		await supabase
 			.from("Pipelines")
 			.update({
-				ig_post_id: pipelineData?.ig_post_id,
-				ig_post_url: pipelineData?.ig_post_url,
+				ig_post_id: pipelines?.ig_post_id,
+				ig_post_url: pipelines?.ig_post_url,
 				remark: "notified affiliates",
 			})
 			.eq("id", pipeline_id)

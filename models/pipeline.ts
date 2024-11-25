@@ -93,7 +93,9 @@ export async function getLatestPipeline() {
 						created_at: {
 							gte: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5),
 						},
-						ig_post_id: null,
+						ig_post_id: {
+							not: null,
+						},
 					},
 				],
 			},
