@@ -34,13 +34,7 @@ export const getCompletedPipelineAffiliates = async (take = 3) => {
 	return prisma.ig_scope_identifiers.findMany({
 		where: {
 			affiliate_business: {
-				some: {
-					pipelines: {
-						status: {
-							equals: "Completed",
-						},
-					},
-				},
+				some: {},
 			},
 		},
 		include: {
