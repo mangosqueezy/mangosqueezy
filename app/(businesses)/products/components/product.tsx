@@ -641,7 +641,10 @@ export default function Product({
 								<Label htmlFor="description">Description</Label>
 								<ScrollArea className="h-64 col-span-4 text-sm rounded-md border">
 									<Editor
-										content={editProductInfo.htmlDescription}
+										content={
+											user?.products.find((p) => p.id === editProductInfo.id)
+												?.html_description || ""
+										}
 										updateDescription={(htmlContent: string, text: string) => {
 											setEditProductInfo({
 												...editProductInfo,
