@@ -86,7 +86,7 @@ model Affiliate_Business {
   pipeline_id        Int?
   
   instagram_scope_identifier String?
-  ig_scope_identifier      ig_scope_identifiers? @relation(fields: [instagram_scope_identifier], references: [ig_scope_identifier])
+  ig_scope_identifier      ig_scope_identifiers? @relation(fields: [instagram_scope_identifier], references: [ig_username])
 
   affiliate          Affiliates @relation(fields: [affiliate_id], references: [id])
   business           Business   @relation(fields: [business_id], references: [id])
@@ -251,8 +251,7 @@ model ig_access_token {
 
 model ig_scope_identifiers {
   id                   String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  ig_scope_identifier  String     @unique
-  ig_username          String?
+  ig_username          String     @unique
   created_at           DateTime   @default(now())
   updated_at           DateTime   @updatedAt
   
