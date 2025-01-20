@@ -4,5 +4,10 @@
 			"path": "/api/bluesky/listConvos",
 			"schedule": "0 5 * * *"
 		}
-	]
+	],
+	"functions": {
+		"api/bluesky/**/*": {
+			"maxDuration": 300
+		}
+	}
 }
