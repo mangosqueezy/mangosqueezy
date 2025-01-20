@@ -1,4 +1,5 @@
 import { clsx } from "clsx";
+import Image from "next/image";
 
 export function Screenshot({
 	width,
@@ -20,7 +21,7 @@ export function Screenshot({
 			)}
 		>
 			<div className="absolute -inset-[var(--padding)] rounded-[calc(var(--radius)+var(--padding))] shadow-sm ring-1 ring-black/5 [--padding:theme(spacing.2)]" />
-			<img
+			<Image
 				alt=""
 				src={src}
 				className="h-full rounded-[var(--radius)] shadow-2xl ring-1 ring-black/10"

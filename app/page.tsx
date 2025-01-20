@@ -42,6 +42,9 @@ function Hero() {
 						<Button href={userId ? "/pipeline" : "/login"}>
 							{userId ? "Pipeline" : "Get Started"}
 						</Button>
+						<Button variant="secondary" href="/pricing">
+							See pricing
+						</Button>
 					</div>
 				</div>
 			</Container>

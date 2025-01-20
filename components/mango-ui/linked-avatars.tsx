@@ -3,6 +3,7 @@
 import { CheckIcon } from "@heroicons/react/16/solid";
 import { clsx } from "clsx";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 const transition = {
 	duration: 0.75,
@@ -68,12 +69,12 @@ function Photos() {
 	return (
 		<div className="z-10 col-start-1 row-start-1">
 			<div className="mx-auto flex size-full max-w-md items-center justify-around">
-				<img
+				<Image
 					alt=""
 					src="/linked-avatars/customer.jpg"
 					className="size-20 rounded-full bg-white/15 ring-4 ring-white/10"
 				/>
-				<img
+				<Image
 					alt=""
 					src="/linked-avatars/manager.jpg"
 					className="size-20 rounded-full bg-white/15 ring-4 ring-white/10"
