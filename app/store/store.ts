@@ -1,5 +1,8 @@
 import { initialEdges, initialNodes } from "@/app/(businesses)/pipeline/data";
-import type { AppState } from "@/app/(businesses)/pipeline/types/appNode";
+import type {
+	AppNode,
+	AppState,
+} from "@/app/(businesses)/pipeline/types/appNode";
 import type { Products } from "@prisma/client";
 import { addEdge, applyEdgeChanges, applyNodeChanges } from "@xyflow/react";
 import { create } from "zustand";
@@ -43,7 +46,7 @@ const useStore = create<AppState>((set, get) => ({
 					};
 				}
 				return node;
-			}),
+			}) as AppNode[],
 		});
 	},
 	products: null,

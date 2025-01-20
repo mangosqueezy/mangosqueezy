@@ -4,7 +4,7 @@ import { Resend } from "resend";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SK!, {
-	apiVersion: "2024-11-20.acacia",
+	apiVersion: "2024-12-18.acacia",
 	httpClient: Stripe.createFetchHttpClient(),
 });
 
