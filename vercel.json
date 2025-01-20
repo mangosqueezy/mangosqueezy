@@ -1,0 +1,8 @@
+{
+	"crons": [
+		{
+			"path": "/api/bluesky/listConvos",
+			"schedule": "0 5 * * *"
+		}
+	]
+}

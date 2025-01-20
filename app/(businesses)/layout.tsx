@@ -17,6 +17,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { getUser } from "./actions";
 import { Providers } from "./providers";
+import "@liveblocks/react-ui/styles.css";
 
 export default function DashboardLayout({
 	children,
