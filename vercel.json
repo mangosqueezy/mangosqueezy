@@ -6,7 +6,7 @@
 		}
 	],
 	"functions": {
-		"api/bluesky/**/*": {
+		"app/api/bluesky/**/*": {
 			"maxDuration": 300
 		}
 	}
