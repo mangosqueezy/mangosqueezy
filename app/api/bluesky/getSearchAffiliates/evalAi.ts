@@ -33,6 +33,7 @@ export async function evalAi({ handle, postMetrics }: EvalAiProps) {
 			`https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=${handle}`,
 		);
 		const profile = await profileResponse.json();
+		const bio = profile.description;
 		const followersCount = profile.followersCount;
 		const postsCount = profile.postsCount;
 
@@ -40,13 +41,14 @@ export async function evalAi({ handle, postMetrics }: EvalAiProps) {
 		const { experimental_output } = await generateText({
 			model: openai("gpt-4o-mini", { structuredOutputs: true }),
 			prompt: `
-				You are an expert in social media marketing. Please evaluate the following data and tell me if the account is good or not for a brand to partner with.
-				Be lenient while evaluating the account, however don't be too lenient simply don't mark it as "Yes" if it's not.
-        Don't be too strict. If you believe the account has potential, mark it as "Yes" and provide a reason and tag.
+				You are an expert in social media marketing. Please evaluate the following data and assess whether the account is a good fit for a brand partnership.
+Be lenient but don’t mark it as ‘Yes’ if it’s not suitable. If you believe the account has potential, mark it as ‘Yes’ and provide a reason along with relevant tags.
+Also, discard profiles where the profile description indicates the user is a founder, co-founder, C-level executive, or investor.
 
+		Profile Description: ${bio}
         Followers Count: ${followersCount}
-				Posts Count: ${postsCount}
-				Post Metrics: ${postMetrics ? JSON.stringify(postMetrics) : "N/A"}
+		Posts Count: ${postsCount}
+		Post Metrics: ${postMetrics ? JSON.stringify(postMetrics) : "N/A"}
 
         Here is the affiliate reference guide for evaluating affiliate accounts:
         

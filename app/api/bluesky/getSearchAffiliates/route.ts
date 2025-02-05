@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { evalAi } from "./evalAi";
-import { lexiconParserAi } from "./lexiconParserAi";
+import { getKeywords } from "./getKeywords";
 
 type Follower = {
 	did: string;
@@ -99,53 +99,64 @@ export async function GET(request: Request) {
 	try {
 		const { searchParams } = new URL(request.url);
 		const limit: string = searchParams.get("limit") || "30";
-		const query: string = searchParams.get("query") || "";
+		const description: string = searchParams.get("description") || "";
 
-		let followers: Follower[] = [];
+		const followers: Follower[] = [];
 
-		const { lexiconQuery } = query
-			? await lexiconParserAi({ query })
-			: {
-					lexiconQuery:
-						"affiliate marketer || affiliate marketing || affiliate program || earn commissions || affiliate partner || looking for collaboration || open to partnerships || brand partnership || work with brands",
-				};
+		const { keywords: searchKeywords } = await getKeywords({
+			description,
+		});
 
-		const followersResponse = await fetch(
-			`https://public.api.bsky.app/xrpc/app.bsky.actor.searchActors?q=${lexiconQuery}&limit=${limit}`,
-		);
+		for (const keyword of searchKeywords) {
+			const followersResponse = await fetch(
+				`https://public.api.bsky.app/xrpc/app.bsky.actor.searchActors?q=${keyword}&limit=${limit}`,
+			);
 
-		const { actors } = await followersResponse.json();
-		followers = actors;
-
-		const authorFeedResponses = await Promise.all(
-			followers.map((follower: Follower) =>
-				fetch(
-					`https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed?actor=${follower.handle}&filter=posts_no_replies&includePins=true&limit=3`,
-				),
-			),
-		);
-
-		const authorFeeds = await Promise.all(
-			authorFeedResponses.map((response) => response.json()),
-		);
+			const { actors } = await followersResponse.json();
+			followers.push(...actors);
+		}
 
 		const postMetricsMap = new Map();
 
-		authorFeeds.forEach((feed: Feed, index: number) => {
-			const handle = followers[index].handle;
-			const metrics: Record<string, PostMetrics> = {};
+		try {
+			const authorFeedResponses = await Promise.allSettled(
+				followers.map((follower: Follower) =>
+					fetch(
+						`https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed?actor=${follower.handle}&filter=posts_no_replies&includePins=true&limit=3`,
+					),
+				),
+			);
 
-			for (const post of feed.feed || []) {
-				metrics[post.post.uri] = {
-					replyCount: post.post.replyCount,
-					repostCount: post.post.repostCount,
-					likeCount: post.post.likeCount,
-					quoteCount: post.post.quoteCount,
-				};
-			}
+			const authorFeeds = (
+				await Promise.allSettled(
+					authorFeedResponses
+						.filter((response) => response.status === "fulfilled")
+						.map((response) =>
+							(response as PromiseFulfilledResult<Response>).value.json(),
+						),
+				)
+			)
+				.filter((result) => result.status === "fulfilled")
+				.map((result) => (result as PromiseFulfilledResult<Feed>).value);
 
-			postMetricsMap.set(handle, metrics);
-		});
+			authorFeeds.forEach((feed: Feed, index: number) => {
+				const handle = followers[index].handle;
+				const metrics: Record<string, PostMetrics> = {};
+
+				for (const post of feed.feed || []) {
+					metrics[post.post.uri] = {
+						replyCount: post.post.replyCount,
+						repostCount: post.post.repostCount,
+						likeCount: post.post.likeCount,
+						quoteCount: post.post.quoteCount,
+					};
+				}
+
+				postMetricsMap.set(handle, metrics);
+			});
+		} catch (error) {
+			console.error("error", error);
+		}
 
 		const authorFeedsWithMetrics = Object.fromEntries(postMetricsMap);
 

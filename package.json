@@ -20,6 +20,7 @@
 		}
 	},
 	"dependencies": {
+		"@ai-sdk/google": "^1.1.9",
 		"@ai-sdk/openai": "^1.0.19",
 		"@ai-sdk/react": "^1.0.2",
 		"@atproto/api": "^0.13.27",
@@ -91,7 +92,7 @@
 		"@vercel/otel": "^1.10.0",
 		"@vercel/speed-insights": "^1.1.0",
 		"@xyflow/react": "^12.3.5",
-		"ai": "^4.0.38",
+		"ai": "^4.1.17",
 		"base64-arraybuffer": "^1.0.2",
 		"braintrust": "^0.0.172",
 		"canvas-confetti": "^1.9.3",
