@@ -13,10 +13,10 @@ const redis = new Redis({
 });
 
 export default async function CampaignsPage(props: {
-	params: Promise<{ slug: Array<string> }>;
+	params: Promise<{ slug: string }>;
 }) {
 	const params = await props.params;
-	const slug = params.slug[0];
+	const { slug } = params;
 
 	const user = await getUser();
 	const pipelines = user?.pipelines;
