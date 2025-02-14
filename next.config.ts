@@ -32,6 +32,10 @@ const nextConfig: NextConfig = {
 				protocol: "https",
 				hostname: "youtu.be",
 			},
+			{
+				protocol: "https",
+				hostname: "cdn.bsky.app",
+			},
 		],
 	},
 };

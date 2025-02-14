@@ -7,13 +7,8 @@ import {
 } from "@/models/pipeline";
 import { getProductById } from "@/models/products";
 import { createResource } from "@/services/createResource";
-import { Client } from "@upstash/qstash";
 import { revalidatePath } from "next/cache";
 import { Resend } from "resend";
-
-const qstashClient = new Client({
-	token: process.env.QSTASH_TOKEN as string,
-});
 
 export async function createPipelineAction(
 	product_id: number,
@@ -36,14 +31,12 @@ export async function createPipelineAction(
 		productId: product_id,
 	});
 
-	await qstashClient.publishJSON({
-		url: "https://www.mangosqueezy.com/api/qstash/background/ig",
-		body: {
-			business_id,
-			product_id,
-			pipeline_id: pipeline?.id,
+	await fetch(
+		`https://www.mangosqueezy.com/api/bluesky/getSearchAffiliates?product_id=${product_id}&limit=100&pipeline_id=${pipeline?.id}&affiliate_count=${affiliate_count}`,
+		{
+			method: "GET",
 		},
-	});
+	);
 
 	const resend = new Resend(process.env.RESEND_API_KEY);
 	await resend.emails.send({
@@ -56,7 +49,7 @@ export async function createPipelineAction(
 		}) as React.ReactElement,
 	});
 
-	revalidatePath("/pipeline/status");
+	revalidatePath("/campaigns");
 
 	return pipeline;
 }

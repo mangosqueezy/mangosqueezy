@@ -38,6 +38,8 @@ function Marker({
 			<Image
 				alt=""
 				src={src}
+				width={38}
+				height={38}
 				className="absolute left-[7px] top-[4px] size-6 rounded-full"
 			/>
 		</motion.div>

@@ -64,6 +64,17 @@ export default function DashboardLayout({
 						<span className="sr-only">Acme Inc</span>
 					</Link>
 					<Link
+						href="/campaigns"
+						className={classNames(
+							pathname.includes("/campaigns")
+								? "text-blue-400 hover:text-blue-500"
+								: "text-gray-400 hover:text-gray-500",
+							"font-medium flex",
+						)}
+					>
+						Campaigns
+					</Link>
+					<Link
 						href="/pipeline"
 						className={classNames(
 							pathname.includes("/pipeline")
@@ -72,7 +83,7 @@ export default function DashboardLayout({
 							"font-medium flex",
 						)}
 					>
-						Autofinder
+						Jobs
 					</Link>
 					<Link
 						href="/metrics"
@@ -129,6 +140,17 @@ export default function DashboardLayout({
 								<span className="sr-only">Acme Inc</span>
 							</Link>
 							<Link
+								href="/campaigns"
+								className={classNames(
+									pathname.includes("/campaigns")
+										? "text-blue-400 hover:text-blue-500"
+										: "text-gray-400 hover:text-gray-500",
+									"font-medium flex",
+								)}
+							>
+								Campaigns
+							</Link>
+							<Link
 								href="/pipeline"
 								className={classNames(
 									pathname.includes("/pipeline")
@@ -137,7 +159,7 @@ export default function DashboardLayout({
 									"font-medium",
 								)}
 							>
-								Autofinder
+								Jobs
 							</Link>
 							<Link
 								href="/metrics"

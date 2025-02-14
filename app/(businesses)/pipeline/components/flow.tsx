@@ -25,14 +25,10 @@ import {
 import type {
 	AppState,
 	AffiliatesNode as TAffiliatesNode,
-	AskAINode as TAskAINode,
 	InputNode as TInputNode,
-	LocationNode as TLocationNode,
 } from "../types/appNode";
 import AffiliatesNode from "./affiliates-node";
-import AskAINode from "./ask-ai-node";
 import InputNode from "./input-node";
-import LocationNode from "./location-node";
 
 type TFlowProps = {
 	products: Array<Products> | null | undefined;
@@ -49,7 +45,7 @@ const selector = (state: AppState) => ({
 });
 
 const rfStyle = {
-	backgroundColor: "#FFFFFF",
+	backgroundColor: "#F7F9FB",
 };
 
 // we define the nodeTypes outside of the component to prevent re-renderings
@@ -57,13 +53,15 @@ const rfStyle = {
 const nodeTypes = {
 	inputProduct: InputNode,
 	inputAffiliate: AffiliatesNode,
-	inputAskAI: AskAINode,
-	inputLocation: LocationNode,
 };
 
 function Flow({ products, business_id }: TFlowProps) {
 	const analytics = useJune(process.env.NEXT_PUBLIC_JUNE_API_KEY!);
 	const [isLoading, setIsLoading] = useState(false);
+	const [jobStatus, setJobStatus] = useState({
+		status: "inactive",
+		message: "Start the job to find the affiliates",
+	});
 	const { nodes, edges, onNodesChange, onEdgesChange, onConnect, setProducts } =
 		useStore(useShallow(selector));
 
@@ -80,23 +78,21 @@ function Flow({ products, business_id }: TFlowProps) {
 	}, [analytics, business_id]);
 
 	const pipelineHandler = async () => {
+		setJobStatus({
+			status: "inprogress",
+			message: "We are finding the affiliates for you",
+		});
 		setIsLoading(true);
 		const product = nodes.find((node) => node.id === "node-1") as TInputNode;
 		const affiliate = nodes.find(
 			(node) => node.id === "node-2",
 		) as TAffiliatesNode;
-		const askAINode = nodes.find((node) => node.id === "node-3") as TAskAINode;
-		const locationNode = nodes.find(
-			(node) => node.id === "node-5",
-		) as TLocationNode;
 
 		let product_id = Number.parseInt(product.data.value);
 		if (product.data.value === "" && products) {
 			product_id = products[0].id;
 		}
-		const prompt = askAINode.data.value;
 		const affiliate_count = Number.parseInt(affiliate.data.value);
-		const location = locationNode.data.value as string;
 
 		const isPipelineExists = await getPipelineByProductIdAndBusinessIdAction(
 			product_id,
@@ -107,16 +103,21 @@ function Flow({ products, business_id }: TFlowProps) {
 			toast.custom((t: Toast) => (
 				<CustomToast
 					t={t}
-					message="Pipeline already created. Please check status page."
+					message="Job already created. We found the affiliates for you."
 					variant="success"
 				/>
 			));
+
+			setJobStatus({
+				status: "completed",
+				message: "Job already created. We found the affiliates for you.",
+			});
 		} else {
 			const result = await createPipelineAction(
 				product_id,
-				prompt,
+				"prompt",
 				affiliate_count,
-				location,
+				"EARTH",
 				business_id as string,
 			);
 			if (result?.id) {
@@ -125,13 +126,10 @@ function Flow({ products, business_id }: TFlowProps) {
 					business_id: business_id,
 					prompt: prompt,
 				});
-				toast.custom((t: Toast) => (
-					<CustomToast
-						t={t}
-						message="Pipeline created successfully. Please check status page."
-						variant="success"
-					/>
-				));
+				setJobStatus({
+					status: "completed",
+					message: "Job created successfully. Please check campaign page.",
+				});
 			}
 		}
 
@@ -142,44 +140,6 @@ function Flow({ products, business_id }: TFlowProps) {
 		<>
 			<Toaster position="top-right" />
 			<div className="h-screen w-full">
-				<div className="flex items-center justify-between space-x-3 px-2 py-2 sm:px-3">
-					<div className="text-md font-bold lg:text-3xl text-gray-800">
-						AI Affiliate Finder
-					</div>
-
-					<div className="flex items-center justify-end space-x-3 px-2 py-2 sm:px-3">
-						<Button asChild variant="ghost" className="mr-2">
-							<Link href="/pipeline/status">View Status</Link>
-						</Button>
-						{products?.length ? (
-							<Button
-								variant="outline"
-								type="button"
-								disabled={isLoading || !products?.length}
-								onClick={pipelineHandler}
-								className={cn(
-									"bg-white px-3 py-2 text-sm font-semibold text-orange-600 ring-1 ring-inset ring-orange-300 bg-orange-200 hover:bg-orange-50",
-									isLoading || (!products?.length && "cursor-not-allowed"),
-								)}
-							>
-								{isLoading ? (
-									<Loader className="mr-1 h-5 w-5 text-gray-400 animate-spin" />
-								) : (
-									<Play className="mr-1 h-5 w-5 text-orange-400" />
-								)}
-								Run
-							</Button>
-						) : (
-							<Button
-								asChild
-								variant="outline"
-								className="bg-orange-200 hover:bg-orange-50 text-orange-600"
-							>
-								<Link href="/products">Add Products</Link>
-							</Button>
-						)}
-					</div>
-				</div>
 				<ReactFlow
 					nodes={nodes}
 					edges={edges}
@@ -188,11 +148,100 @@ function Flow({ products, business_id }: TFlowProps) {
 					onConnect={onConnect}
 					nodeTypes={nodeTypes}
 					fitView
+					nodeOrigin={[0.5, 0.5]}
+					fitViewOptions={{
+						padding: 0.1,
+						minZoom: 0.1,
+						maxZoom: 1,
+						duration: 200,
+						nodes: [{ id: "node-1" }, { id: "node-2" }, { id: "node-4" }],
+					}}
 					style={rfStyle}
 				>
 					<Controls position="top-left" />
 					<MiniMap />
-					<Background variant={BackgroundVariant.Dots} gap={12} size={1} />
+					<Background variant={BackgroundVariant.Dots} />
+
+					<div className="absolute top-4 right-4 w-80 rounded-lg border bg-white shadow-lg z-10">
+						<div className="border-b px-4 py-3">
+							<div className="flex items-center justify-between">
+								<h3 className="text-sm font-medium text-gray-900">Activity</h3>
+								<Button asChild variant="ghost" size="sm">
+									<Link
+										href="/campaigns"
+										className="text-orange-600 text-xs  underline decoration-orange-600"
+									>
+										View Campaigns
+									</Link>
+								</Button>
+							</div>
+						</div>
+
+						<div className="px-4 py-4">
+							<div className="space-y-3">
+								<div className="flex items-center justify-between">
+									<div className="flex items-center w-full">
+										<span className="relative flex h-2 w-2">
+											<span
+												className={cn(
+													"animate-ping absolute inline-flex h-full w-full rounded-full opacity-75",
+													jobStatus.status === "inactive"
+														? "bg-yellow-400"
+														: jobStatus.status === "inprogress"
+															? "bg-orange-400"
+															: "bg-green-400",
+												)}
+											/>
+											<span
+												className={cn(
+													"relative inline-flex rounded-full h-2 w-2",
+													jobStatus.status === "inactive"
+														? "bg-yellow-500"
+														: jobStatus.status === "inprogress"
+															? "bg-orange-500"
+															: "bg-green-500",
+												)}
+											/>
+										</span>
+										<span className="text-xs text-gray-500 ml-2">
+											{jobStatus.message}
+										</span>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div className="border-t px-4 py-3 flex gap-2 justify-end">
+							{products?.length ? (
+								<Button
+									variant="outline"
+									size="sm"
+									type="button"
+									disabled={isLoading || !products?.length}
+									onClick={pipelineHandler}
+									className={cn(
+										"bg-white px-3 py-2 text-sm font-semibold text-orange-600 ring-1 ring-inset ring-orange-300 bg-orange-200 hover:bg-orange-50",
+										isLoading || (!products?.length && "cursor-not-allowed"),
+									)}
+								>
+									{isLoading ? (
+										<Loader className="mr-1 h-5 w-5 text-gray-400 animate-spin" />
+									) : (
+										<Play className="mr-1 h-5 w-5 text-orange-400" />
+									)}
+									Run
+								</Button>
+							) : (
+								<Button
+									asChild
+									variant="outline"
+									className="bg-orange-200 hover:bg-orange-50 text-orange-600"
+								>
+									<Link href="/products">Add Products</Link>
+								</Button>
+							)}
+						</div>
+					</div>
 				</ReactFlow>
 			</div>
 		</>

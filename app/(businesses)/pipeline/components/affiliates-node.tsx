@@ -43,9 +43,15 @@ export default function AffiliatesNode({
 				/>
 			</div>
 			<Handle
+				type="target"
+				position={Position.Top}
+				id="c"
+				isConnectable={isConnectable}
+			/>
+			<Handle
 				type="source"
 				position={Position.Bottom}
-				id="c"
+				id="d"
 				isConnectable={isConnectable}
 			/>
 		</div>

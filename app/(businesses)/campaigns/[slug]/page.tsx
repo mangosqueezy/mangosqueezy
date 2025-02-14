@@ -1,0 +1,47 @@
+import { getChatMessages } from "@/models/chat_message";
+import type { ChatMessage } from "@prisma/client";
+import { Redis } from "@upstash/redis";
+import { getUser } from "../../actions";
+import Campaign, { type Affiliate } from "./campaign";
+
+const UPSTASH_REDIS_REST_URL = process.env.UPSTASH_REDIS_REST_URL;
+const UPSTASH_REDIS_REST_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+const redis = new Redis({
+	url: UPSTASH_REDIS_REST_URL!,
+	token: UPSTASH_REDIS_REST_TOKEN!,
+});
+
+export default async function CampaignsPage({
+	params,
+}: { params: { slug: string } }) {
+	const { slug } = params;
+
+	const user = await getUser();
+	const pipelines = user?.pipelines;
+	const products = user?.products;
+
+	const pipeline = pipelines?.find((p) => p.id === Number.parseInt(slug));
+	const product = products?.find((p) => p.id === pipeline?.product_id);
+
+	const chatMessages = await getChatMessages({
+		pipeline_id: pipeline?.id as number,
+	});
+
+	const potentialAffiliates = await redis.smembers(slug);
+	const affiliate = potentialAffiliates[0];
+
+	return (
+		<div className="container mx-auto px-4 py-8">
+			{affiliate.length > 0 && (
+				<Campaign
+					product={product}
+					commission={user?.commission || 0}
+					affiliates={affiliate as unknown as Affiliate[]}
+					chatMessages={chatMessages as ChatMessage[]}
+					pipeline_id={pipeline?.id as number}
+				/>
+			)}
+		</div>
+	);
+}

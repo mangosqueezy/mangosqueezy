@@ -32,11 +32,11 @@ function Hero() {
 				<Navbar userId={userId} />
 				<div className="pb-24 pt-16 sm:pb-32 sm:pt-24 md:pb-48 md:pt-32">
 					<h1 className="font-display text-balance text-6xl/[0.9] font-medium tracking-tight text-gray-950 sm:text-8xl/[0.8] md:text-9xl/[0.8]">
-						Get more sales.
+						AI Affiliate Agent.
 					</h1>
 					<p className="mt-8 max-w-lg text-xl/7 font-medium text-gray-950/75 sm:text-2xl/8">
-						We help B2B and B2C businesses by finding affiliates, creating
-						links, and tracking results for you.
+						We help B2B SaaS businesses by finding affiliates, creating links,
+						and tracking results for you.
 					</p>
 					<div className="mt-12 flex flex-col gap-x-6 gap-y-4 sm:flex-row">
 						<Button href={userId ? "/pipeline" : "/login"}>

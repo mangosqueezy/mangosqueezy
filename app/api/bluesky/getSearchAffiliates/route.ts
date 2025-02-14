@@ -1,6 +1,16 @@
+import { getProductById } from "@/models/products";
+import { Redis } from "@upstash/redis";
 import { NextResponse } from "next/server";
 import { evalAi } from "./evalAi";
 import { getKeywords } from "./getKeywords";
+
+const UPSTASH_REDIS_REST_URL = process.env.UPSTASH_REDIS_REST_URL;
+const UPSTASH_REDIS_REST_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+const redis = new Redis({
+	url: UPSTASH_REDIS_REST_URL!,
+	token: UPSTASH_REDIS_REST_TOKEN!,
+});
 
 type Follower = {
 	did: string;
@@ -99,12 +109,15 @@ export async function GET(request: Request) {
 	try {
 		const { searchParams } = new URL(request.url);
 		const limit: string = searchParams.get("limit") || "30";
-		const description: string = searchParams.get("description") || "";
-
+		const product_id: string = searchParams.get("product_id") || "";
+		const pipeline_id: string = searchParams.get("pipeline_id") || "";
+		const affiliate_count: string = searchParams.get("affiliate_count") || "10";
 		const followers: Follower[] = [];
 
+		const product = await getProductById(Number.parseInt(product_id));
+
 		const { keywords: searchKeywords } = await getKeywords({
-			description,
+			description: product?.description || "",
 		});
 
 		for (const keyword of searchKeywords) {
@@ -167,19 +180,31 @@ export async function GET(request: Request) {
 						handle,
 						postMetrics: postMetrics as PostMetrics | undefined,
 					});
+					const displayName = followers.find(
+						(follower) => follower.handle === handle,
+					)?.displayName;
+
+					const avatar = followers.find(
+						(follower) => follower.handle === handle,
+					)?.avatar;
+
 					return {
 						handle,
+						displayName,
+						avatar,
 						...result,
 					};
 				},
 			),
 		);
 
-		const filteredEvaluationResults = evaluationResults.filter(
-			(result) => result.evaluation === "Yes",
-		);
+		const limitedResults = evaluationResults
+			.filter((result) => result.evaluation === "Yes")
+			.slice(0, Number.parseInt(affiliate_count));
 
-		return NextResponse.json(filteredEvaluationResults, { status: 200 });
+		const result = await redis.sadd(pipeline_id, [...limitedResults]);
+
+		return NextResponse.json(result, { status: 200 });
 	} catch (_) {
 		return NextResponse.json(
 			{ error: "something went wrong" },

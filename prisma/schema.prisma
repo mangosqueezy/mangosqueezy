@@ -77,21 +77,21 @@ model Affiliates {
 }
 
 model Affiliate_Business {
-  id                 String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  business_id        String     @db.Uuid
+  id                 String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  business_id        String  @db.Uuid
   affiliate_id       Int
   affiliate_link     String?
   affiliate_link_key String?
   product_id         Int?
   pipeline_id        Int?
-  
-  instagram_scope_identifier String?
-  ig_scope_identifier      ig_scope_identifiers? @relation(fields: [instagram_scope_identifier], references: [ig_username])
 
-  affiliate          Affiliates @relation(fields: [affiliate_id], references: [id])
-  business           Business   @relation(fields: [business_id], references: [id])
-  products           Products?  @relation(fields: [product_id], references: [id])
-  pipelines          Pipelines? @relation(fields: [pipeline_id], references: [id])
+  instagram_scope_identifier String?
+  ig_scope_identifier        ig_scope_identifiers? @relation(fields: [instagram_scope_identifier], references: [ig_username])
+
+  affiliate Affiliates @relation(fields: [affiliate_id], references: [id])
+  business  Business   @relation(fields: [business_id], references: [id])
+  products  Products?  @relation(fields: [product_id], references: [id])
+  pipelines Pipelines? @relation(fields: [pipeline_id], references: [id])
 
   @@unique([business_id, affiliate_id])
   @@index([business_id], map: "business_id")
@@ -144,12 +144,12 @@ model Products {
 }
 
 model Pipelines {
-  id              Int       @id @default(autoincrement())
+  id              Int      @id @default(autoincrement())
   prompt          String?
   remark          String?
   status          String   @default("Pending")
   affiliate_count Int?
-  business_id     String?   @db.Uuid
+  business_id     String?  @db.Uuid
   product_id      Int?
   format          String?
   location        String?
@@ -158,9 +158,23 @@ model Pipelines {
   ig_post_url     String?
   created_at      DateTime @default(now())
 
-  business        Business? @relation(fields: [business_id], references: [id])
-  products        Products? @relation(fields: [product_id], references: [id])
+  business           Business?            @relation(fields: [business_id], references: [id])
+  products           Products?            @relation(fields: [product_id], references: [id])
   affiliate_business Affiliate_Business[]
+  ChatMessage        ChatMessage[]
+
+  @@schema("public")
+}
+
+model ChatMessage {
+  id          Int       @id @default(autoincrement())
+  sender      String
+  receiver    String
+  text        String
+  pipeline_id Int
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  pipeline    Pipelines @relation(fields: [pipeline_id], references: [id])
 
   @@schema("public")
 }
@@ -239,24 +253,24 @@ model resources {
 }
 
 model ig_access_token {
-  id         String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  token      String
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  token         String
   encryption_iv String
-  expires_at String
-  created_at DateTime   @default(now())
-  updated_at DateTime   @updatedAt
+  expires_at    String
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
 
   @@schema("public")
 }
 
 model ig_scope_identifiers {
-  id                   String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  ig_username          String     @unique
-  created_at           DateTime   @default(now())
-  updated_at           DateTime   @updatedAt
-  
-  affiliate_business   Affiliate_Business[]
-  
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ig_username String   @unique
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  affiliate_business Affiliate_Business[]
+
   @@schema("public")
 }
 

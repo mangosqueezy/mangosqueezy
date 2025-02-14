@@ -13,7 +13,7 @@ import { getUserById } from "@/models/business";
 import type { Affiliate_Business } from "@prisma/client";
 import Link from "next/link";
 
-export default async function OrdersPage() {
+export default async function MetricsPage() {
 	const supabase = await createClient();
 	const { data } = await supabase.auth.getUser();
 	const userId = data?.user?.id as string;
