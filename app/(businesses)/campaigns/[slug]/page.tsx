@@ -12,10 +12,11 @@ const redis = new Redis({
 	token: UPSTASH_REDIS_REST_TOKEN!,
 });
 
-export default async function CampaignsPage({
-	params,
-}: { params: { slug: string } }) {
-	const { slug } = params;
+export default async function CampaignsPage(props: {
+	params: Promise<{ slug: Array<string> }>;
+}) {
+	const params = await props.params;
+	const slug = params.slug[0];
 
 	const user = await getUser();
 	const pipelines = user?.pipelines;
