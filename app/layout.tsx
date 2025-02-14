@@ -28,12 +28,12 @@ export const metadata: Metadata = {
 		type: "website",
 		images: [
 			{
-				url: "https://lkjqkobxmgqedqtidcws.supabase.co/storage/v1/object/public/mangosqueezy/opengraph-image.jpg",
+				url: "https://lkjqkobxmgqedqtidcws.supabase.co/storage/v1/object/public/mangosqueezy/github.png",
 				width: 800,
 				height: 600,
 			},
 			{
-				url: "https://lkjqkobxmgqedqtidcws.supabase.co/storage/v1/object/public/mangosqueezy/opengraph-image.jpg",
+				url: "https://lkjqkobxmgqedqtidcws.supabase.co/storage/v1/object/public/mangosqueezy/github.png",
 				width: 1800,
 				height: 1600,
 			},
