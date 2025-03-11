@@ -68,7 +68,7 @@ import { useJune } from "@/hooks/useJune";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Business, Products } from "@prisma/client";
-import { MoreHorizontal, PlusCircle } from "lucide-react";
+import { Loader2, MoreHorizontal, PlusCircle } from "lucide-react";
 import { useActionState, useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import toast, { Toaster, type Toast } from "react-hot-toast";
@@ -79,7 +79,7 @@ import {
 	updateProductAction,
 } from "../actions";
 
-const defaultContent = "<h2>Find and onboard affiliates automatically</h2>";
+const defaultContent = "";
 
 enum PriceType {
 	Subscription = "Subscription",
@@ -184,6 +184,7 @@ export default function Product({
 		isShippable: true,
 	});
 	const [isPending, startTransition] = useTransition();
+	const [isSaving, setIsSaving] = useState(false);
 	const [openEditProductDialog, setOpenEditProductDialog] = useState(false);
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
@@ -203,10 +204,11 @@ export default function Product({
 	});
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
+		setIsSaving(true);
 		const formData = new FormData();
 		formData.append("name", data.name);
 		formData.append("price", data.price);
-		formData.append("description", data.description);
+		formData.append("description", data.description || "");
 		formData.append("html-description", data.htmlDescription || "");
 		formData.append("image-reference-file", data.picture.fileDetails);
 		formData.append("image-reference-file-name", data.picture.name);
@@ -223,9 +225,11 @@ export default function Product({
 				price: data.price,
 				description: data.description,
 			});
+			setOpen(false);
 		} else if (result === "error") {
 			toast.error("Something went wrong please try again later");
 		}
+		setIsSaving(false);
 	}
 
 	useEffect(() => {
@@ -484,9 +488,16 @@ export default function Product({
 											</div>
 										</div>
 										<SheetFooter>
-											<SheetClose asChild>
-												<Button type="submit">Save changes</Button>
-											</SheetClose>
+											<Button type="submit" disabled={isSaving}>
+												{isSaving ? (
+													<>
+														<span className="mr-2">Saving...</span>
+														<Loader2 className="h-4 w-4 animate-spin" />
+													</>
+												) : (
+													"Save changes"
+												)}
+											</Button>
 										</SheetFooter>
 									</form>
 								</Form>
