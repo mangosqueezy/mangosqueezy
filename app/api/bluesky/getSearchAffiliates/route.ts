@@ -1,7 +1,7 @@
 import { getProductById } from "@/models/products";
 import { Redis } from "@upstash/redis";
 import { NextResponse } from "next/server";
-import { evalAi } from "./evalAi";
+import { type Difficulty, evalAi } from "./evalAi";
 import { getKeywords } from "./getKeywords";
 
 const UPSTASH_REDIS_REST_URL = process.env.UPSTASH_REDIS_REST_URL;
@@ -11,6 +11,21 @@ const redis = new Redis({
 	url: UPSTASH_REDIS_REST_URL!,
 	token: UPSTASH_REDIS_REST_TOKEN!,
 });
+
+export type Affiliate = {
+	handle: string;
+	displayName: string;
+	avatar: string;
+	evaluation: "Yes" | "No";
+	tag: string;
+	reason: string;
+	status: "active" | "inactive";
+};
+
+export type potentialAffiliates = {
+	difficulty: string;
+	affiliates: Affiliate[];
+};
 
 type Follower = {
 	did: string;
@@ -112,6 +127,7 @@ export async function GET(request: Request) {
 		const product_id: string = searchParams.get("product_id") || "";
 		const pipeline_id: string = searchParams.get("pipeline_id") || "";
 		const affiliate_count: string = searchParams.get("affiliate_count") || "10";
+		const difficulty: string = searchParams.get("difficulty") || "hard";
 		const followers: Follower[] = [];
 
 		const product = await getProductById(Number.parseInt(product_id));
@@ -179,6 +195,7 @@ export async function GET(request: Request) {
 					const result = await evalAi({
 						handle,
 						postMetrics: postMetrics as PostMetrics | undefined,
+						difficulty: difficulty as Difficulty,
 					});
 					const displayName = followers.find(
 						(follower) => follower.handle === handle,
@@ -192,17 +209,73 @@ export async function GET(request: Request) {
 						handle,
 						displayName,
 						avatar,
+						status: "active",
 						...result,
 					};
 				},
 			),
 		);
 
-		const limitedResults = evaluationResults
-			.filter((result) => result.evaluation === "Yes")
-			.slice(0, Number.parseInt(affiliate_count));
+		const affiliatesFromRedis = (await redis.smembers(
+			pipeline_id,
+		)) as potentialAffiliates[];
+		const potentialAffiliates = affiliatesFromRedis[0]?.affiliates
+			? (affiliatesFromRedis[0].affiliates as unknown as Affiliate[])
+			: [];
 
-		const result = await redis.sadd(pipeline_id, [...limitedResults]);
+		// Filter out results that have matching handles in Redis
+		const filteredResults = evaluationResults
+			.filter((result) => result.evaluation === "Yes")
+			.filter(
+				(result) =>
+					potentialAffiliates.length === 0 ||
+					!potentialAffiliates.some(
+						(affiliate) => affiliate.handle === result.handle,
+					),
+			);
+
+		// Get the required number of active affiliates
+		const potentialAffiliatesLength =
+			potentialAffiliates.length > 0
+				? potentialAffiliates.filter(
+						(affiliate) => affiliate.status === "active",
+					).length
+				: 0;
+		const activeAffiliatesNeeded =
+			Number.parseInt(affiliate_count) - potentialAffiliatesLength;
+		const parsedResults = filteredResults
+			.slice(0, activeAffiliatesNeeded)
+			.map((result) => ({
+				handle: result.handle,
+				displayName: result.displayName,
+				avatar: result.avatar,
+				evaluation: result.evaluation,
+				reason: result.reason,
+				tag: result.tag,
+				status: "active",
+			}));
+
+		// Add existing affiliates from Redis only if they exist
+		if (potentialAffiliates.length > 0) {
+			redis.spop(pipeline_id);
+
+			for (const affiliate of potentialAffiliates) {
+				parsedResults.push({
+					handle: affiliate.handle,
+					displayName: affiliate.displayName,
+					avatar: affiliate.avatar,
+					evaluation: affiliate.evaluation,
+					reason: affiliate.reason,
+					tag: affiliate.tag,
+					status: affiliate.status,
+				});
+			}
+		}
+
+		const result = await redis.sadd(pipeline_id, {
+			difficulty,
+			affiliates: [...parsedResults],
+		});
 
 		return NextResponse.json(result, { status: 200 });
 	} catch (_) {

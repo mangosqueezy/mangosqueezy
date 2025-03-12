@@ -12,6 +12,11 @@ const redis = new Redis({
 	token: UPSTASH_REDIS_REST_TOKEN!,
 });
 
+export type potentialAffiliates = {
+	difficulty: string;
+	affiliates: Affiliate[];
+};
+
 export default async function CampaignsPage(props: {
 	params: Promise<{ slug: string }>;
 }) {
@@ -29,8 +34,11 @@ export default async function CampaignsPage(props: {
 		pipeline_id: pipeline?.id as number,
 	});
 
-	const potentialAffiliates = await redis.smembers(slug);
-	const affiliate = potentialAffiliates[0];
+	const potentialAffiliates = (await redis.smembers(
+		slug,
+	)) as potentialAffiliates[];
+	const affiliate = potentialAffiliates[0].affiliates;
+	const difficulty = potentialAffiliates[0].difficulty;
 
 	return (
 		<div className="container mx-auto px-4 py-8">
@@ -41,6 +49,8 @@ export default async function CampaignsPage(props: {
 					affiliates={affiliate as unknown as Affiliate[]}
 					chatMessages={chatMessages as ChatMessage[]}
 					pipeline_id={pipeline?.id as number}
+					affiliate_count={pipeline?.affiliate_count || 0}
+					difficulty={difficulty}
 				/>
 			)}
 		</div>

@@ -5,10 +5,14 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import type { Products } from "@prisma/client";
 import type { ChatMessage } from "@prisma/client";
-import { ArrowRight, UserCircle } from "lucide-react";
+import { ArrowRight, Loader2, Plus, UserCircle, X } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
-import { createChatMessageAction } from "./actions";
+import { useActionState, useCallback, useEffect, useState } from "react";
+import {
+	createChatMessageAction,
+	deleteAffiliateAction,
+	getAffiliatesAction,
+} from "./actions";
 
 export type Affiliate = {
 	handle: string;
@@ -17,6 +21,7 @@ export type Affiliate = {
 	evaluation: "Yes" | "No";
 	tag: string;
 	reason: string;
+	status: "active" | "inactive";
 };
 
 export default function Campaign({
@@ -25,12 +30,16 @@ export default function Campaign({
 	product,
 	commission,
 	chatMessages,
+	affiliate_count,
+	difficulty,
 }: {
 	pipeline_id: number;
 	affiliates: Affiliate[];
 	product: Products | undefined;
 	commission: number;
 	chatMessages: ChatMessage[];
+	affiliate_count: number;
+	difficulty: string;
 }) {
 	const [selectedAffiliate, setSelectedAffiliate] = useState<Affiliate | null>(
 		null,
@@ -39,6 +48,40 @@ export default function Campaign({
 	const [messages, setMessages] = useState<
 		{ sender: string; text: string; date: Date }[]
 	>([]);
+	const [isLoading, setIsLoading] = useState(false);
+
+	const handleAddAffiliate = useCallback(async () => {
+		setIsLoading(true);
+
+		let nextDifficulty = difficulty;
+		if (difficulty === "hard") {
+			nextDifficulty = "medium";
+		} else if (difficulty === "medium") {
+			nextDifficulty = "easy";
+		}
+
+		await getAffiliatesAction({
+			product_id: product?.id.toString() || "",
+			pipeline_id: pipeline_id.toString(),
+			affiliate_count: affiliate_count.toString(),
+			difficulty: nextDifficulty,
+		});
+		setIsLoading(false);
+	}, [product?.id, pipeline_id, affiliate_count, difficulty]);
+
+	const handleDeleteAffiliate = (handle: string) => {
+		const updatedAffiliates = affiliates.map((affiliate) =>
+			affiliate.handle === handle
+				? { ...affiliate, status: "inactive" as const }
+				: affiliate,
+		);
+
+		deleteAffiliateAction(
+			pipeline_id.toString(),
+			difficulty,
+			updatedAffiliates,
+		);
+	};
 
 	const handleSendMessage = async () => {
 		if (message.trim()) {
@@ -109,7 +152,7 @@ export default function Campaign({
 						</div>
 						<div className="text-center">
 							<p className="text-2xl font-bold text-gray-800">
-								{affiliates.length}
+								{affiliate_count}
 							</p>
 							<p className="text-sm text-gray-600">No of Affiliates</p>
 						</div>
@@ -123,45 +166,79 @@ export default function Campaign({
 					{/* Affiliates List - Updated */}
 					<div className="w-full md:w-[380px] border-r border-gray-100">
 						<div className="p-5 bg-white border-b">
-							<h2 className="text-xl font-bold text-gray-800">Messages</h2>
-							<p className="text-sm text-gray-500 mt-1">
-								Select an affiliate to chat
-							</p>
+							<div className="flex items-center justify-between">
+								<div>
+									<h2 className="text-xl font-bold text-gray-800">Messages</h2>
+									<p className="text-sm text-gray-500 mt-1">
+										Select an affiliate to chat
+									</p>
+								</div>
+								<Button
+									variant="ghost"
+									size="icon"
+									onClick={handleAddAffiliate}
+									className="hover:bg-orange-100"
+									aria-label="Add new affiliate"
+									disabled={isLoading}
+								>
+									{isLoading ? (
+										<Loader2 className="w-5 h-5 text-orange-500 animate-spin" />
+									) : (
+										<Plus className="w-5 h-5 text-orange-500" />
+									)}
+								</Button>
+							</div>
 						</div>
 						<div className="overflow-y-auto h-[calc(100%-85px)]">
-							{affiliates.map((affiliate) => (
-								<div key={`container-${affiliate.handle}`}>
-									<div
-										key={affiliate.handle}
-										className={`flex items-center gap-4 p-5 cursor-pointer transition-all ${
-											selectedAffiliate?.handle === affiliate.handle
-												? "bg-orange-50 border-l-4 border-l-orange-500"
-												: "hover:bg-gray-50 border-l-4 border-l-transparent"
-										}`}
-										onClick={() => setSelectedAffiliate(affiliate)}
-										onKeyDown={(e) =>
-											e.key === "Enter" && setSelectedAffiliate(affiliate)
-										}
-									>
-										<div className="flex items-center gap-3 min-w-0">
-											<Image
-												src={affiliate.avatar}
-												alt="Avatar"
-												width={36}
-												height={36}
-												className="rounded-full"
-											/>
-											<p className="font-semibold text-gray-900 text-sm truncate">
-												{affiliate.displayName}
-											</p>
+							{affiliates
+								.filter((affiliate) => affiliate.status === "active")
+								.map((affiliate) => (
+									<div key={`container-${affiliate.handle}`}>
+										<div
+											key={affiliate.handle}
+											className={`flex items-center justify-between p-5 cursor-pointer transition-all ${
+												selectedAffiliate?.handle === affiliate.handle
+													? "bg-orange-50 border-l-4 border-l-orange-500"
+													: "hover:bg-gray-50 border-l-4 border-l-transparent"
+											}`}
+										>
+											<div
+												className="flex items-center gap-3 min-w-0 flex-grow"
+												onClick={() => setSelectedAffiliate(affiliate)}
+												onKeyDown={(e) =>
+													e.key === "Enter" && setSelectedAffiliate(affiliate)
+												}
+											>
+												<Image
+													src={affiliate.avatar}
+													alt="Avatar"
+													width={36}
+													height={36}
+													className="rounded-full"
+												/>
+												<p className="font-semibold text-gray-900 text-sm truncate">
+													{affiliate.displayName}
+												</p>
+											</div>
+											<Button
+												variant="ghost"
+												type="button"
+												onClick={(e) => {
+													e.stopPropagation();
+													handleDeleteAffiliate(affiliate.handle);
+												}}
+												className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+												aria-label="Delete affiliate"
+											>
+												<X className="w-4 h-4 text-gray-500 hover:text-red-500" />
+											</Button>
 										</div>
+										<Separator
+											className="w-full"
+											key={`${affiliate.handle}-separator`}
+										/>
 									</div>
-									<Separator
-										className="w-full"
-										key={`${affiliate.handle}-separator`}
-									/>
-								</div>
-							))}
+								))}
 						</div>
 					</div>
 

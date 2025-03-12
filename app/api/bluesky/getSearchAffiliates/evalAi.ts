@@ -9,12 +9,19 @@ type PostMetrics = {
 	quoteCount: number;
 };
 
+export type Difficulty = "easy" | "medium" | "hard";
+
 type EvalAiProps = {
 	handle: string;
 	postMetrics?: PostMetrics | undefined;
+	difficulty?: Difficulty;
 };
 
-export async function evalAi({ handle, postMetrics }: EvalAiProps) {
+export async function evalAi({
+	handle,
+	postMetrics,
+	difficulty = "hard",
+}: EvalAiProps) {
 	// Define the schema using zod
 	const evaluationSchema = z.object({
 		evaluation: z.enum(["Yes", "No"]),
@@ -42,7 +49,7 @@ export async function evalAi({ handle, postMetrics }: EvalAiProps) {
 			model: openai("gpt-4o-mini", { structuredOutputs: true }),
 			prompt: `
 				You are an expert in social media marketing. Please evaluate the following data and assess whether the account is a good fit for a brand partnership.
-Be lenient but don’t mark it as ‘Yes’ if it’s not suitable. If you believe the account has potential, mark it as ‘Yes’ and provide a reason along with relevant tags.
+Be ${difficulty} but don’t mark it as ‘Yes’ if it’s not suitable. If you believe the account has potential, mark it as ‘Yes’ and provide a reason along with relevant tags.
 Also, discard profiles where the profile description indicates the user is a founder, co-founder, C-level executive, or investor.
 
 		Profile Description: ${bio}
