@@ -7,12 +7,12 @@
     <br />
     <br />
     <a href="https://mangosqueezy.com">Website</a>
+    <br />
+    <a href="https://www.uneed.best/tool/mangosqueezy">
+      <img src="https://www.uneed.best/POTD1.png" style="width: 250px;" alt="Uneed POTD1 Badge" />
+    </a>
   </p>
 </p>
-
-# Under active development
-
-> The project is currently under development and is not ready to use yet.
 
 # Get started
 

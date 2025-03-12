@@ -91,6 +91,11 @@ export default function ElegantOnboarding({
 			case 1:
 				return (
 					<div className="relative">
+						<p className="text-sm text-gray-500 mb-2">
+							How much commission do you want to offer to affiliates? eg 10, 20,
+							30, etc. The entered commission will be paid out to the affiliate
+							when they make a sale.
+						</p>
 						<Input
 							id="commission"
 							name="commission"
@@ -136,23 +141,31 @@ export default function ElegantOnboarding({
 		<>
 			<Toaster position="top-right" />
 
-			<div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4 relative overflow-hidden">
-				<div className="absolute inset-0 overflow-hidden">
-					<div className="absolute left-0 top-0 h-[800px] w-[800px] animate-blob rounded-full bg-gradient-to-r from-purple-300 to-pink-300 opacity-70 mix-blend-multiply blur-xl filter" />
-					<div className="animation-delay-2000 absolute right-0 top-0 h-[600px] w-[600px] animate-blob rounded-full bg-gradient-to-r from-yellow-300 to-pink-300 opacity-70 mix-blend-multiply blur-xl filter" />
-					<div className="animation-delay-4000 absolute bottom-0 left-20 h-[700px] w-[700px] animate-blob rounded-full bg-gradient-to-r from-blue-300 to-green-300 opacity-70 mix-blend-multiply blur-xl filter" />
-				</div>
-				<div className="bg-white bg-opacity-80 backdrop-blur-lg rounded-xl shadow-xl overflow-hidden w-full max-w-4xl flex flex-col lg:flex-row relative z-10">
-					<div className="bg-gray-900 bg-opacity-90 text-white p-8 lg:w-1/3">
-						<h2 className="text-2xl font-bold mb-6">Welcome Aboard</h2>
+			<div className="min-h-screen bg-white flex items-center justify-center p-4 relative">
+				{/* Subtle background pattern */}
+				<div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-50" />
+
+				{/* Subtle gradient overlay */}
+				<div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-gray-100 opacity-70" />
+
+				{/* Main content */}
+				<div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200 w-full max-w-4xl flex flex-col lg:flex-row relative z-10">
+					<div className="bg-gray-50/80 backdrop-blur-sm border-r border-gray-200 p-8 lg:w-1/3">
+						<h2 className="text-2xl font-bold mb-6 text-gray-900">
+							Welcome Aboard
+						</h2>
 						<ul className="space-y-4">
 							{steps.map((step, index) => (
 								<li
 									key={`${index}-${step}`}
-									className={`flex items-center space-x-2 ${index <= currentStep ? "text-white" : "text-gray-400"}`}
+									className={`flex items-center space-x-2 ${index <= currentStep ? "text-gray-900" : "text-gray-400"}`}
 								>
 									<div
-										className={`w-6 h-6 rounded-full flex items-center justify-center ${index <= currentStep ? "bg-green-600" : "bg-gray-700 animate-pulse"}`}
+										className={`w-6 h-6 rounded-full flex items-center justify-center border ${
+											index <= currentStep
+												? "bg-black text-white border-black"
+												: "bg-gray-50 border-gray-300"
+										}`}
 									>
 										{index < currentStep ? (
 											<CircleCheck className="h-4 w-4" />
@@ -160,20 +173,20 @@ export default function ElegantOnboarding({
 											index + 1
 										)}
 									</div>
-									<span>{step}</span>
+									<span className="font-medium">{step}</span>
 								</li>
 							))}
 						</ul>
 					</div>
-					<div className="p-8 lg:w-2/3">
+					<div className="p-8 lg:w-2/3 bg-white/80 backdrop-blur-sm">
 						<div className="space-y-6 h-48">
 							<div className="mb-8">
-								<h3 className="text-2xl font-semibold mb-2">
+								<h3 className="text-2xl font-semibold mb-2 text-gray-900">
 									{steps[currentStep]}
 								</h3>
-								<div className="h-1 w-full bg-gray-200 rounded-full overflow-hidden">
+								<div className="h-1 w-full bg-gray-100 rounded-full overflow-hidden">
 									<div
-										className="h-full bg-primary transition-all duration-500 ease-out"
+										className="h-full bg-black transition-all duration-500 ease-out"
 										style={{
 											width: `${((currentStep + 1) / steps.length) * 100}%`,
 										}}
@@ -198,18 +211,27 @@ export default function ElegantOnboarding({
 								onClick={() => handleStepChange("previous")}
 								disabled={currentStep === 0}
 								variant="outline"
+								className="border-gray-200 hover:bg-gray-50 hover:text-black"
 							>
 								<ChevronLeft className="mr-2 h-4 w-4" /> Previous
 							</Button>
 							{currentStep < steps.length - 1 ? (
-								<Button type="button" onClick={() => handleStepChange("next")}>
+								<Button
+									type="button"
+									onClick={() => handleStepChange("next")}
+									className="bg-black hover:bg-gray-900 text-white"
+								>
 									Next <ChevronRight className="ml-2 h-4 w-4" />
 								</Button>
 							) : (
-								<Button type="button" onClick={handleSubmit}>
+								<Button
+									type="button"
+									onClick={handleSubmit}
+									className="bg-black hover:bg-gray-900 text-white"
+								>
 									{isLoading ? (
 										<span className="flex items-center">
-											<Loader className="h-4 w-4 mr-1 text-gray-400 animate-spin" />
+											<Loader className="h-4 w-4 mr-1 animate-spin" />
 											Submitting
 										</span>
 									) : (
