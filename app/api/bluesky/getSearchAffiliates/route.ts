@@ -224,7 +224,7 @@ export async function GET(request: Request) {
 			: [];
 
 		// Filter out results that have matching handles in Redis
-		const filteredResults = evaluationResults
+		let filteredResults = evaluationResults
 			.filter((result) => result.evaluation === "Yes")
 			.filter(
 				(result) =>
@@ -233,6 +233,86 @@ export async function GET(request: Request) {
 						(affiliate) => affiliate.handle === result.handle,
 					),
 			);
+
+		// If no results found and difficulty is hard, try medium
+		if (filteredResults.length === 0 && difficulty === "hard") {
+			const mediumResults = await Promise.all(
+				Object.entries(authorFeedsWithMetrics).map(
+					async ([handle, postMetrics]) => {
+						const result = await evalAi({
+							handle,
+							postMetrics: postMetrics as PostMetrics | undefined,
+							difficulty: "medium" as Difficulty,
+						});
+						const displayName = followers.find(
+							(follower) => follower.handle === handle,
+						)?.displayName;
+
+						const avatar = followers.find(
+							(follower) => follower.handle === handle,
+						)?.avatar;
+
+						return {
+							handle,
+							displayName,
+							avatar,
+							status: "active",
+							...result,
+						};
+					},
+				),
+			);
+
+			filteredResults = mediumResults
+				.filter((result) => result.evaluation === "Yes")
+				.filter(
+					(result) =>
+						potentialAffiliates.length === 0 ||
+						!potentialAffiliates.some(
+							(affiliate) => affiliate.handle === result.handle,
+						),
+				);
+
+			// If still no results and difficulty was medium, try easy
+			if (filteredResults.length === 0) {
+				const easyResults = await Promise.all(
+					Object.entries(authorFeedsWithMetrics).map(
+						async ([handle, postMetrics]) => {
+							const result = await evalAi({
+								handle,
+								postMetrics: postMetrics as PostMetrics | undefined,
+								difficulty: "easy" as Difficulty,
+							});
+							const displayName = followers.find(
+								(follower) => follower.handle === handle,
+							)?.displayName;
+
+							const avatar = followers.find(
+								(follower) => follower.handle === handle,
+							)?.avatar;
+
+							return {
+								handle,
+								displayName,
+								avatar,
+								status: "active",
+								...result,
+							};
+						},
+					),
+				);
+
+				filteredResults = easyResults
+					.filter((result) => result.evaluation === "Yes")
+					.filter(
+						(result) =>
+							potentialAffiliates.length === 0 ||
+							!potentialAffiliates.some(
+								(affiliate) => affiliate.handle === result.handle,
+							),
+					);
+			}
+		}
 
 		// Get the required number of active affiliates
 		const potentialAffiliatesLength =
