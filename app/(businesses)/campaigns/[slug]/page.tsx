@@ -42,17 +42,15 @@ export default async function CampaignsPage(props: {
 
 	return (
 		<div className="container mx-auto px-4 py-8">
-			{affiliate.length > 0 && (
-				<Campaign
-					product={product}
-					commission={user?.commission || 0}
-					affiliates={affiliate as unknown as Affiliate[]}
-					chatMessages={chatMessages as ChatMessage[]}
-					pipeline_id={pipeline?.id as number}
-					affiliate_count={pipeline?.affiliate_count || 0}
-					difficulty={difficulty}
-				/>
-			)}
+			<Campaign
+				product={product}
+				commission={user?.commission || 0}
+				affiliates={affiliate as unknown as Affiliate[]}
+				chatMessages={chatMessages as ChatMessage[]}
+				pipeline_id={pipeline?.id as number}
+				affiliate_count={pipeline?.affiliate_count || 0}
+				difficulty={difficulty}
+			/>
 		</div>
 	);
 }

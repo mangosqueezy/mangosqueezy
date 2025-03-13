@@ -127,7 +127,7 @@ export async function GET(request: Request) {
 		const product_id: string = searchParams.get("product_id") || "";
 		const pipeline_id: string = searchParams.get("pipeline_id") || "";
 		const affiliate_count: string = searchParams.get("affiliate_count") || "10";
-		const difficulty: string = searchParams.get("difficulty") || "hard";
+		let difficulty: string = searchParams.get("difficulty") || "hard";
 		const followers: Follower[] = [];
 
 		const product = await getProductById(Number.parseInt(product_id));
@@ -236,13 +236,14 @@ export async function GET(request: Request) {
 
 		// If no results found and difficulty is hard, try medium
 		if (filteredResults.length === 0 && difficulty === "hard") {
+			difficulty = "medium";
 			const mediumResults = await Promise.all(
 				Object.entries(authorFeedsWithMetrics).map(
 					async ([handle, postMetrics]) => {
 						const result = await evalAi({
 							handle,
 							postMetrics: postMetrics as PostMetrics | undefined,
-							difficulty: "medium" as Difficulty,
+							difficulty: difficulty as Difficulty,
 						});
 						const displayName = followers.find(
 							(follower) => follower.handle === handle,
@@ -275,13 +276,14 @@ export async function GET(request: Request) {
 
 			// If still no results and difficulty was medium, try easy
 			if (filteredResults.length === 0) {
+				difficulty = "easy";
 				const easyResults = await Promise.all(
 					Object.entries(authorFeedsWithMetrics).map(
 						async ([handle, postMetrics]) => {
 							const result = await evalAi({
 								handle,
 								postMetrics: postMetrics as PostMetrics | undefined,
-								difficulty: "easy" as Difficulty,
+								difficulty: difficulty as Difficulty,
 							});
 							const displayName = followers.find(
 								(follower) => follower.handle === handle,

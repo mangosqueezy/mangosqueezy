@@ -137,9 +137,9 @@ export default function Campaign({
 	return (
 		<div className="container mx-auto px-4">
 			{/* Header Section */}
-			<div className="mb-8 bg-white rounded-lg shadow-sm p-6">
+			<div className="mb-8 bg-white rounded-lg border border-gray-200 p-6">
 				<div className="flex flex-col lg:flex-row gap-8 items-center">
-					<div className="w-full lg:w-1/4">
+					<div className="w-full h-full lg:w-1/4">
 						<div className="relative aspect-square w-full">
 							<Image
 								src={product?.image_url || ""}
@@ -156,7 +156,7 @@ export default function Campaign({
 						<p className="text-gray-700 text-sm">{product?.description}</p>
 					</div>
 
-					<div className="w-full lg:w-1/4 flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg">
+					<div className="w-full lg:w-1/4 flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg border border-gray-200">
 						<div className="text-center mb-4">
 							<p className="text-3xl font-bold text-green-500">{commission}%</p>
 							<p className="text-sm text-gray-600">Commission Rate</p>
@@ -170,6 +170,25 @@ export default function Campaign({
 					</div>
 				</div>
 			</div>
+
+			{affiliates.length === 0 && (
+				<div className="my-4 p-4 bg-orange-50 rounded-lg border border-orange-200">
+					<p className="text-xs text-orange-700">
+						We couldn't find suitable affiliates for this product. This might be
+						because:
+					</p>
+					<ul className="mt-2 text-xs text-orange-600 list-disc list-inside">
+						<li>
+							The product description needs more specific details, it might be
+							too broad
+						</li>
+					</ul>
+					<p className="mt-2 text-xs text-orange-700">
+						Consider updating the product description with more specific details
+						and product benefits.
+					</p>
+				</div>
+			)}
 
 			{/* Updated Chat Interface */}
 			<div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
