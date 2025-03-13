@@ -7,7 +7,13 @@ import type { Products } from "@prisma/client";
 import type { ChatMessage } from "@prisma/client";
 import { ArrowRight, Loader2, Plus, UserCircle, X } from "lucide-react";
 import Image from "next/image";
-import { useActionState, useCallback, useEffect, useState } from "react";
+import {
+	useActionState,
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+} from "react";
 import {
 	createChatMessageAction,
 	deleteAffiliateAction,
@@ -99,6 +105,11 @@ export default function Campaign({
 		}
 	};
 
+	const activeAffiliates = useMemo(
+		() => affiliates.filter((affiliate) => affiliate.status === "active"),
+		[affiliates],
+	);
+
 	useEffect(() => {
 		if (selectedAffiliate) {
 			const messages = chatMessages
@@ -173,20 +184,23 @@ export default function Campaign({
 										Select an affiliate to chat
 									</p>
 								</div>
-								<Button
-									variant="ghost"
-									size="icon"
-									onClick={handleAddAffiliate}
-									className="hover:bg-orange-100"
-									aria-label="Add new affiliate"
-									disabled={isLoading}
-								>
-									{isLoading ? (
-										<Loader2 className="w-5 h-5 text-orange-500 animate-spin" />
-									) : (
-										<Plus className="w-5 h-5 text-orange-500" />
-									)}
-								</Button>
+
+								{activeAffiliates.length !== affiliate_count && (
+									<Button
+										variant="ghost"
+										size="icon"
+										onClick={handleAddAffiliate}
+										className="hover:bg-orange-100"
+										aria-label="Add new affiliate"
+										disabled={isLoading}
+									>
+										{isLoading ? (
+											<Loader2 className="w-5 h-5 text-orange-500 animate-spin" />
+										) : (
+											<Plus className="w-5 h-5 text-orange-500" />
+										)}
+									</Button>
+								)}
 							</div>
 						</div>
 						<div className="overflow-y-auto h-[calc(100%-85px)]">
