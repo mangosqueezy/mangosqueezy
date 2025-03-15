@@ -17,14 +17,14 @@ import Image from "next/image";
 export const metadata: Metadata = {
 	title: "Pricing",
 	description:
-		"Companies all over the world have closed millions of affiliate deals with mangosqueezy. Sign up today and start growing your business smarter.",
+		"AI affiliate agent to find affiliates for your SaaS business. Sign up today and start growing your business smarter.",
 };
 
 const tiers = [
 	{
 		name: "Starter" as const,
 		slug: "starter",
-		description: "Everything you need to start selling.",
+		description: "Everything you need to start.",
 		priceMonthly: 0,
 		href: "/login",
 		highlights: [
@@ -110,11 +110,10 @@ const tiers = [
 function Header() {
 	return (
 		<Container className="mt-16">
-			<Heading as="h1">Pricing that grows with your team size.</Heading>
+			<Heading as="h1">Simple Pricing</Heading>
 			<Lead className="mt-6 max-w-3xl">
-				Companies all over the world have closed millions of affiliate deals
-				with mangosqueezy. Sign up today and start growing your business
-				smarter.
+				AI affiliate agent to find affiliates for your SaaS business. Sign up
+				today and start growing your business smarter.
 			</Lead>
 		</Container>
 	);

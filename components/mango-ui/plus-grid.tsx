@@ -13,9 +13,11 @@ export function PlusGrid({
 export function PlusGridRow({
 	className = "",
 	children,
+	rowClassName = "w-screen",
 }: {
 	className?: string;
 	children: React.ReactNode;
+	rowClassName?: string;
 }) {
 	return (
 		<div
@@ -26,7 +28,10 @@ export function PlusGridRow({
 		>
 			<div
 				aria-hidden="true"
-				className="absolute inset-y-0 left-1/2 -z-10 w-screen -translate-x-1/2"
+				className={clsx(
+					"absolute inset-y-0 left-1/2 -z-10 -translate-x-1/2",
+					rowClassName,
+				)}
 			>
 				<div className="absolute inset-x-0 top-0 border-t border-black/5" />
 				<div className="absolute inset-x-0 top-2 border-t border-black/5" />

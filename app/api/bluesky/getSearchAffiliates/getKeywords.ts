@@ -16,7 +16,7 @@ ${description}
 		`;
 
 		const result = await generateObject({
-			model: google("gemini-2.0-flash-exp"),
+			model: google("gemini-2.0-flash"),
 			prompt: prompt,
 			schema: z.object({
 				keywords: z.array(z.string()),
