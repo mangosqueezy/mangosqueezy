@@ -80,11 +80,11 @@ function BentoSection() {
 
 			<div className="mt-10 grid grid-cols-1 gap-4 sm:mt-16 lg:grid-cols-6 lg:grid-rows-2">
 				<BentoCard
-					eyebrow="Insight"
-					title="Get perfect clarity"
-					description="mangosqueezy uses social engineering to build a detailed analytics picture of your affiliates. Know their conversion rate, engagement rate, and more."
+					eyebrow="Chat"
+					title="Chat with affiliates"
+					description="Chat with your affiliates to build relationships, answer questions, and provide support. Keep all your affiliate communications organized in one place."
 					graphic={
-						<div className="h-80 bg-[url(/screenshots/affiliate-dashboard.jpeg)] bg-[size:1000px_560px] bg-[left_-300px_top_-50px] bg-no-repeat" />
+						<div className="h-80 bg-[url(/screenshots/chat.png)] bg-[left_0px_top_-80px] bg-no-repeat" />
 					}
 					fade={["bottom"]}
 					className="max-lg:rounded-t-4xl lg:col-span-3 lg:rounded-tl-4xl"
@@ -94,7 +94,7 @@ function BentoSection() {
 					title="Analyze your affiliates"
 					description="With our advanced data analytics, you'll know how your affiliates are performing and how to improve their performance."
 					graphic={
-						<div className="absolute inset-0 bg-[url(/screenshots/analytics.png)] bg-[size:900px_430px] bg-[left_-120px_top_-53px] bg-no-repeat" />
+						<div className="absolute inset-0 bg-[url(/screenshots/analytics.png)] bg-[left_-500px_bottom_-100px] bg-no-repeat" />
 					}
 					fade={["bottom"]}
 					className="lg:col-span-3 lg:rounded-tr-4xl"
@@ -104,7 +104,7 @@ function BentoSection() {
 					title="Easy to add products"
 					description="mangosqueezy is easy to add products for affiliates."
 					graphic={
-						<div className="absolute inset-0 bg-[url(/screenshots/products.png)] bg-[size:230px_400px] bg-[left_50px_top_-43px] bg-no-repeat" />
+						<div className="absolute inset-0 bg-[url(/screenshots/products.png)] bg-no-repeat" />
 					}
 					fade={["bottom"]}
 					className="lg:col-span-2 lg:rounded-bl-4xl"
