@@ -1,6 +1,6 @@
 "use client";
 
-import mangosqueezy from "@/assets/mangosqueezy-primary-logo.svg";
+import mangosqueezy from "@/assets/mango.jpg";
 import { clsx } from "clsx";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -55,7 +55,7 @@ function Circles() {
 function MainLogo() {
 	return (
 		<div className="absolute left-44 top-32 flex size-16 items-center justify-center rounded-full bg-white shadow ring-1 ring-black/5">
-			<Image src={mangosqueezy} alt="Mango Squeezy" width={64} height={64} />
+			<Image src={mangosqueezy} alt="mangosqueezy" width={32} height={32} />
 		</div>
 	);
 }
