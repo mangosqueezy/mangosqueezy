@@ -26,9 +26,11 @@ interface ExistingUserFormInputs {
 export function ConnectifyForm({
 	products,
 	businessId,
+	commission_percentage,
 }: {
 	products: Products[] | [];
 	businessId: string;
+	commission_percentage: number;
 }) {
 	const [selectedProduct, setSelectedProduct] = useState<Products | null>(null);
 	const [submitting, setSubmitting] = useState(false);
@@ -420,6 +422,36 @@ export function ConnectifyForm({
 									>
 										{selectedProduct.name}
 									</motion.h2>
+									<motion.div
+										initial={{ opacity: 0, y: 20 }}
+										animate={{ opacity: 1, y: 0 }}
+										transition={{ duration: 0.6, delay: 0.1 }}
+										className="flex items-center justify-between bg-orange-50 p-4 rounded-lg"
+									>
+										<div>
+											<p className="text-sm text-orange-700 font-medium">
+												Product Price
+											</p>
+											<p className="text-2xl font-bold text-orange-900">
+												${selectedProduct.price}
+											</p>
+										</div>
+										<div className="text-right">
+											<p className="text-sm text-orange-700 font-medium">
+												Your Commission
+											</p>
+											<p className="text-2xl font-bold text-orange-900">
+												$
+												{(
+													(commission_percentage / 100) *
+													selectedProduct.price
+												).toFixed(2)}
+											</p>
+											<p className="text-sm text-orange-600">
+												({commission_percentage}%)
+											</p>
+										</div>
+									</motion.div>
 									<motion.p
 										initial={{ opacity: 0, y: 20 }}
 										animate={{ opacity: 1, y: 0 }}

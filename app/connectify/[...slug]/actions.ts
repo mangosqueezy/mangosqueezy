@@ -1,5 +1,6 @@
 "use server";
 
+import AffiliateEmailTemplate from "@/components/mango-ui/affiliate-email-template";
 import { getAffiliateBusinessInfoById } from "@/models/affiliate_business";
 import {
 	createAffiliate,
@@ -7,6 +8,7 @@ import {
 	getAffiliateByEmail,
 } from "@/models/affiliates";
 import { Dub } from "dub";
+import { Resend } from "resend";
 
 const defaultSocialMediaProfiles = {
 	url: "",
@@ -15,6 +17,7 @@ const defaultSocialMediaProfiles = {
 };
 
 const DUB_API_KEY = process.env.DUB_API_KEY;
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function checkAndCreateAffiliate(formData: FormData) {
 	const first_name = formData.get("first_name") as string;
@@ -63,6 +66,17 @@ export async function checkAndCreateAffiliate(formData: FormData) {
 				affiliate_link_key: affiliate_link_key,
 			});
 
+			await resend.emails.send({
+				from: "mangosqueezy <amit@tapasom.com>",
+				to: [email],
+				replyTo: "amit@tapasom.com",
+				subject:
+					"Thank you for promoting our products! Here's your affiliate link.",
+				react: AffiliateEmailTemplate({
+					affiliateLink: affiliate_link,
+				}) as React.ReactElement,
+			});
+
 			return "successfully you have been added as a partner for this product with a business";
 		}
 
@@ -93,6 +107,17 @@ export async function checkAndCreateAffiliate(formData: FormData) {
 			pipeline_id: Number(pipeline_id),
 			affiliate_link: affiliate_link,
 			affiliate_link_key: affiliate_link_key,
+		});
+
+		await resend.emails.send({
+			from: "mangosqueezy <amit@tapasom.com>",
+			to: [email],
+			replyTo: "amit@tapasom.com",
+			subject:
+				"Thank you for promoting our products! Here's your affiliate link.",
+			react: AffiliateEmailTemplate({
+				affiliateLink: affiliate_link,
+			}) as React.ReactElement,
 		});
 
 		return "successfully you have been added as a partner for this product with a business";
