@@ -115,22 +115,49 @@ export async function udpateAffiliateStatus(
 
 type TAffiliateBusiness = Pick<
 	Affiliate_Business,
-	"business_id" | "affiliate_id" | "product_id"
+	| "business_id"
+	| "affiliate_id"
+	| "product_id"
+	| "pipeline_id"
+	| "affiliate_link"
+	| "affiliate_link_key"
 >;
 
 export async function createAffiliateBusiness({
 	business_id,
 	affiliate_id,
 	product_id,
+	pipeline_id,
+	affiliate_link,
+	affiliate_link_key,
 }: TAffiliateBusiness) {
 	try {
-		return prisma.affiliate_Business.create({
+		if (pipeline_id) {
+			const result = await prisma.affiliate_Business.create({
+				data: {
+					business_id,
+					affiliate_id,
+					product_id,
+					pipeline_id,
+					affiliate_link,
+					affiliate_link_key,
+				},
+			});
+
+			return result;
+		}
+
+		const result = await prisma.affiliate_Business.create({
 			data: {
 				business_id,
 				affiliate_id,
 				product_id,
+				affiliate_link,
+				affiliate_link_key,
 			},
 		});
+
+		return result;
 	} catch (err) {
 		console.error(err);
 	}

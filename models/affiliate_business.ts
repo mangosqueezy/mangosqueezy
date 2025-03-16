@@ -25,6 +25,18 @@ export async function getAffiliateBusinessInfoById(
 					wallet_address: true,
 					svix_consumer_app_id: true,
 					payment_preference: true,
+					products: {
+						select: {
+							id: true,
+							name: true,
+							description: true,
+						},
+					},
+					pipelines: {
+						select: {
+							id: true,
+						},
+					},
 				},
 			},
 		},

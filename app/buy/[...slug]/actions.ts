@@ -3,7 +3,7 @@
 import { isRealTimePaymentsEnabled } from "@/config/flags";
 import { getAffiliateBusinessInfoById } from "@/models/affiliate_business";
 import { createOrder } from "@/models/orders";
-import { payoutTask } from "@/trigger/payout-job";
+import { Client } from "@upstash/qstash";
 import { redirect } from "next/navigation";
 
 type PaymentPreference =
@@ -11,6 +11,10 @@ type PaymentPreference =
 	| "HalfCryptoHalfFiat"
 	| "FullFiat"
 	| undefined;
+
+const client = new Client({
+	token: process.env.QSTASH_TOKEN as string,
+});
 
 export async function createOrderAction(formData: FormData) {
 	const email = formData.get("email") as string;
@@ -37,21 +41,26 @@ export async function createOrderAction(formData: FormData) {
 			Number.parseInt(affiliate_id),
 		);
 
-		await payoutTask.trigger({
-			affiliate_id: Number.parseInt(affiliate_id),
-			business_id,
-			svix_consumer_app_id: information?.business.svix_consumer_app_id!,
-			commission: information?.business.commission as number,
-			amount,
-			business_wallet_address: information?.business.wallet_address as string,
-			affiliate_wallet_address: information?.affiliate.wallet_address as string,
-			business_email: information?.business.email as string,
-			affiliate_email: information?.affiliate.email as string,
-			product_id,
-			email,
-			payment_preference: information?.business
-				.payment_preference satisfies PaymentPreference,
-			realTimePaymentsEnabled: realTimePaymentsEnabled as boolean,
+		await client.publishJSON({
+			url: "https://www.mangosqueezy.com/api/qstash/background/payout",
+			body: {
+				affiliate_id: Number.parseInt(affiliate_id),
+				business_id,
+				svix_consumer_app_id: information?.business.svix_consumer_app_id!,
+				commission: information?.business.commission as number,
+				amount,
+				business_wallet_address: information?.business.wallet_address as string,
+				affiliate_wallet_address: information?.affiliate
+					.wallet_address as string,
+				business_email: information?.business.email as string,
+				affiliate_email: information?.affiliate.email as string,
+				product_id,
+				email,
+				payment_preference: information?.business
+					.payment_preference satisfies PaymentPreference,
+				realTimePaymentsEnabled: realTimePaymentsEnabled as boolean,
+			},
+			callback: "https://www.mangosqueezy.com/api/callback/qstash/payout",
 		});
 	} catch (err) {
 		console.error(err);
