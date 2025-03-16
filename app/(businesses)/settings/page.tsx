@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import {
 	Card,
 	CardContent,
@@ -8,14 +9,18 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { Business } from "@prisma/client";
+import type { Business, Products } from "@prisma/client";
+import { Copy, Mail, Share2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { getUser } from "../actions";
 
 export default function Settings() {
-	const [loggedInUser, setLoggedInUser] = useState<Business | undefined | null>(
-		null,
-	);
+	const router = useRouter();
+	const [loggedInUser, setLoggedInUser] = useState<
+		(Business & { products: Products[] }) | undefined | null
+	>(null);
+	const [copyStatus, setCopyStatus] = useState<string>("");
 
 	const getLoggedInUser = useCallback(async () => {
 		const user = await getUser();
@@ -26,30 +31,136 @@ export default function Settings() {
 		getLoggedInUser();
 	}, [getLoggedInUser]);
 
+	const copyToClipboard = async (text: string) => {
+		try {
+			await navigator.clipboard.writeText(text);
+			setCopyStatus("Link copied to clipboard!");
+			setTimeout(() => setCopyStatus(""), 2000);
+		} catch (err) {
+			setCopyStatus("Failed to copy link");
+			setTimeout(() => setCopyStatus(""), 2000);
+		}
+	};
+
 	return (
-		<div className="flex flex-col items-center justify-center w-full h-full">
-			<Card className="w-[350px]">
-				<CardHeader>
-					<CardTitle>Settings</CardTitle>
-					<CardDescription>Your profile settings</CardDescription>
-				</CardHeader>
-				<CardContent>
-					<form>
-						<div className="grid w-full items-center gap-4">
-							<div className="flex flex-col space-y-1.5">
-								<Label htmlFor="email">Email</Label>
-								<Input
-									disabled
-									type="email"
-									value={loggedInUser?.email || ""}
-									id="email"
-									className="cursor-not-allowed"
-								/>
+		<div className="container mx-auto px-4 py-8 max-w-3xl">
+			<div className="space-y-6">
+				{/* Profile Section */}
+				<div>
+					<h2 className="text-2xl font-semibold tracking-tight mb-6">
+						Settings
+					</h2>
+					<Card className="border border-orange-200 bg-orange-20">
+						<CardHeader>
+							<div className="flex items-center gap-2">
+								<Mail className="h-5 w-5 text-muted-foreground" />
+								<CardTitle>Profile Information</CardTitle>
 							</div>
-						</div>
-					</form>
-				</CardContent>
-			</Card>
+							<CardDescription>
+								Manage your account settings and email preferences
+							</CardDescription>
+						</CardHeader>
+						<CardContent>
+							<div className="space-y-4">
+								<div>
+									<Label htmlFor="email" className="text-sm font-medium">
+										Email Address
+									</Label>
+									<div className="mt-1">
+										<Input
+											disabled
+											type="email"
+											value={loggedInUser?.email || ""}
+											id="email"
+											className="bg-muted cursor-not-allowed"
+										/>
+									</div>
+									<p className="mt-1 text-sm text-muted-foreground">
+										This is the email associated with your account
+									</p>
+								</div>
+							</div>
+						</CardContent>
+					</Card>
+				</div>
+
+				{/* Affiliate Section */}
+				<div>
+					<Card className="border border-orange-200 bg-orange-20">
+						<CardHeader>
+							<div className="flex items-center gap-2">
+								<Share2 className="h-5 w-5 text-muted-foreground" />
+								<CardTitle>Affiliate Invitation</CardTitle>
+							</div>
+							<CardDescription>
+								Share this link with potential affiliates to promote your
+								products
+							</CardDescription>
+						</CardHeader>
+						<CardContent>
+							{loggedInUser?.products && loggedInUser.products.length > 0 ? (
+								<div className="space-y-4">
+									<div>
+										<Label className="text-sm font-medium">
+											Your Affiliate Invitation Link
+										</Label>
+										<div className="mt-2 flex gap-2">
+											<div className="relative flex-1">
+												<Input
+													readOnly
+													value={`https://www.mangosqueezy.com/connectify/${loggedInUser.id}`}
+													className="pr-24 font-mono text-sm bg-muted"
+												/>
+											</div>
+											<Button
+												variant="secondary"
+												size="default"
+												onClick={() =>
+													copyToClipboard(
+														`https://www.mangosqueezy.com/connectify/${loggedInUser.id}`,
+													)
+												}
+												className="shrink-0 flex items-center gap-2"
+											>
+												<Copy className="h-4 w-4" />
+												Copy
+											</Button>
+										</div>
+										{copyStatus && (
+											<p
+												className={`mt-2 text-sm ${
+													copyStatus.includes("Failed")
+														? "text-destructive"
+														: "text-green-600"
+												}`}
+											>
+												{copyStatus}
+											</p>
+										)}
+										<p className="mt-3 text-sm text-muted-foreground">
+											Share this link with potential affiliates. They can use it
+											to sign up and start promoting your products.
+										</p>
+									</div>
+								</div>
+							) : (
+								<div className="py-4 text-center">
+									<p className="text-sm text-muted-foreground">
+										Add a product first to get your affiliate invitation link
+									</p>
+									<Button
+										variant="outline"
+										className="mt-4"
+										onClick={() => router.push("/products")}
+									>
+										Add Your First Product
+									</Button>
+								</div>
+							)}
+						</CardContent>
+					</Card>
+				</div>
+			</div>
 		</div>
 	);
 }
