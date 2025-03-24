@@ -355,6 +355,7 @@ export async function GET(request: Request) {
 		}
 
 		const result = await redis.sadd(pipeline_id, {
+			platform: "bluesky",
 			difficulty,
 			affiliates: [...parsedResults],
 		});

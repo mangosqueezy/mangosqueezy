@@ -46,9 +46,11 @@ export async function deleteAffiliateAction(
 	pipeline_id: string,
 	difficulty: string,
 	affiliates: Affiliate[],
+	platform: string,
 ) {
 	await redis.spop(pipeline_id);
 	await redis.sadd(pipeline_id, {
+		platform,
 		difficulty,
 		affiliates: [...affiliates],
 	});

@@ -16,6 +16,7 @@ export async function createPipelineAction(
 	affiliate_count: number,
 	location: string,
 	business_id: string,
+	platform: string,
 ) {
 	const pipeline = await createPipeline({
 		product_id,
@@ -31,12 +32,23 @@ export async function createPipelineAction(
 		productId: product_id,
 	});
 
-	await fetch(
-		`https://www.mangosqueezy.com/api/bluesky/getSearchAffiliates?product_id=${product_id}&limit=100&pipeline_id=${pipeline?.id}&affiliate_count=${affiliate_count}`,
-		{
-			method: "GET",
-		},
-	);
+	const platform_name = platform.toLowerCase();
+
+	if (platform_name === "instagram") {
+		await fetch(
+			`https://mangosqueezy-hono-app-76817065059.us-central1.run.app/api/search-ig-user?q=${product?.description}&affiliateCount=${affiliate_count}&pipeline_id=${pipeline?.id}&difficulty=medium`,
+			{
+				method: "GET",
+			},
+		);
+	} else if (platform_name === "bluesky") {
+		await fetch(
+			`https://www.mangosqueezy.com/api/bluesky/getSearchAffiliates?product_id=${product_id}&limit=100&pipeline_id=${pipeline?.id}&affiliate_count=${affiliate_count}`,
+			{
+				method: "GET",
+			},
+		);
+	}
 
 	const resend = new Resend(process.env.RESEND_API_KEY);
 	await resend.emails.send({

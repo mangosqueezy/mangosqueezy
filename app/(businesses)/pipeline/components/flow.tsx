@@ -26,9 +26,12 @@ import type {
 	AppState,
 	AffiliatesNode as TAffiliatesNode,
 	InputNode as TInputNode,
+	PlatformNode as TPlatformNode,
 } from "../types/appNode";
 import AffiliatesNode from "./affiliates-node";
 import InputNode from "./input-node";
+import OutputNode from "./output-node";
+import PlatformNode from "./platform-node";
 
 type TFlowProps = {
 	products: Array<Products> | null | undefined;
@@ -53,6 +56,8 @@ const rfStyle = {
 const nodeTypes = {
 	inputProduct: InputNode,
 	inputAffiliate: AffiliatesNode,
+	inputPlatform: PlatformNode,
+	output: OutputNode,
 };
 
 function Flow({ products, business_id }: TFlowProps) {
@@ -87,6 +92,9 @@ function Flow({ products, business_id }: TFlowProps) {
 		const affiliate = nodes.find(
 			(node) => node.id === "node-2",
 		) as TAffiliatesNode;
+		const platform = nodes.find(
+			(node) => node.id === "node-3",
+		) as TPlatformNode;
 
 		let product_id = Number.parseInt(product.data.value);
 		if (product.data.value === "" && products) {
@@ -119,6 +127,7 @@ function Flow({ products, business_id }: TFlowProps) {
 				affiliate_count,
 				"EARTH",
 				business_id as string,
+				platform.data.value,
 			);
 			if (result?.id) {
 				analytics?.track("pipeline_created", {

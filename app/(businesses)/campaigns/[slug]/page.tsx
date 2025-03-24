@@ -13,6 +13,7 @@ const redis = new Redis({
 });
 
 export type potentialAffiliates = {
+	platform: string;
 	difficulty: string;
 	affiliates: Affiliate[];
 };
@@ -39,6 +40,7 @@ export default async function CampaignsPage(props: {
 	)) as potentialAffiliates[];
 	const affiliate = potentialAffiliates[0].affiliates;
 	const difficulty = potentialAffiliates[0].difficulty;
+	const platform = potentialAffiliates[0].platform;
 
 	return (
 		<div className="container mx-auto px-4 py-8">
@@ -50,6 +52,7 @@ export default async function CampaignsPage(props: {
 				pipeline_id={pipeline?.id as number}
 				affiliate_count={pipeline?.affiliate_count || 0}
 				difficulty={difficulty}
+				platform={platform}
 			/>
 		</div>
 	);

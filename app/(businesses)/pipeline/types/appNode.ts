@@ -50,13 +50,22 @@ export type FormatNode = Node<
 	"inputFormat"
 >;
 
+export type PlatformNode = Node<
+	{
+		value: string;
+		label: string;
+	},
+	"inputPlatform"
+>;
+
 export type AppNode =
 	| BuiltInNode
 	| InputNode
 	| AffiliatesNode
 	| AskAINode
 	| LocationNode
-	| FormatNode;
+	| FormatNode
+	| PlatformNode;
 
 export type AppState = {
 	nodes: AppNode[];

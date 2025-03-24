@@ -16,10 +16,17 @@ export const initialNodes = [
 		data: { value: "3", label: "Affiliate" },
 	},
 	{
+		id: "node-3",
+		type: "inputPlatform",
+		position: { x: 400, y: 400 },
+		targetPosition: "top",
+		data: { value: "instagram", label: "Platform" },
+	},
+	{
 		id: "node-4",
 		type: "output",
 		targetPosition: "top",
-		position: { x: 400, y: 450 },
+		position: { x: 400, y: 600 },
 		data: { label: "Output" },
 	},
 ] as AppNode[];

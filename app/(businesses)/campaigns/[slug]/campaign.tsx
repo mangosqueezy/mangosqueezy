@@ -38,6 +38,7 @@ export default function Campaign({
 	chatMessages,
 	affiliate_count,
 	difficulty,
+	platform,
 }: {
 	pipeline_id: number;
 	affiliates: Affiliate[];
@@ -46,6 +47,7 @@ export default function Campaign({
 	chatMessages: ChatMessage[];
 	affiliate_count: number;
 	difficulty: string;
+	platform: string;
 }) {
 	const [selectedAffiliate, setSelectedAffiliate] = useState<Affiliate | null>(
 		null,
@@ -86,6 +88,7 @@ export default function Campaign({
 			pipeline_id.toString(),
 			difficulty,
 			updatedAffiliates,
+			platform,
 		);
 	};
 
@@ -201,6 +204,15 @@ export default function Campaign({
 									<h2 className="text-xl font-bold text-gray-800">Messages</h2>
 									<p className="text-sm text-gray-500 mt-1">
 										Select an affiliate to chat
+									</p>
+									<p className="text-sm text-gray-500 mt-1 flex items-center">
+										{`Platform: ${platform}`}
+										<Image
+											src={`/logo-cluster/${platform}.svg`}
+											alt={platform}
+											width={30}
+											height={30}
+										/>
 									</p>
 								</div>
 

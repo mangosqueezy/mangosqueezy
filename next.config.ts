@@ -41,6 +41,10 @@ const nextConfig: NextConfig = {
 				protocol: "https",
 				hostname: "cdn.bsky.app",
 			},
+			{
+				protocol: "https",
+				hostname: "scontent-ord5-2.xx.fbcdn.net",
+			},
 		],
 	},
 };
