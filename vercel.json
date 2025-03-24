@@ -8,6 +8,9 @@
 	"functions": {
 		"app/api/bluesky/**/*": {
 			"maxDuration": 300
+		},
+		"app/pipeline/**/*": {
+			"maxDuration": 300
 		}
 	}
 }
