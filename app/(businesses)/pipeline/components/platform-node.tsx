@@ -2,7 +2,7 @@
 
 import useStore from "@/app/store/store";
 import { Handle, type NodeProps, Position } from "@xyflow/react";
-import { MapPin } from "lucide-react";
+import { Handshake } from "lucide-react";
 import type { PlatformNode as PlatformNodeProps } from "../types/appNode";
 import { PlatformSelector } from "./platform-selector";
 
@@ -16,7 +16,7 @@ export default function PlatformNode({
 		<div className="h-full w-64 border border-gray-300 rounded bg-white">
 			<div className="bg-indigo-300 p-2 rounded-t">
 				<div className="flex items-center">
-					<MapPin className="h-5 w-5 mr-2" />
+					<Handshake className="h-5 w-5 mr-2" />
 					<span className="text-sm font-medium text-gray-700">Platform</span>
 				</div>
 			</div>
