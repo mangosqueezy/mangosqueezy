@@ -11,6 +11,9 @@
 		},
 		"app/api/instagram/**/*": {
 			"maxDuration": 300
+		},
+		"app/pipeline/**/*": {
+			"maxDuration": 300
 		}
 	}
 }
