@@ -9,7 +9,7 @@
 		"app/api/bluesky/**/*": {
 			"maxDuration": 300
 		},
-		"app/pipeline/**/*": {
+		"app/api/instagram/**/*": {
 			"maxDuration": 300
 		}
 	}

@@ -36,7 +36,7 @@ export async function createPipelineAction(
 
 	if (platform_name === "instagram") {
 		await fetch(
-			`https://mangosqueezy-hono-app-76817065059.us-central1.run.app/api/search-ig-user?q=${product?.description}&affiliateCount=${affiliate_count}&pipeline_id=${pipeline?.id}&difficulty=medium`,
+			`https://www.mangosqueezy.com/api/instagram/search-ig-user?description=${product?.description}&affiliate_count=${affiliate_count}&pipeline_id=${pipeline?.id}`,
 			{
 				method: "GET",
 			},
