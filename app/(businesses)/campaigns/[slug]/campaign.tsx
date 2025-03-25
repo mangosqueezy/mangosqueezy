@@ -9,14 +9,9 @@ import type { Products } from "@prisma/client";
 import type { ChatMessage } from "@prisma/client";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { ArrowRight, Loader2, Plus, UserCircle, X } from "lucide-react";
+import { revalidatePath } from "next/cache";
 import Image from "next/image";
-import {
-	useActionState,
-	useCallback,
-	useEffect,
-	useMemo,
-	useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
 	createChatMessageAction,
 	deleteAffiliateAction,
@@ -86,6 +81,7 @@ export default function Campaign({
 							message: payload.new.remark,
 						});
 						setIsLoading(false);
+						revalidatePath(`/campaigns/${pipeline_id}`);
 					},
 				)
 				.subscribe();
