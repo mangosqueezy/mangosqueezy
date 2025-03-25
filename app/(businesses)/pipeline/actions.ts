@@ -7,8 +7,13 @@ import {
 } from "@/models/pipeline";
 import { getProductById } from "@/models/products";
 import { createResource } from "@/services/createResource";
+import { Client } from "@upstash/qstash";
 import { revalidatePath } from "next/cache";
 import { Resend } from "resend";
+
+const client = new Client({
+	token: process.env.QSTASH_TOKEN as string,
+});
 
 export async function createPipelineAction(
 	product_id: number,
@@ -35,12 +40,14 @@ export async function createPipelineAction(
 	const platform_name = platform.toLowerCase();
 
 	if (platform_name === "instagram") {
-		await fetch(
-			`https://www.mangosqueezy.com/api/instagram/search-ig-user?description=${product?.description}&affiliate_count=${affiliate_count}&pipeline_id=${pipeline?.id}`,
-			{
-				method: "GET",
+		await client.publishJSON({
+			url: "https://www.mangosqueezy.com/api/qstash/background/search-ig-user",
+			body: {
+				description: product?.description,
+				affiliate_count,
+				pipeline_id: pipeline?.id,
 			},
-		);
+		});
 	} else if (platform_name === "bluesky") {
 		await fetch(
 			`https://www.mangosqueezy.com/api/bluesky/getSearchAffiliates?product_id=${product_id}&limit=100&pipeline_id=${pipeline?.id}&affiliate_count=${affiliate_count}`,

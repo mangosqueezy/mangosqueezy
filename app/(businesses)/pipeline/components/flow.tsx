@@ -1,4 +1,12 @@
 "use client";
+import useStore from "@/app/store/store";
+import { CustomToast } from "@/components/mango-ui/custom-toast";
+import { Button } from "@/components/ui/button";
+import { useJune } from "@/hooks/useJune";
+import { createClient } from "@/lib/supabase/client";
+import { cn } from "@/lib/utils";
+import type { Products } from "@prisma/client";
+import type { RealtimeChannel } from "@supabase/supabase-js";
 import {
 	Background,
 	BackgroundVariant,
@@ -6,18 +14,11 @@ import {
 	MiniMap,
 	ReactFlow,
 } from "@xyflow/react";
-import { useEffect, useState } from "react";
-import { useShallow } from "zustand/react/shallow";
-
-import useStore from "@/app/store/store";
-import { CustomToast } from "@/components/mango-ui/custom-toast";
-import { Button } from "@/components/ui/button";
-import { useJune } from "@/hooks/useJune";
-import { cn } from "@/lib/utils";
-import type { Products } from "@prisma/client";
 import { Loader, Play } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import toast, { Toaster, type Toast } from "react-hot-toast";
+import { useShallow } from "zustand/react/shallow";
 import {
 	createPipelineAction,
 	getPipelineByProductIdAndBusinessIdAction,
@@ -60,9 +61,12 @@ const nodeTypes = {
 	output: OutputNode,
 };
 
+const supabase = createClient();
+
 function Flow({ products, business_id }: TFlowProps) {
 	const analytics = useJune(process.env.NEXT_PUBLIC_JUNE_API_KEY!);
 	const [isLoading, setIsLoading] = useState(false);
+	const [pipelineId, setPipelineId] = useState<number | null>(null);
 	const [jobStatus, setJobStatus] = useState({
 		status: "inactive",
 		message: "Start the job to find the affiliates",
@@ -81,6 +85,36 @@ function Flow({ products, business_id }: TFlowProps) {
 			});
 		}
 	}, [analytics, business_id]);
+
+	useEffect(() => {
+		let channel: RealtimeChannel;
+		if (pipelineId) {
+			channel = supabase
+				.channel("custom-all-channel")
+				.on(
+					"postgres_changes",
+					{
+						event: "UPDATE",
+						schema: "public",
+						table: "Pipelines",
+						filter: `id=eq.${pipelineId}`,
+					},
+					(payload) => {
+						setJobStatus({
+							status: payload.new.status,
+							message: payload.new.remark,
+						});
+					},
+				)
+				.subscribe();
+		}
+
+		return () => {
+			if (channel) {
+				supabase.removeChannel(channel);
+			}
+		};
+	}, [pipelineId]);
 
 	const pipelineHandler = async () => {
 		setJobStatus({
@@ -121,24 +155,29 @@ function Flow({ products, business_id }: TFlowProps) {
 				message: "Job already created. We found the affiliates for you.",
 			});
 		} else {
+			const platform_name = platform.data.value.toLowerCase();
 			const result = await createPipelineAction(
 				product_id,
 				"prompt",
 				affiliate_count,
 				"EARTH",
 				business_id as string,
-				platform.data.value,
+				platform_name,
 			);
 			if (result?.id) {
-				analytics?.track("pipeline_created", {
-					product_id: product?.id,
-					business_id: business_id,
-					prompt: prompt,
-				});
-				setJobStatus({
-					status: "completed",
-					message: "Job created successfully. Please check campaign page.",
-				});
+				setPipelineId(result.id);
+				if (platform_name === "instagram") {
+					setJobStatus({
+						status: "completed",
+						message:
+							"We are finding the affiliates for you, we will notify you once we find the affiliates.",
+					});
+				} else {
+					setJobStatus({
+						status: "completed",
+						message: "Job created successfully. Please check campaign page.",
+					});
+				}
 			}
 		}
 
