@@ -41,7 +41,7 @@ export async function createPipelineAction(
 
 	if (platform_name === "instagram") {
 		await client.publishJSON({
-			url: "https://www.mangosqueezy.com/api/qstash/background/search-ig-user",
+			url: "https://mangosqueezy-hono-app-76817065059.us-central1.run.app/api/search-ig-user",
 			body: {
 				description: product?.description,
 				affiliate_count,
