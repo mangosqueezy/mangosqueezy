@@ -46,6 +46,8 @@ export async function createPipelineAction(
 				description: product?.description,
 				affiliate_count,
 				pipeline_id: pipeline?.id,
+				difficulty: "medium",
+				operation: "batch",
 			},
 		});
 	} else if (platform_name === "bluesky") {

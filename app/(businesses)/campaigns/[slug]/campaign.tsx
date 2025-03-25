@@ -3,8 +3,11 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { createClient } from "@/lib/supabase/client";
+import { cn } from "@/lib/utils";
 import type { Products } from "@prisma/client";
 import type { ChatMessage } from "@prisma/client";
+import type { RealtimeChannel } from "@supabase/supabase-js";
 import { ArrowRight, Loader2, Plus, UserCircle, X } from "lucide-react";
 import Image from "next/image";
 import {
@@ -19,6 +22,8 @@ import {
 	deleteAffiliateAction,
 	getAffiliatesAction,
 } from "./actions";
+
+const supabase = createClient();
 
 export type Affiliate = {
 	handle: string;
@@ -57,6 +62,41 @@ export default function Campaign({
 		{ sender: string; text: string; date: Date }[]
 	>([]);
 	const [isLoading, setIsLoading] = useState(false);
+	const [jobStatus, setJobStatus] = useState({
+		status: "idle",
+		message: "",
+	});
+
+	useEffect(() => {
+		let channel: RealtimeChannel;
+		if (pipeline_id) {
+			channel = supabase
+				.channel("custom-all-channel")
+				.on(
+					"postgres_changes",
+					{
+						event: "UPDATE",
+						schema: "public",
+						table: "Pipelines",
+						filter: `id=eq.${pipeline_id}`,
+					},
+					(payload) => {
+						setJobStatus({
+							status: payload.new.status,
+							message: payload.new.remark,
+						});
+						setIsLoading(false);
+					},
+				)
+				.subscribe();
+		}
+
+		return () => {
+			if (channel) {
+				supabase.removeChannel(channel);
+			}
+		};
+	}, [pipeline_id]);
 
 	const handleAddAffiliate = useCallback(async () => {
 		setIsLoading(true);
@@ -68,14 +108,25 @@ export default function Campaign({
 			nextDifficulty = "easy";
 		}
 
+		if (platform === "instagram") {
+			setJobStatus({
+				status: "processing",
+				message: "Searching for affiliates...",
+			});
+		}
+
 		await getAffiliatesAction({
 			product_id: product?.id.toString() || "",
 			pipeline_id: pipeline_id.toString(),
 			affiliate_count: affiliate_count.toString(),
 			difficulty: nextDifficulty,
+			platform,
 		});
-		setIsLoading(false);
-	}, [product?.id, pipeline_id, affiliate_count, difficulty]);
+
+		if (platform !== "instagram") {
+			setIsLoading(false);
+		}
+	}, [product?.id, pipeline_id, affiliate_count, difficulty, platform]);
 
 	const handleDeleteAffiliate = (handle: string) => {
 		const updatedAffiliates = affiliates.map((affiliate) =>
@@ -201,19 +252,47 @@ export default function Campaign({
 						<div className="p-5 bg-white border-b">
 							<div className="flex items-center justify-between">
 								<div>
-									<h2 className="text-xl font-bold text-gray-800">Messages</h2>
-									<p className="text-sm text-gray-500 mt-1">
-										Select an affiliate to chat
-									</p>
-									<p className="text-sm text-gray-500 mt-1 flex items-center">
-										{`Platform: ${platform}`}
+									<h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+										Messages
 										<Image
 											src={`/logo-cluster/${platform}.svg`}
 											alt={platform}
-											width={30}
-											height={30}
+											width={24}
+											height={24}
 										/>
+									</h2>
+									<p className="text-sm text-gray-500 mt-1">
+										Select an affiliate to chat
 									</p>
+									{jobStatus.message && (
+										<div className="flex items-center w-full text-xs">
+											<span className="relative flex h-2 w-2">
+												<span
+													className={cn(
+														"animate-ping absolute inline-flex h-full w-full rounded-full opacity-75",
+														jobStatus.status === "inactive"
+															? "bg-yellow-400"
+															: jobStatus.status === "inprogress"
+																? "bg-orange-400"
+																: "bg-green-400",
+													)}
+												/>
+												<span
+													className={cn(
+														"relative inline-flex rounded-full h-2 w-2",
+														jobStatus.status === "inactive"
+															? "bg-yellow-500"
+															: jobStatus.status === "inprogress"
+																? "bg-orange-500"
+																: "bg-green-500",
+													)}
+												/>
+											</span>
+											<span className="text-xs text-gray-500 ml-2">
+												{jobStatus.message}
+											</span>
+										</div>
+									)}
 								</div>
 
 								{activeAffiliates.length !== affiliate_count && (

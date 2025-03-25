@@ -2,6 +2,8 @@
 
 import { EmailTemplate } from "@/components/mango-ui/email-template";
 import { createChatMessage } from "@/models/chat_message";
+import { getProductById } from "@/models/products";
+import { Client } from "@upstash/qstash";
 import { Redis } from "@upstash/redis";
 import { revalidatePath } from "next/cache";
 import { Resend } from "resend";
@@ -13,6 +15,10 @@ const UPSTASH_REDIS_REST_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 const redis = new Redis({
 	url: UPSTASH_REDIS_REST_URL!,
 	token: UPSTASH_REDIS_REST_TOKEN!,
+});
+
+const client = new Client({
+	token: process.env.QSTASH_TOKEN as string,
 });
 
 export async function createChatMessageAction(
@@ -65,18 +71,35 @@ export async function getAffiliatesAction({
 	pipeline_id,
 	affiliate_count,
 	difficulty,
+	platform,
 }: {
 	product_id: string;
 	pipeline_id: string;
 	affiliate_count: string;
 	difficulty: string;
+	platform: string;
 }) {
-	await fetch(
-		`https://www.mangosqueezy.com/api/bluesky/getSearchAffiliates?product_id=${product_id}&limit=100&pipeline_id=${pipeline_id}&affiliate_count=${affiliate_count}&difficulty=${difficulty}`,
-		{
-			method: "GET",
-		},
-	);
+	if (platform === "bluesky") {
+		await fetch(
+			`https://www.mangosqueezy.com/api/bluesky/getSearchAffiliates?product_id=${product_id}&limit=100&pipeline_id=${pipeline_id}&affiliate_count=${affiliate_count}&difficulty=${difficulty}&platform=${platform}`,
+			{
+				method: "GET",
+			},
+		);
+	} else if (platform === "instagram") {
+		const product = await getProductById(Number(product_id));
+
+		await client.publishJSON({
+			url: "https://mangosqueezy-hono-app-76817065059.us-central1.run.app/api/search-ig-user",
+			body: {
+				description: product?.description,
+				affiliate_count,
+				pipeline_id,
+				difficulty,
+				operation: "single",
+			},
+		});
+	}
 
 	revalidatePath(`/campaigns/${pipeline_id}`);
 
