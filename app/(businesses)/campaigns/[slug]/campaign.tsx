@@ -1,21 +1,20 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
+import Textarea from "@/components/mango-ui/textarea";
 import { createClient } from "@/lib/supabase/client";
-import { cn } from "@/lib/utils";
 import type { Products } from "@prisma/client";
 import type { ChatMessage } from "@prisma/client";
 import type { RealtimeChannel } from "@supabase/supabase-js";
-import { ArrowRight, Loader2, Plus, UserCircle, X } from "lucide-react";
+import { Heart, Loader2, MessageCircle, Quote, Repeat2 } from "lucide-react";
 import { revalidatePath } from "next/cache";
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import {
 	createChatMessageAction,
 	deleteAffiliateAction,
 	getAffiliatesAction,
+	getAuthorFeedAction,
+	getInstagramFeedAction,
 } from "./actions";
 
 const supabase = createClient();
@@ -28,7 +27,85 @@ export type Affiliate = {
 	tag: string;
 	reason: string;
 	status: "active" | "inactive";
+	platform: "instagram" | "bluesky";
 };
+
+interface BlueskyPost {
+	post: {
+		uri: string;
+		author: {
+			handle: string;
+			displayName: string;
+			avatar: string;
+		};
+		record: {
+			text: string;
+			createdAt: string;
+		};
+		embed?: {
+			$type: string;
+			record?: {
+				embeds?: Array<{
+					$type: string;
+					images?: Array<{
+						thumb: string;
+						fullsize: string;
+						alt: string;
+						aspectRatio: {
+							width: number;
+							height: number;
+						};
+					}>;
+				}>;
+			};
+		};
+		replyCount: number;
+		repostCount: number;
+		likeCount: number;
+		quoteCount: number;
+		indexedAt: string;
+	};
+}
+
+interface InstagramPost {
+	caption: string;
+	media_url: string;
+	permalink: string;
+	thumbnail_url?: string;
+	comments_count: number;
+	like_count: number;
+	timestamp: string;
+	id: string;
+}
+
+interface InstagramFeed {
+	business_discovery: {
+		profile_picture_url: string;
+		followers_count: number;
+		media_count: number;
+		media: {
+			data: InstagramPost[];
+		};
+		name: string;
+		biography: string;
+		website: string;
+	};
+}
+
+interface BlueskyProfile {
+	did: string;
+	handle: string;
+	displayName: string;
+	avatar: string;
+	description: string;
+	banner: string;
+	followersCount: number;
+	followsCount: number;
+	postsCount: number;
+	indexedAt: string;
+}
+
+type BlueskyFeed = BlueskyPost[];
 
 export default function Campaign({
 	pipeline_id,
@@ -49,18 +126,27 @@ export default function Campaign({
 	difficulty: string;
 	platform: string;
 }) {
+	const uniqueId = useId();
 	const [selectedAffiliate, setSelectedAffiliate] = useState<Affiliate | null>(
 		null,
 	);
-	const [message, setMessage] = useState("");
-	const [messages, setMessages] = useState<
-		{ sender: string; text: string; date: Date }[]
-	>([]);
+	const [messages, setMessages] = useState<{
+		sender: string;
+		text: string;
+		date: Date;
+	}>();
 	const [isLoading, setIsLoading] = useState(false);
 	const [jobStatus, setJobStatus] = useState({
 		status: "idle",
 		message: "",
 	});
+	const [blueskyFeed, setBlueskyFeed] = useState<BlueskyFeed | null>(null);
+	const [blueskyProfile, setBlueskyProfile] = useState<BlueskyProfile | null>(
+		null,
+	);
+	const [instagramFeed, setInstagramFeed] = useState<InstagramFeed | null>(
+		null,
+	);
 
 	useEffect(() => {
 		let channel: RealtimeChannel;
@@ -140,16 +226,16 @@ export default function Campaign({
 	};
 
 	const handleSendMessage = async () => {
-		if (message.trim()) {
-			setMessages([
-				...messages,
-				{ sender: "amit@tapasom.com", text: message, date: new Date() },
-			]);
-			setMessage("");
+		if (messages?.text.trim()) {
+			setMessages({
+				sender: "amit@tapasom.com",
+				text: messages.text,
+				date: new Date(),
+			});
 
 			await createChatMessageAction(
 				pipeline_id,
-				message,
+				messages.text,
 				selectedAffiliate?.handle as string,
 			);
 		}
@@ -180,16 +266,69 @@ export default function Campaign({
 					(msg): msg is { sender: string; text: string; date: Date } =>
 						msg !== null,
 				);
-			setMessages(messages);
+			// setMessages(messages);
 		}
 	}, [chatMessages, selectedAffiliate]);
 
+	const handleAffiliateSelect = async (affiliate: Affiliate) => {
+		setSelectedAffiliate(affiliate);
+		setIsLoading(true);
+		setBlueskyFeed(null);
+		setInstagramFeed(null);
+
+		try {
+			const price = product?.price || 0;
+			const commissionPercentage = commission;
+			const exampleEarning = (price * commissionPercentage) / 100;
+			if (platform === "bluesky") {
+				const { feed, result, profileData } = await getAuthorFeedAction(
+					affiliate.handle,
+					commissionPercentage,
+					exampleEarning,
+					product?.description || "",
+				);
+				setBlueskyFeed(feed);
+				setBlueskyProfile(profileData);
+				setMessages({
+					sender: "amit@tapasom.com",
+					text: result,
+					date: new Date(),
+				});
+			} else if (platform === "instagram") {
+				const { data, result } = await getInstagramFeedAction(
+					affiliate.handle,
+					commissionPercentage,
+					exampleEarning,
+					product?.description || "",
+				);
+				setInstagramFeed(data);
+				setMessages({
+					sender: "amit@tapasom.com",
+					text: result,
+					date: new Date(),
+				});
+			}
+		} catch (error) {
+			console.error("Error fetching posts:", error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	const formatDate = (dateString: string) => {
+		return new Date(dateString).toLocaleDateString(undefined, {
+			year: "numeric",
+			month: "short",
+			day: "numeric",
+		});
+	};
+
 	return (
-		<div className="container mx-auto px-4">
-			{/* Header Section */}
-			<div className="mb-8 bg-white rounded-lg border border-gray-200 p-6">
+		<div className="container mx-auto px-4 py-8">
+			{/* Product Header */}
+			<div className="mb-8 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
 				<div className="flex flex-col lg:flex-row gap-8 items-center">
-					<div className="w-full h-full lg:w-1/4">
+					<div className="w-full lg:w-1/4">
 						<div className="relative aspect-square w-full">
 							<Image
 								src={product?.image_url || ""}
@@ -203,12 +342,14 @@ export default function Campaign({
 
 					<div className="w-full lg:w-1/2">
 						<h1 className="text-2xl font-bold mb-4">{product?.name}</h1>
-						<p className="text-gray-700 text-sm">{product?.description}</p>
+						<p className="text-gray-700">{product?.description}</p>
 					</div>
 
 					<div className="w-full lg:w-1/4 flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg border border-gray-200">
 						<div className="text-center mb-4">
-							<p className="text-3xl font-bold text-green-500">{commission}%</p>
+							<p className="text-3xl font-bold text-orange-500">
+								{commission}%
+							</p>
 							<p className="text-sm text-gray-600">Commission Rate</p>
 						</div>
 						<div className="text-center">
@@ -221,252 +362,303 @@ export default function Campaign({
 				</div>
 			</div>
 
-			{affiliates.length === 0 && (
-				<div className="my-4 p-4 bg-orange-50 rounded-lg border border-orange-200">
-					<p className="text-xs text-orange-700">
-						We couldn't find suitable affiliates for this product. This might be
-						because:
-					</p>
-					<ul className="mt-2 text-xs text-orange-600 list-disc list-inside">
-						<li>
-							The product description needs more specific details, it might be
-							too broad
-						</li>
-					</ul>
-					<p className="mt-2 text-xs text-orange-700">
-						Consider updating the product description with more specific details
-						and product benefits.
-					</p>
-				</div>
-			)}
+			{/* Textarea Component */}
+			<div className="mb-8">
+				<Textarea
+					affiliates={activeAffiliates}
+					selectedAffiliate={selectedAffiliate}
+					onAffiliateSelect={handleAffiliateSelect}
+					message={messages?.text || ""}
+					onMessageChange={setMessages}
+					onSendMessage={handleSendMessage}
+					isLoading={isLoading}
+					chatMessages={chatMessages}
+				/>
+			</div>
 
-			{/* Updated Chat Interface */}
-			<div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
-				<div className="flex flex-col md:flex-row h-[700px]">
-					{/* Affiliates List - Updated */}
-					<div className="w-full md:w-[380px] border-r border-gray-100">
-						<div className="p-5 bg-white border-b">
-							<div className="flex items-center justify-between">
-								<div>
-									<h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-										Messages
-										<Image
-											src={`/logo-cluster/${platform}.svg`}
-											alt={platform}
-											width={24}
-											height={24}
-										/>
-									</h2>
-									<p className="text-sm text-gray-500 mt-1">
-										Select an affiliate to chat
-									</p>
-									{jobStatus.message && (
-										<div className="flex items-center w-full text-xs">
-											<span className="relative flex h-2 w-2">
-												<span
-													className={cn(
-														"animate-ping absolute inline-flex h-full w-full rounded-full opacity-75",
-														jobStatus.status === "inactive"
-															? "bg-yellow-400"
-															: jobStatus.status === "inprogress"
-																? "bg-orange-400"
-																: "bg-green-400",
-													)}
-												/>
-												<span
-													className={cn(
-														"relative inline-flex rounded-full h-2 w-2",
-														jobStatus.status === "inactive"
-															? "bg-yellow-500"
-															: jobStatus.status === "inprogress"
-																? "bg-orange-500"
-																: "bg-green-500",
-													)}
-												/>
-											</span>
-											<span className="text-xs text-gray-500 ml-2">
-												{jobStatus.message}
-											</span>
-										</div>
-									)}
-								</div>
-
-								{activeAffiliates.length !== affiliate_count && (
-									<Button
-										variant="ghost"
-										size="icon"
-										onClick={handleAddAffiliate}
-										className="hover:bg-orange-100"
-										aria-label="Add new affiliate"
-										disabled={isLoading}
-									>
-										{isLoading ? (
-											<Loader2 className="w-5 h-5 text-orange-500 animate-spin" />
-										) : (
-											<Plus className="w-5 h-5 text-orange-500" />
-										)}
-									</Button>
-								)}
-							</div>
-						</div>
-						<div className="overflow-y-auto h-[calc(100%-85px)]">
-							{affiliates
-								.filter((affiliate) => affiliate.status === "active")
-								.map((affiliate) => (
-									<div key={`container-${affiliate.handle}`}>
-										<div
-											key={affiliate.handle}
-											className={`flex items-center justify-between p-5 cursor-pointer transition-all ${
-												selectedAffiliate?.handle === affiliate.handle
-													? "bg-orange-50 border-l-4 border-l-orange-500"
-													: "hover:bg-gray-50 border-l-4 border-l-transparent"
-											}`}
-										>
-											<div
-												className="flex items-center gap-3 min-w-0 flex-grow"
-												onClick={() => setSelectedAffiliate(affiliate)}
-												onKeyDown={(e) =>
-													e.key === "Enter" && setSelectedAffiliate(affiliate)
-												}
-											>
+			{/* Social Media Posts Grid */}
+			<div className="space-y-6">
+				{isLoading ? (
+					<div className="flex items-center justify-center py-12">
+						<Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
+					</div>
+				) : selectedAffiliate ? (
+					<>
+						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+							{/* Profile Card */}
+							<div
+								className="relative group"
+								key={`profile-card-${selectedAffiliate.handle}-${uniqueId}`}
+							>
+								<div className="absolute -inset-0.5 bg-gradient-to-r from-blue-100 to-orange-100 rounded-lg blur opacity-20 animate-glow" />
+								<div className="relative bg-white/30 backdrop-blur-lg rounded-lg border border-gray-200/50 shadow-md overflow-hidden">
+									<div className="relative">
+										{/* Banner - using a gradient as placeholder */}
+										{platform === "bluesky" && blueskyProfile?.banner ? (
+											<div className="h-14 relative">
 												<Image
-													src={affiliate.avatar}
-													alt="Avatar"
-													width={36}
-													height={36}
-													className="rounded-full"
+													src={blueskyProfile.banner}
+													alt="Profile banner"
+													fill
+													className="object-cover"
 												/>
-												<p className="font-semibold text-gray-900 text-sm truncate">
-													{affiliate.displayName}
-												</p>
 											</div>
-											<Button
-												variant="ghost"
-												type="button"
-												onClick={(e) => {
-													e.stopPropagation();
-													handleDeleteAffiliate(affiliate.handle);
-												}}
-												className="p-1 hover:bg-gray-100 rounded-full transition-colors"
-												aria-label="Delete affiliate"
-											>
-												<X className="w-4 h-4 text-gray-500 hover:text-red-500" />
-											</Button>
+										) : (
+											<div className="h-14 bg-gradient-to-r from-orange-400/20 to-pink-500/20" />
+										)}
+
+										{/* Profile Section */}
+										<div className="px-4 pb-4">
+											{/* Avatar */}
+											<div className="relative -mt-10 mb-2">
+												<div className="w-20 h-20 rounded-full border-4 border-white shadow-md overflow-hidden">
+													<Image
+														src={selectedAffiliate?.avatar || ""}
+														alt={selectedAffiliate?.displayName || "Profile"}
+														width={80}
+														height={80}
+														className="object-cover"
+													/>
+												</div>
+											</div>
+
+											{/* Profile Info */}
+											<div className="space-y-2.5">
+												<div>
+													<h2 className="text-lg font-bold text-gray-900">
+														{selectedAffiliate?.displayName}
+													</h2>
+													<p className="text-sm text-gray-500">
+														@{selectedAffiliate?.handle}
+													</p>
+												</div>
+
+												{/* Stats Grid */}
+												<div className="grid grid-cols-3 gap-2 py-2 border-y border-gray-100">
+													{platform === "instagram" && instagramFeed && (
+														<>
+															<div className="text-center">
+																<p className="text-base font-semibold text-gray-900">
+																	{instagramFeed.business_discovery.followers_count.toLocaleString()}
+																</p>
+																<p className="text-xs text-gray-500">
+																	Followers
+																</p>
+															</div>
+															<div className="text-center">
+																<p className="text-base font-semibold text-gray-900">
+																	{instagramFeed.business_discovery.media_count.toLocaleString()}
+																</p>
+																<p className="text-xs text-gray-500">Posts</p>
+															</div>
+															<div className="text-center">
+																<p className="text-base font-semibold text-gray-900">
+																	{commission}%
+																</p>
+																<p className="text-xs text-gray-500">
+																	Commission
+																</p>
+															</div>
+														</>
+													)}
+													{platform === "bluesky" && blueskyProfile && (
+														<>
+															<div className="text-center">
+																<p className="text-base font-semibold text-gray-900">
+																	{blueskyProfile.followersCount.toLocaleString()}
+																</p>
+																<p className="text-xs text-gray-500">
+																	Followers
+																</p>
+															</div>
+															<div className="text-center">
+																<p className="text-base font-semibold text-gray-900">
+																	{blueskyProfile.postsCount.toLocaleString()}
+																</p>
+																<p className="text-xs text-gray-500">Posts</p>
+															</div>
+															<div className="text-center">
+																<p className="text-base font-semibold text-gray-900">
+																	{commission}%
+																</p>
+																<p className="text-xs text-gray-500">
+																	Commission
+																</p>
+															</div>
+														</>
+													)}
+												</div>
+
+												{/* Bio Section */}
+												<div>
+													<h3 className="text-sm font-medium text-gray-900 mb-1">
+														Bio
+													</h3>
+													{platform === "instagram" && instagramFeed ? (
+														<p className="text-sm text-gray-700 line-clamp-2">
+															{instagramFeed.business_discovery.biography}
+														</p>
+													) : platform === "bluesky" && blueskyProfile ? (
+														<p className="text-sm text-gray-700 line-clamp-2">
+															{blueskyProfile.description}
+														</p>
+													) : (
+														<div className="h-3 bg-gray-200/50 rounded animate-pulse" />
+													)}
+												</div>
+
+												{/* Affiliate Status */}
+												<div className="flex items-center gap-1.5 mt-2">
+													<div className="w-1.5 h-1.5 rounded-full bg-gray-400" />
+													<span className="text-xs text-gray-600">
+														{selectedAffiliate?.status === "active"
+															? "Not confirmed"
+															: "Pending Confirmation"}
+													</span>
+												</div>
+											</div>
 										</div>
-										<Separator
-											className="w-full"
-											key={`${affiliate.handle}-separator`}
-										/>
+									</div>
+								</div>
+							</div>
+							{platform === "bluesky" &&
+								blueskyFeed?.map((item: BlueskyPost) => (
+									<div
+										key={item.post.uri}
+										className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
+									>
+										<div className="p-4">
+											<div className="flex items-center gap-3 mb-3">
+												<img
+													src={item.post.author.avatar}
+													alt={item.post.author.displayName}
+													className="w-10 h-10 rounded-full"
+												/>
+												<div>
+													<p className="font-medium text-gray-900">
+														{item.post.author.displayName}
+													</p>
+													<p className="text-sm text-gray-500">
+														@{item.post.author.handle}
+													</p>
+												</div>
+											</div>
+
+											<p className="text-gray-900 text-sm mb-4">
+												{item.post.record.text}
+											</p>
+
+											{item.post.embed?.record?.embeds?.[0]?.$type ===
+												"app.bsky.embed.images#view" && (
+												<div className="relative aspect-square mb-4">
+													<Image
+														src={
+															item.post.embed.record.embeds[0].images?.[0]
+																.fullsize || ""
+														}
+														alt="Post image"
+														fill
+														className="object-cover rounded-lg"
+													/>
+												</div>
+											)}
+
+											<div className="flex items-center justify-between text-sm text-gray-500 pt-3 border-t">
+												<div className="flex items-center gap-4">
+													<div className="flex items-center gap-1">
+														<MessageCircle className="w-4 h-4" />
+														<span>{item.post.replyCount}</span>
+													</div>
+													<div className="flex items-center gap-1">
+														<Repeat2 className="w-4 h-4" />
+														<span>{item.post.repostCount}</span>
+													</div>
+													<div className="flex items-center gap-1">
+														<Heart className="w-4 h-4" />
+														<span>{item.post.likeCount}</span>
+													</div>
+													<div className="flex items-center gap-1">
+														<Quote className="w-4 h-4" />
+														<span>{item.post.quoteCount}</span>
+													</div>
+												</div>
+												<time className="text-xs">
+													{formatDate(item.post.indexedAt)}
+												</time>
+											</div>
+										</div>
+									</div>
+								))}
+
+							{platform === "instagram" &&
+								instagramFeed?.business_discovery.media.data.map((post) => (
+									<div
+										key={post.id}
+										className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
+									>
+										<div className="p-4">
+											<div className="flex items-center gap-3 mb-3">
+												<img
+													src={
+														instagramFeed.business_discovery.profile_picture_url
+													}
+													alt={instagramFeed.business_discovery.name}
+													className="w-10 h-10 rounded-full"
+												/>
+												<div>
+													<p className="font-medium text-gray-900">
+														{instagramFeed.business_discovery.name}
+													</p>
+													<p className="text-sm text-gray-500">
+														{instagramFeed.business_discovery.followers_count}{" "}
+														followers
+													</p>
+												</div>
+											</div>
+
+											<div className="relative aspect-square mb-4 bg-gray-100 rounded-lg overflow-hidden">
+												<Image
+													src={post.thumbnail_url || post.media_url}
+													alt="Instagram post"
+													fill
+													className="object-cover"
+												/>
+											</div>
+
+											<p className="text-gray-900 text-sm mb-4 line-clamp-3">
+												{post.caption}
+											</p>
+
+											<div className="flex items-center justify-between text-sm text-gray-500 pt-3 border-t">
+												<div className="flex items-center gap-4">
+													<div className="flex items-center gap-1">
+														<Heart className="w-4 h-4" />
+														<span>{post.like_count}</span>
+													</div>
+													<div className="flex items-center gap-1">
+														<MessageCircle className="w-4 h-4" />
+														<span>{post.comments_count}</span>
+													</div>
+												</div>
+												<time className="text-xs">
+													{formatDate(post.timestamp)}
+												</time>
+											</div>
+										</div>
 									</div>
 								))}
 						</div>
+					</>
+				) : (
+					<div className="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
+						<h3 className="text-lg font-medium text-gray-900 mb-2">
+							Select an Affiliate
+						</h3>
+						<p className="text-gray-500">
+							Choose an affiliate to view their recent posts
+						</p>
 					</div>
-
-					{/* Chat Area - Updated */}
-					<div className="flex-1 flex flex-col bg-gray-50">
-						{selectedAffiliate ? (
-							<>
-								{/* Chat Header */}
-								<div className="p-5 bg-white border-b border-gray-100">
-									<div className="grid grid-cols-[36px_1fr] gap-3 items-center">
-										<div className="relative w-9 h-9 rounded-full bg-orange-100 overflow-hidden">
-											<Image
-												src={selectedAffiliate.avatar}
-												alt="Avatar"
-												fill
-												className="object-cover"
-											/>
-										</div>
-										<div className="grid gap-0.5">
-											<h3 className="font-bold text-md text-gray-900">
-												{selectedAffiliate.displayName}
-											</h3>
-											<p className="text-xs text-gray-500">
-												{selectedAffiliate.reason}
-											</p>
-										</div>
-									</div>
-								</div>
-
-								{/* Messages */}
-								<div
-									className="flex-1 overflow-y-auto p-6 space-y-6"
-									style={{
-										backgroundImage:
-											"repeating-linear-gradient(transparent, transparent 31px, #e5e7eb 31px, #e5e7eb 32px)",
-										backgroundSize: "100% 32px",
-										backgroundPosition: "0 0",
-									}}
-								>
-									{messages.map((msg, index) => (
-										<div
-											key={`${msg.sender}-${index}`}
-											className={`flex ${msg.sender === "amit@tapasom.com" ? "justify-end" : "justify-start"}`}
-										>
-											<div
-												className={`max-w-[85%] md:max-w-[70%] ${
-													msg.sender === "amit@tapasom.com"
-														? "bg-orange-200 text-gray-800"
-														: "bg-white text-gray-800"
-												} px-5 py-3.5 rounded-2xl shadow-sm`}
-											>
-												<p className="text-[15px] leading-relaxed">
-													{msg.text}
-												</p>
-												<p
-													className={`text-xs mt-1.5 ${
-														msg.sender === "amit@tapasom.com"
-															? "text-gray-600"
-															: "text-gray-400"
-													}`}
-												>
-													{msg.date.toLocaleTimeString([], {
-														hour: "2-digit",
-														minute: "2-digit",
-													})}
-												</p>
-											</div>
-										</div>
-									))}
-								</div>
-
-								{/* Message Input */}
-								<div className="p-5 bg-white border-t border-gray-100">
-									<div className="flex gap-3 items-center">
-										<Input
-											value={message}
-											onChange={(e) => setMessage(e.target.value)}
-											placeholder="Send a message..."
-											className="flex-1 px-5 py-3.5 bg-gray-50 rounded-xl border-0 text-gray-800 placeholder-gray-400 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"
-											onKeyPress={(e) =>
-												e.key === "Enter" && handleSendMessage()
-											}
-										/>
-										<Button
-											onClick={handleSendMessage}
-											type="button"
-											className="p-3.5 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500/20"
-										>
-											<ArrowRight className="w-6 h-6" />
-										</Button>
-									</div>
-								</div>
-							</>
-						) : (
-							<div className="flex-1 flex flex-col items-center justify-center text-center p-6">
-								<div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center mb-4">
-									<UserCircle className="w-8 h-8 text-orange-500" />
-								</div>
-								<h3 className="text-xl font-semibold text-gray-800 mb-2">
-									Select a Conversation
-								</h3>
-								<p className="text-gray-500 max-w-sm text-sm">
-									Choose an affiliate from the list to start chatting
-								</p>
-							</div>
-						)}
-					</div>
-				</div>
+				)}
 			</div>
 		</div>
 	);

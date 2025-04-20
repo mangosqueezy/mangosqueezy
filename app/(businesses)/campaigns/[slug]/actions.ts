@@ -3,8 +3,10 @@
 import { EmailTemplate } from "@/components/mango-ui/email-template";
 import { createChatMessage } from "@/models/chat_message";
 import { getProductById } from "@/models/products";
+import { openai } from "@ai-sdk/openai";
 import { Client } from "@upstash/qstash";
 import { Redis } from "@upstash/redis";
+import { generateText } from "ai";
 import { revalidatePath } from "next/cache";
 import { Resend } from "resend";
 import type { Affiliate } from "./campaign";
@@ -20,6 +22,14 @@ const redis = new Redis({
 const client = new Client({
 	token: process.env.QSTASH_TOKEN as string,
 });
+
+interface BlueskyPost {
+	post: {
+		author: {
+			handle: string;
+		};
+	};
+}
 
 export async function createChatMessageAction(
 	pipeline_id: number,
@@ -104,4 +114,120 @@ export async function getAffiliatesAction({
 	revalidatePath(`/campaigns/${pipeline_id}`);
 
 	return true;
+}
+
+export async function getAuthorFeedAction(
+	handle: string,
+	commissionPercentage: number,
+	exampleEarning: number,
+	productDescription: string,
+) {
+	const [feedResponse, profileResponse] = await Promise.all([
+		fetch(
+			`https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed?actor=${handle}&filter=posts_no_replies&includePins=false&limit=30`,
+		),
+		fetch(
+			`https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=${handle}`,
+		),
+	]);
+
+	const [feedData, profileData] = await Promise.all([
+		feedResponse.json(),
+		profileResponse.json(),
+	]);
+
+	const filteredFeed = feedData?.feed?.filter(
+		(post: BlueskyPost) => post.post.author.handle === handle,
+	);
+	const postContent = filteredFeed?.[0]?.post.record.text;
+
+	const result = await generateDraftPostAction(
+		handle,
+		postContent,
+		productDescription,
+		commissionPercentage,
+		exampleEarning,
+	);
+
+	return {
+		feed: filteredFeed,
+		result,
+		profileData,
+	};
+}
+
+export async function getInstagramFeedAction(
+	handle: string,
+	commissionPercentage: number,
+	exampleEarning: number,
+	productDescription: string,
+) {
+	const response = await fetch(
+		`https://graph.facebook.com/v21.0/17841458398835295?fields=business_discovery.username(${handle}){profile_picture_url,followers_count,media_count,media{caption,media_url,permalink,thumbnail_url,comments_count,like_count,timestamp},name,biography,website}&access_token=${process.env.IG_ACCESS_TOKEN}`,
+	);
+	const data = await response.json();
+
+	const result = await generateDraftPostAction(
+		handle,
+		data.business_discovery.media.data[0].caption,
+		productDescription,
+		commissionPercentage,
+		exampleEarning,
+	);
+
+	return { data, result };
+}
+
+export async function generateDraftPostAction(
+	handle: string,
+	postContent: string,
+	productDescription: string,
+	commissionPercentage: number,
+	exampleEarning: number,
+	status: "warm" | "cold" = "warm",
+	tone: "professional" | "casual" | "friendly" = "professional",
+) {
+	try {
+		let systemPrompt =
+			"You are a social media expert who writes friendly, human-like partnership messages. Your goal is to introduce an affiliate program in a genuine and natural way, focusing on the value for the other person, not just your product.";
+
+		let prompt = `Write a warm, personal message inviting ${handle} to join our affiliate program.
+
+Product: ${productDescription}
+Commission: ${commissionPercentage}%
+Potential Earnings: around $${exampleEarning} per sale.
+
+Make it:
+- Simple and clear.
+- Friendly and human-sounding.
+- Focused on their benefit.
+- Ending with a soft invitation to chat or learn more.
+`;
+		if (status === "warm") {
+			prompt = `Here's the post content: "${postContent}"
+
+Write a reply for ${handle} that:
+- Feels personal and genuine.
+- Shows you understand the post.
+- Uses a ${tone} tone.
+- Sounds like a real person, not AI.
+- Builds a real connection rather than pushing sales.
+- Ends with a friendly call to action if suitable.
+- The output should not be in the double quotes. Just plain text.`;
+
+			systemPrompt =
+				"You are a social media expert who writes authentic, human-like comments and replies for Instagram. Your goal is to help brands build real connections with people by understanding their posts and responding in a friendly, thoughtful way — just like a human social media manager would.";
+		}
+
+		const { text } = await generateText({
+			model: openai("gpt-4o-mini"),
+			system: systemPrompt,
+			prompt,
+		});
+
+		return text;
+	} catch (error) {
+		console.error("Error generating draft post:", error);
+		throw error;
+	}
 }
