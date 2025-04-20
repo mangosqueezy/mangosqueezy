@@ -36,6 +36,7 @@ interface TextareaProps {
 	onSendMessage: () => Promise<void>;
 	isLoading: boolean;
 	chatMessages: ChatMessage[];
+	platform: string;
 }
 
 function classNames(...classes: string[]) {
@@ -68,6 +69,7 @@ export default function Textarea({
 	onSendMessage,
 	isLoading,
 	chatMessages,
+	platform,
 }: TextareaProps) {
 	const [isSubmitting, setIsSubmitting] = React.useState(false);
 	const [interactions, setInteractions] = React.useState(0);
@@ -147,8 +149,8 @@ export default function Textarea({
 												{selectedAffiliate.displayName}
 											</span>
 											<img
-												src={`/logo-cluster/${selectedAffiliate.platform}.svg`}
-												alt={selectedAffiliate.platform}
+												src={`/logo-cluster/${platform}.svg`}
+												alt={platform}
 												className="h-4 w-4"
 											/>
 											{(() => {
@@ -201,8 +203,8 @@ export default function Textarea({
 														{affiliate.displayName}
 													</span>
 													<img
-														src={`/logo-cluster/${affiliate.platform}.svg`}
-														alt={affiliate.platform}
+														src={`/logo-cluster/${platform}.svg`}
+														alt={platform}
 														className="ml-auto h-4 w-4"
 													/>
 												</div>
