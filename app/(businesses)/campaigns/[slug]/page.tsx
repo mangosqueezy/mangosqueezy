@@ -2,7 +2,7 @@ import { getChatMessages } from "@/models/chat_message";
 import type { ChatMessage } from "@prisma/client";
 import { Redis } from "@upstash/redis";
 import { getUser } from "../../actions";
-import Campaign, { type Affiliate } from "./campaign";
+import Campaign, { type Platform, type Affiliate } from "./campaign";
 
 const UPSTASH_REDIS_REST_URL = process.env.UPSTASH_REDIS_REST_URL;
 const UPSTASH_REDIS_REST_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
@@ -52,7 +52,7 @@ export default async function CampaignsPage(props: {
 				pipeline_id={pipeline?.id as number}
 				affiliate_count={pipeline?.affiliate_count || 0}
 				difficulty={difficulty}
-				platform={platform}
+				platform={platform as Platform}
 			/>
 		</div>
 	);
