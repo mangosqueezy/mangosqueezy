@@ -28,7 +28,7 @@ export default function PlatformNode({
 					Platform:
 				</label>
 				<PlatformSelector
-					defaultValue={"instagram"}
+					defaultValue={"youtube"}
 					onSelect={(platformName) => {
 						updateNodeData(id, platformName);
 					}}

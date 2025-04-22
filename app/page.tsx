@@ -35,8 +35,8 @@ function Hero() {
 						AI Agent.
 					</h1>
 					<p className="mt-8 max-w-lg text-xl/7 font-medium text-gray-950/75 sm:text-2xl/8">
-						We help B2B SaaS businesses find affiliates. Let us handle the
-						boring work so you can focus on growing your business.
+						We help businesses find and build genuine affiliate relationships on
+						YouTube, Instagram and bluesky.
 					</p>
 					<div className="mt-12 flex flex-col gap-x-6 gap-y-4 sm:flex-row">
 						<Button href={userId ? "/pipeline" : "/login"}>

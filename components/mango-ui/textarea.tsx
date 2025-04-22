@@ -15,12 +15,14 @@ interface Affiliate {
 	handle: string;
 	displayName: string;
 	avatar: string;
-	platform: "instagram" | "bluesky";
+	platform: "instagram" | "bluesky" | "youtube";
 	evaluation: "Yes" | "No";
 	tag: string;
 	reason: string;
 	status: "active" | "inactive";
-	interactions?: number; // Number of warm-up interactions
+	interactions?: number;
+	channelId?: string;
+	videoId?: string;
 }
 
 interface TextareaProps {
@@ -136,83 +138,85 @@ export default function Textarea({
 				<div className="flex items-center justify-between space-x-3 border-t border-gray-200 px-2 py-2 sm:px-3">
 					<div className="flex">
 						<div className="relative">
-							<Listbox value={selectedAffiliate} onChange={onAffiliateSelect}>
-								<ListboxButton className="relative inline-flex items-center gap-x-1.5 rounded-full bg-gray-50 px-3 py-1.5 text-sm font-medium text-gray-900 hover:bg-gray-100">
-									{selectedAffiliate ? (
-										<div className="flex items-center gap-x-2">
-											<img
-												src={selectedAffiliate.avatar}
-												alt=""
-												className="h-6 w-6 rounded-full"
-											/>
-											<span className="text-gray-900">
-												{selectedAffiliate.displayName}
-											</span>
-											<img
-												src={`/logo-cluster/${platform}.svg`}
-												alt={platform}
-												className="h-4 w-4"
-											/>
-											{(() => {
-												const status = getEngagementStatus(interactions);
-												return (
-													<span
-														className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${status.bgColor} ${status.textColor}`}
-													>
+							{affiliates.length > 0 ? (
+								<Listbox value={selectedAffiliate} onChange={onAffiliateSelect}>
+									<ListboxButton className="relative inline-flex items-center gap-x-1.5 rounded-full bg-gray-50 px-3 py-1.5 text-sm font-medium text-gray-900 hover:bg-gray-100">
+										{selectedAffiliate ? (
+											<div className="flex items-center gap-x-2">
+												<img
+													src={selectedAffiliate.avatar}
+													alt=""
+													className="h-6 w-6 rounded-full"
+												/>
+												<span className="text-gray-900">
+													{selectedAffiliate.displayName}
+												</span>
+												<img
+													src={`/logo-cluster/${platform}${platform.toLowerCase() === "youtube" ? ".jpg" : ".svg"}`}
+													alt={platform}
+													className="h-4 w-4"
+												/>
+												{(() => {
+													const status = getEngagementStatus(interactions);
+													return (
 														<span
-															className={`mr-1 h-1.5 w-1.5 rounded-full ${status.dotColor}`}
-														/>
-														{status.label}
-													</span>
-												);
-											})()}
-										</div>
-									) : (
-										<>
-											<UserCircleIcon
-												className="h-6 w-6 text-gray-400"
-												aria-hidden="true"
-											/>
-											<span>Select affiliate</span>
-										</>
-									)}
-								</ListboxButton>
+															className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${status.bgColor} ${status.textColor}`}
+														>
+															<span
+																className={`mr-1 h-1.5 w-1.5 rounded-full ${status.dotColor}`}
+															/>
+															{status.label}
+														</span>
+													);
+												})()}
+											</div>
+										) : (
+											<>
+												<UserCircleIcon
+													className="h-6 w-6 text-gray-400"
+													aria-hidden="true"
+												/>
+												<span>Select affiliate</span>
+											</>
+										)}
+									</ListboxButton>
 
-								<ListboxOptions className="absolute left-0 z-10 mt-1 max-h-60 w-60 overflow-auto rounded-lg bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-									{affiliates.map((affiliate) => (
-										<ListboxOption
-											key={affiliate.handle}
-											value={affiliate}
-											className={({ active }) =>
-												classNames(
-													active
-														? "bg-orange-50 text-orange-900"
-														: "text-gray-900",
-													"relative cursor-default select-none py-2 px-3",
-												)
-											}
-										>
-											{({ selected, active }) => (
-												<div className="flex items-center">
-													<img
-														src={affiliate.avatar}
-														alt=""
-														className="h-6 w-6 rounded-full"
-													/>
-													<span className="ml-3 block truncate font-medium">
-														{affiliate.displayName}
-													</span>
-													<img
-														src={`/logo-cluster/${platform}.svg`}
-														alt={platform}
-														className="ml-auto h-4 w-4"
-													/>
-												</div>
-											)}
-										</ListboxOption>
-									))}
-								</ListboxOptions>
-							</Listbox>
+									<ListboxOptions className="absolute left-0 z-10 mt-1 max-h-60 w-60 overflow-auto rounded-lg bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+										{affiliates.map((affiliate) => (
+											<ListboxOption
+												key={affiliate.handle}
+												value={affiliate}
+												className={({ active }) =>
+													classNames(
+														active
+															? "bg-orange-50 text-orange-900"
+															: "text-gray-900",
+														"relative cursor-default select-none py-2 px-3",
+													)
+												}
+											>
+												{({ selected, active }) => (
+													<div className="flex items-center">
+														<img
+															src={affiliate.avatar}
+															alt=""
+															className="h-6 w-6 rounded-full"
+														/>
+														<span className="ml-3 block truncate font-medium">
+															{affiliate.displayName}
+														</span>
+														<img
+															src={`/logo-cluster/${platform}${platform.toLowerCase() === "youtube" ? ".jpg" : ".svg"}`}
+															alt={platform}
+															className="ml-auto h-4 w-4"
+														/>
+													</div>
+												)}
+											</ListboxOption>
+										))}
+									</ListboxOptions>
+								</Listbox>
+							) : null}
 						</div>
 					</div>
 					<div className="flex-shrink-0">

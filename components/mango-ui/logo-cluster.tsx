@@ -109,7 +109,7 @@ export function LogoCluster() {
 					hover={{ x: 3, y: 5, rotate: 7, delay: 0.2 }}
 				/>
 				<Logo
-					src="/logo-cluster/linkedin.svg"
+					src="/logo-cluster/youtube.jpg"
 					left={144}
 					top={40}
 					hover={{ x: -2, y: -5, rotate: -6, delay: 0.15 }}

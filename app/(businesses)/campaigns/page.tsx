@@ -9,7 +9,9 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { Toaster } from "react-hot-toast";
 import { getUser } from "../actions";
+import { DeletePipelineButton } from "./delete-pipeline-button";
 
 export default async function CampaignsPage() {
 	const user = await getUser();
@@ -18,6 +20,7 @@ export default async function CampaignsPage() {
 
 	return (
 		<div className="flex min-h-screen w-full flex-col">
+			<Toaster position="top-right" />
 			<Card>
 				<CardHeader>
 					<CardTitle>Campaigns</CardTitle>
@@ -29,11 +32,11 @@ export default async function CampaignsPage() {
 						<Table>
 							<TableHeader>
 								<TableRow>
-									<TableHead>Job ID</TableHead>
+									<TableHead>ID</TableHead>
 									<TableHead>Product Name</TableHead>
 									<TableHead>Product Description</TableHead>
 									<TableHead>Status</TableHead>
-									<TableHead>View</TableHead>
+									<TableHead>Actions</TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
@@ -64,12 +67,15 @@ export default async function CampaignsPage() {
 												</span>
 											</TableCell>
 											<TableCell>
-												<Link
-													href={`/campaigns/${pipeline.id}`}
-													className="text-blue-600 hover:underline"
-												>
-													View
-												</Link>
+												<div className="flex items-center gap-2">
+													<Link
+														href={`/campaigns/${pipeline.id}`}
+														className="text-blue-600 hover:underline"
+													>
+														View
+													</Link>
+													<DeletePipelineButton pipelineId={pipeline.id} />
+												</div>
 											</TableCell>
 										</TableRow>
 									);

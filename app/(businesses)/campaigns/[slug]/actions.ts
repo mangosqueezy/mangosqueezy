@@ -13,7 +13,7 @@ import type { Affiliate } from "./campaign";
 
 const UPSTASH_REDIS_REST_URL = process.env.UPSTASH_REDIS_REST_URL;
 const UPSTASH_REDIS_REST_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
-
+const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 const redis = new Redis({
 	url: UPSTASH_REDIS_REST_URL!,
 	token: UPSTASH_REDIS_REST_TOKEN!,
@@ -29,6 +29,107 @@ interface BlueskyPost {
 			handle: string;
 		};
 	};
+}
+
+type YouTubeThumbnail = {
+	url: string;
+	width?: number;
+	height?: number;
+};
+
+type YouTubeThumbnails = {
+	default: YouTubeThumbnail;
+	medium: YouTubeThumbnail;
+	high: YouTubeThumbnail;
+};
+
+type YouTubeSearchResult = {
+	kind: string;
+	etag: string;
+	id: {
+		kind: string;
+		channelId?: string;
+		videoId?: string;
+	};
+	snippet: {
+		publishedAt: string;
+		channelId: string;
+		title: string;
+		description: string;
+		thumbnails: YouTubeThumbnails;
+		channelTitle: string;
+		publishTime: string;
+	};
+};
+
+type YouTubeSearchResponse = {
+	items: YouTubeSearchResult[];
+};
+
+export interface YouTubeVideoResponse {
+	kind: string;
+	etag: string;
+	items: YouTubeVideo[];
+	pageInfo: PageInfo;
+}
+
+export interface YouTubeVideo {
+	kind: string;
+	etag: string;
+	id: string;
+	snippet: VideoSnippet;
+	contentDetails: ContentDetails;
+	statistics: Statistics;
+}
+
+export interface VideoSnippet {
+	publishedAt: string;
+	channelId: string;
+	title: string;
+	description: string;
+	thumbnails: {
+		default: Thumbnail;
+		medium: Thumbnail;
+		high: Thumbnail;
+		standard: Thumbnail;
+		maxres: Thumbnail;
+	};
+	channelTitle: string;
+	tags: string[];
+	categoryId: string;
+	liveBroadcastContent: string;
+	localized: {
+		title: string;
+		description: string;
+	};
+}
+
+export interface Thumbnail {
+	url: string;
+	width: number;
+	height: number;
+}
+
+export interface ContentDetails {
+	duration: string;
+	dimension: string;
+	definition: string;
+	caption: string;
+	licensedContent: boolean;
+	contentRating: Record<string, unknown>;
+	projection: string;
+}
+
+export interface Statistics {
+	viewCount: string;
+	likeCount: string;
+	favoriteCount: string;
+	commentCount: string;
+}
+
+export interface PageInfo {
+	totalResults: number;
+	resultsPerPage: number;
 }
 
 export async function createChatMessageAction(
@@ -92,6 +193,13 @@ export async function getAffiliatesAction({
 	if (platform === "bluesky") {
 		await fetch(
 			`https://www.mangosqueezy.com/api/bluesky/getSearchAffiliates?product_id=${product_id}&limit=100&pipeline_id=${pipeline_id}&affiliate_count=${affiliate_count}&difficulty=${difficulty}&platform=${platform}`,
+			{
+				method: "GET",
+			},
+		);
+	} else if (platform === "youtube") {
+		await fetch(
+			`https://www.mangosqueezy.com/api/youtube/getSearchAffiliates?product_id=${product_id}&limit=100&pipeline_id=${pipeline_id}&affiliate_count=${affiliate_count}&difficulty=${difficulty}&platform=${platform}`,
 			{
 				method: "GET",
 			},
@@ -176,6 +284,87 @@ export async function getInstagramFeedAction(
 	);
 
 	return { data, result };
+}
+
+export async function getYoutubeFeedAction(
+	handle: string,
+	channelId: string,
+	commissionPercentage: number,
+	exampleEarning: number,
+	productDescription: string,
+) {
+	const response = await fetch(
+		`https://youtube.googleapis.com/youtube/v3/channels?part=statistics,snippet&key=${YOUTUBE_API_KEY}&id=${channelId}`,
+	);
+
+	const youtubeSearchResponse = await fetch(
+		`https://youtube.googleapis.com/youtube/v3/search?part=snippet&key=${YOUTUBE_API_KEY}&type=channel,video,playlist&channelId=${channelId}`,
+	);
+
+	const youtubeSearchData: YouTubeSearchResponse =
+		await youtubeSearchResponse.json();
+
+	const youtubeSearchItems = youtubeSearchData.items;
+
+	let videoData: YouTubeVideoResponse = {
+		items: [],
+		kind: "",
+		etag: "",
+		pageInfo: { totalResults: 0, resultsPerPage: 0 },
+	};
+	const videoPromises = youtubeSearchItems
+		.slice(0, Math.min(youtubeSearchItems.length, 10))
+		.map(async (item) => {
+			if (item.id.videoId) {
+				const youtubeVideoResponse = await fetch(
+					`https://youtube.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${item.id.videoId}&key=${YOUTUBE_API_KEY}`,
+				);
+				return youtubeVideoResponse.json();
+			}
+			return null;
+		});
+
+	const videoResults = await Promise.all(videoPromises);
+	const validVideoResults = videoResults.filter(
+		(result): result is YouTubeVideoResponse => result !== null,
+	);
+
+	if (validVideoResults.length > 0) {
+		// Combine all valid video results into a single response
+		videoData = {
+			kind: validVideoResults[0].kind,
+			etag: validVideoResults[0].etag,
+			items: validVideoResults.reduce(
+				(acc, curr) => acc.concat(curr.items),
+				[] as YouTubeVideo[],
+			),
+			pageInfo: {
+				totalResults: validVideoResults.reduce(
+					(acc, curr) => acc + curr.pageInfo.totalResults,
+					0,
+				),
+				resultsPerPage: validVideoResults.reduce(
+					(acc, curr) => acc + curr.pageInfo.resultsPerPage,
+					0,
+				),
+			},
+		};
+	}
+
+	const feed = await response.json();
+	const data = feed.items;
+	const feedVideo = videoData?.items || [];
+
+	const caption = videoData?.items?.[0]?.contentDetails?.caption || "";
+	const result = await generateDraftPostAction(
+		handle,
+		caption,
+		productDescription,
+		commissionPercentage,
+		exampleEarning,
+	);
+
+	return { data, result, feedVideo };
 }
 
 export async function generateDraftPostAction(

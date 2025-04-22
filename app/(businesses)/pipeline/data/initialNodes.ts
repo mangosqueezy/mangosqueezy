@@ -20,7 +20,7 @@ export const initialNodes = [
 		type: "inputPlatform",
 		position: { x: 400, y: 400 },
 		targetPosition: "top",
-		data: { value: "instagram", label: "Platform" },
+		data: { value: "youtube", label: "Platform" },
 	},
 	{
 		id: "node-4",

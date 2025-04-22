@@ -57,8 +57,14 @@ export async function createPipelineAction(
 				method: "GET",
 			},
 		);
+	} else if (platform_name === "youtube") {
+		await fetch(
+			`https://www.mangosqueezy.com/api/youtube/getSearchAffiliates?product_id=${product_id}&limit=100&pipeline_id=${pipeline?.id}&affiliate_count=${affiliate_count}`,
+			{
+				method: "GET",
+			},
+		);
 	}
-
 	const resend = new Resend(process.env.RESEND_API_KEY);
 	await resend.emails.send({
 		from: "mangosqueezy <amit@tapasom.com>",

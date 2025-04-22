@@ -107,3 +107,13 @@ export async function getLatestPipeline() {
 		console.error(err);
 	}
 }
+
+export async function deletePipelineById(id: number) {
+	try {
+		return await prisma.pipelines.delete({
+			where: { id },
+		});
+	} catch (err) {
+		console.error(err);
+	}
+}

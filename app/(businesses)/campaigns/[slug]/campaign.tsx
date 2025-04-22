@@ -10,24 +10,60 @@ import { revalidatePath } from "next/cache";
 import Image from "next/image";
 import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import {
+	type YouTubeVideo,
+	type YouTubeVideoResponse,
 	createChatMessageAction,
 	deleteAffiliateAction,
 	getAffiliatesAction,
 	getAuthorFeedAction,
 	getInstagramFeedAction,
+	getYoutubeFeedAction,
 } from "./actions";
 
 const supabase = createClient();
 
+export type YouTubeThumbnail = {
+	url: string;
+	width?: number;
+	height?: number;
+};
+
+export type YouTubeThumbnails = {
+	default: YouTubeThumbnail;
+	medium: YouTubeThumbnail;
+	high: YouTubeThumbnail;
+};
+
+export type YouTubeSearchResult = {
+	kind: string;
+	etag: string;
+	id: {
+		kind: string;
+		channelId?: string;
+		videoId?: string;
+	};
+	snippet: {
+		publishedAt: string;
+		channelId: string;
+		title: string;
+		description: string;
+		thumbnails: YouTubeThumbnails;
+		channelTitle: string;
+		publishTime: string;
+	};
+};
+
 export type Affiliate = {
 	handle: string;
+	channelId?: string;
+	videoId?: string;
 	displayName: string;
 	avatar: string;
 	evaluation: "Yes" | "No";
 	tag: string;
 	reason: string;
 	status: "active" | "inactive";
-	platform: "instagram" | "bluesky";
+	platform: "instagram" | "bluesky" | "youtube";
 };
 
 interface BlueskyPost {
@@ -107,6 +143,21 @@ interface BlueskyProfile {
 
 type BlueskyFeed = BlueskyPost[];
 
+type YouTubeChannel = {
+	statistics: {
+		viewCount: string;
+		subscriberCount: string;
+		videoCount: string;
+	};
+	snippet: {
+		title: string;
+		description: string;
+		thumbnails: YouTubeThumbnails;
+	};
+};
+
+export type Platform = "instagram" | "bluesky" | "youtube";
+
 export default function Campaign({
 	pipeline_id,
 	affiliates,
@@ -124,7 +175,7 @@ export default function Campaign({
 	chatMessages: ChatMessage[];
 	affiliate_count: number;
 	difficulty: string;
-	platform: string;
+	platform: Platform;
 }) {
 	const uniqueId = useId();
 	const [selectedAffiliate, setSelectedAffiliate] = useState<Affiliate | null>(
@@ -142,6 +193,10 @@ export default function Campaign({
 		message: "",
 	});
 	const [blueskyFeed, setBlueskyFeed] = useState<BlueskyFeed | null>(null);
+	const [youtubeFeed, setYoutubeFeed] = useState<YouTubeVideo[] | null>(null);
+	const [youtubeProfile, setYoutubeProfile] = useState<YouTubeChannel[] | null>(
+		null,
+	);
 	const [blueskyProfile, setBlueskyProfile] = useState<BlueskyProfile | null>(
 		null,
 	);
@@ -281,6 +336,8 @@ export default function Campaign({
 		setIsLoading(true);
 		setBlueskyFeed(null);
 		setInstagramFeed(null);
+		setYoutubeFeed(null);
+		setYoutubeProfile(null);
 
 		try {
 			const price = product?.price || 0;
@@ -308,6 +365,22 @@ export default function Campaign({
 					product?.description || "",
 				);
 				setInstagramFeed(data);
+				setMessages({
+					sender: "amit@tapasom.com",
+					text: result,
+					date: new Date(),
+				});
+			} else if (platform === "youtube") {
+				const { data, result, feedVideo } = await getYoutubeFeedAction(
+					affiliate.handle,
+					affiliate.channelId as string,
+					commissionPercentage,
+					exampleEarning,
+					product?.description || "",
+				);
+
+				setYoutubeProfile(data);
+				setYoutubeFeed(feedVideo);
 				setMessages({
 					sender: "amit@tapasom.com",
 					text: result,
@@ -383,6 +456,69 @@ export default function Campaign({
 				/>
 			</div>
 
+			{/* Affiliate Management Buttons */}
+			<div className="flex items-center justify-between mb-6">
+				<div className="flex items-center gap-2">
+					<h3 className="text-lg font-semibold text-gray-900">Affiliates</h3>
+					<span className="px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 rounded-full">
+						{activeAffiliates.length} / {affiliate_count}
+					</span>
+				</div>
+				<div className="flex items-center gap-3">
+					{selectedAffiliate?.status === "active" && (
+						<button
+							type="button"
+							onClick={() => handleDeleteAffiliate(selectedAffiliate.handle)}
+							className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-md transition-colors"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								className="w-4 h-4"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								strokeWidth="2"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+							>
+								<title>Delete icon</title>
+								<path d="M3 6h18" />
+								<path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+								<path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+							</svg>
+							Remove Affiliate
+						</button>
+					)}
+					{activeAffiliates.length < affiliate_count && (
+						<button
+							type="button"
+							onClick={handleAddAffiliate}
+							disabled={isAddingAffiliate}
+							className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 disabled:cursor-not-allowed rounded-md transition-colors"
+						>
+							{isAddingAffiliate ? (
+								<Loader2 className="w-4 h-4 animate-spin" />
+							) : (
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									className="w-4 h-4"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="2"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+								>
+									<title>Add icon</title>
+									<path d="M12 5v14M5 12h14" />
+								</svg>
+							)}
+							Add New Affiliate
+						</button>
+					)}
+				</div>
+			</div>
+
 			{/* Social Media Posts Grid */}
 			<div className="space-y-6">
 				{isLoading ? (
@@ -391,71 +527,6 @@ export default function Campaign({
 					</div>
 				) : selectedAffiliate ? (
 					<>
-						<div className="flex items-center justify-between mb-6">
-							<div className="flex items-center gap-2">
-								<h3 className="text-lg font-semibold text-gray-900">
-									Affiliates
-								</h3>
-								<span className="px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 rounded-full">
-									{activeAffiliates.length} / {affiliate_count}
-								</span>
-							</div>
-							<div className="flex items-center gap-3">
-								{selectedAffiliate?.status === "active" && (
-									<button
-										type="button"
-										onClick={() =>
-											handleDeleteAffiliate(selectedAffiliate.handle)
-										}
-										className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-md transition-colors"
-									>
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											className="w-4 h-4"
-											viewBox="0 0 24 24"
-											fill="none"
-											stroke="currentColor"
-											strokeWidth="2"
-											strokeLinecap="round"
-											strokeLinejoin="round"
-										>
-											<title>Delete icon</title>
-											<path d="M3 6h18" />
-											<path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-											<path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-										</svg>
-										Remove Affiliate
-									</button>
-								)}
-								{activeAffiliates.length < affiliate_count && (
-									<button
-										type="button"
-										onClick={handleAddAffiliate}
-										disabled={isAddingAffiliate}
-										className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 disabled:cursor-not-allowed rounded-md transition-colors"
-									>
-										{isAddingAffiliate ? (
-											<Loader2 className="w-4 h-4 animate-spin" />
-										) : (
-											<svg
-												xmlns="http://www.w3.org/2000/svg"
-												className="w-4 h-4"
-												viewBox="0 0 24 24"
-												fill="none"
-												stroke="currentColor"
-												strokeWidth="2"
-												strokeLinecap="round"
-												strokeLinejoin="round"
-											>
-												<title>Add icon</title>
-												<path d="M12 5v14M5 12h14" />
-											</svg>
-										)}
-										Add New Affiliate
-									</button>
-								)}
-							</div>
-						</div>
 						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 							{/* Profile Card */}
 							<div
@@ -463,7 +534,9 @@ export default function Campaign({
 								key={`profile-card-${selectedAffiliate.handle}-${uniqueId}`}
 							>
 								<div className="absolute -inset-0.5 bg-gradient-to-r from-blue-100 to-orange-100 rounded-lg blur opacity-20 animate-glow" />
-								<div className="relative bg-white/30 backdrop-blur-lg rounded-lg border border-gray-200/50 shadow-md overflow-hidden">
+								<div
+									className={`relative bg-white/30 backdrop-blur-lg rounded-lg border border-gray-200/50 shadow-md overflow-hidden ${platform === "youtube" ? "h-[430px]" : ""}`}
+								>
 									<div className="relative">
 										{/* Banner - using a gradient as placeholder */}
 										{platform === "bluesky" && blueskyProfile?.banner ? (
@@ -559,6 +632,38 @@ export default function Campaign({
 															</div>
 														</>
 													)}
+													{platform === "youtube" &&
+														youtubeProfile &&
+														youtubeFeed && (
+															<>
+																<div className="text-center">
+																	<p className="text-base font-semibold text-gray-900">
+																		{youtubeProfile[0].statistics
+																			.subscriberCount || "-"}
+																	</p>
+																	<p className="text-xs text-gray-500">
+																		Subscribers
+																	</p>
+																</div>
+																<div className="text-center">
+																	<p className="text-base font-semibold text-gray-900">
+																		{youtubeProfile[0].statistics.videoCount ||
+																			"-"}
+																	</p>
+																	<p className="text-xs text-gray-500">
+																		Videos
+																	</p>
+																</div>
+																<div className="text-center">
+																	<p className="text-base font-semibold text-gray-900">
+																		{commission}%
+																	</p>
+																	<p className="text-xs text-gray-500">
+																		Commission
+																	</p>
+																</div>
+															</>
+														)}
 												</div>
 
 												{/* Bio Section */}
@@ -573,6 +678,10 @@ export default function Campaign({
 													) : platform === "bluesky" && blueskyProfile ? (
 														<p className="text-sm text-gray-700 line-clamp-2">
 															{blueskyProfile.description}
+														</p>
+													) : platform === "youtube" && youtubeFeed ? (
+														<p className="text-sm text-gray-700 line-clamp-2">
+															{youtubeFeed[0].snippet.description}
 														</p>
 													) : (
 														<div className="h-3 bg-gray-200/50 rounded animate-pulse" />
@@ -714,6 +823,71 @@ export default function Campaign({
 												</div>
 												<time className="text-xs">
 													{formatDate(post.timestamp)}
+												</time>
+											</div>
+										</div>
+									</div>
+								))}
+
+							{platform === "youtube" &&
+								youtubeFeed?.map((item) => (
+									<div
+										key={item.id}
+										className={`bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden ${platform === "youtube" ? "h-[430px]" : ""}`}
+									>
+										<div className="p-4">
+											<div className="flex items-center gap-3 mb-3">
+												<img
+													src={item.snippet.thumbnails.default.url}
+													alt={item.snippet.channelTitle}
+													className="w-10 h-10 rounded-full"
+												/>
+												<div>
+													<p className="font-medium text-gray-900">
+														{item.snippet.channelTitle}
+													</p>
+													<p className="text-sm text-gray-500">
+														@{selectedAffiliate?.handle}
+													</p>
+												</div>
+											</div>
+
+											<div className="relative aspect-video mb-4 bg-gray-100 rounded-lg overflow-hidden">
+												<Image
+													src={item.snippet.thumbnails.high.url}
+													alt="YouTube thumbnail"
+													fill
+													className="object-cover"
+												/>
+											</div>
+
+											<div className="relative aspect-video mb-4 h-48">
+												<iframe
+													src={`https://www.youtube.com/embed/${item.id}`}
+													title={item.snippet.title}
+													allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+													allowFullScreen
+													className="absolute top-0 left-0 w-full h-full rounded-lg"
+												/>
+											</div>
+
+											<p className="text-gray-900 text-sm mb-4 line-clamp-3">
+												{item.snippet.description}
+											</p>
+
+											<div className="flex items-center justify-between text-sm text-gray-500 pt-3 border-t">
+												<div className="flex items-center gap-4">
+													<div className="flex items-center gap-1">
+														<MessageCircle className="w-4 h-4" />
+														<span>{item.statistics?.commentCount || "-"}</span>
+													</div>
+													<div className="flex items-center gap-1">
+														<Heart className="w-4 h-4" />
+														<span>{item.statistics?.likeCount || "-"}</span>
+													</div>
+												</div>
+												<time className="text-xs">
+													{formatDate(item.snippet.publishedAt)}
 												</time>
 											</div>
 										</div>
