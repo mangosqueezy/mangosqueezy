@@ -158,6 +158,57 @@ type YouTubeChannel = {
 
 export type Platform = "instagram" | "bluesky" | "youtube";
 
+export type AffiliateStage = {
+	stage: "warm_up" | "engaged" | "negotiating" | "ready" | "inactive";
+	progress: number;
+	color: string;
+	label: string;
+};
+
+const getAffiliateStage = (messages: ChatMessage[]): AffiliateStage => {
+	if (!messages.length) {
+		return {
+			stage: "warm_up",
+			progress: 10,
+			color: "bg-blue-500",
+			label: "Warming Up",
+		};
+	}
+
+	const latestStatus = messages[0].chat_message_status || "warm_up";
+
+	switch (latestStatus) {
+		case "ready":
+			return {
+				stage: "ready",
+				progress: 100,
+				color: "bg-green-500",
+				label: "Ready to Collaborate",
+			};
+		case "negotiating":
+			return {
+				stage: "negotiating",
+				progress: 75,
+				color: "bg-orange-500",
+				label: "Negotiating Terms",
+			};
+		case "engaged":
+			return {
+				stage: "engaged",
+				progress: 50,
+				color: "bg-yellow-500",
+				label: "Actively Engaged",
+			};
+		default:
+			return {
+				stage: "warm_up",
+				progress: 25,
+				color: "bg-blue-500",
+				label: "Warming Up",
+			};
+	}
+};
+
 export default function Campaign({
 	pipeline_id,
 	affiliates,
@@ -203,6 +254,12 @@ export default function Campaign({
 	const [instagramFeed, setInstagramFeed] = useState<InstagramFeed | null>(
 		null,
 	);
+	const [affiliateStage, setAffiliateStage] = useState<AffiliateStage>({
+		stage: "warm_up",
+		progress: 10,
+		color: "bg-blue-500",
+		label: "Warming Up",
+	});
 
 	useEffect(() => {
 		let channel: RealtimeChannel;
@@ -309,27 +366,14 @@ export default function Campaign({
 
 	useEffect(() => {
 		if (selectedAffiliate) {
-			const messages = chatMessages
-				.map((message) => {
-					if (
-						message.sender === selectedAffiliate.handle ||
-						message.receiver === selectedAffiliate.handle
-					) {
-						return {
-							sender: message.sender,
-							text: message.text,
-							date: message.created_at,
-						};
-					}
-					return null;
-				})
-				.filter(
-					(msg): msg is { sender: string; text: string; date: Date } =>
-						msg !== null,
-				);
-			// setMessages(messages);
+			const relevantMessages = chatMessages.filter(
+				(message) =>
+					message.sender === selectedAffiliate.handle ||
+					message.receiver === selectedAffiliate.handle,
+			);
+			setAffiliateStage(getAffiliateStage(relevantMessages));
 		}
-	}, [chatMessages, selectedAffiliate]);
+	}, [selectedAffiliate, chatMessages]);
 
 	const handleAffiliateSelect = async (affiliate: Affiliate) => {
 		setSelectedAffiliate(affiliate);
@@ -577,6 +621,37 @@ export default function Campaign({
 														@{selectedAffiliate?.handle}
 													</p>
 												</div>
+
+												{/* Add this after the Profile Info section, before Stats Grid */}
+												{selectedAffiliate && (
+													<div className="mb-4">
+														<div className="flex items-center justify-between mb-2">
+															<span className="text-sm font-medium text-gray-700">
+																Engagement Progress
+															</span>
+															<span
+																className="text-sm font-medium"
+																style={{ color: affiliateStage.color }}
+															>
+																{affiliateStage.progress}%
+															</span>
+														</div>
+														<div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+															<div
+																className={`h-full ${affiliateStage.color} transition-all duration-500 ease-in-out`}
+																style={{ width: `${affiliateStage.progress}%` }}
+															/>
+														</div>
+														<div className="mt-1 flex items-center gap-1.5">
+															<div
+																className={`w-1.5 h-1.5 rounded-full ${affiliateStage.color} animate-pulse`}
+															/>
+															<span className="text-xs text-gray-600">
+																{affiliateStage.label}
+															</span>
+														</div>
+													</div>
+												)}
 
 												{/* Stats Grid */}
 												<div className="grid grid-cols-3 gap-2 py-2 border-y border-gray-100">

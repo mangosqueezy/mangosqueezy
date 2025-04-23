@@ -27,6 +27,6 @@ export async function getChatMessages({
 }: { pipeline_id: number }) {
 	return prisma.chatMessage.findMany({
 		where: { pipeline_id },
-		orderBy: { created_at: "asc" },
+		orderBy: { created_at: "desc" },
 	});
 }

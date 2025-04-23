@@ -355,7 +355,7 @@ export async function getYoutubeFeedAction(
 	const data = feed.items;
 	const feedVideo = videoData?.items || [];
 
-	const caption = videoData?.items?.[0]?.contentDetails?.caption || "";
+	const caption = videoData?.items?.[0]?.snippet.description || "";
 	const result = await generateDraftPostAction(
 		handle,
 		caption,
@@ -400,8 +400,6 @@ Write a reply for ${handle} that:
 - Shows you understand the post.
 - Uses a ${tone} tone.
 - Sounds like a real person, not AI.
-- Builds a real connection rather than pushing sales.
-- Ends with a friendly call to action if suitable.
 - The output should not be in the double quotes. Just plain text.`;
 
 			systemPrompt =

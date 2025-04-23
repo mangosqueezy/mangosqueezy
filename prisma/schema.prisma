@@ -172,6 +172,7 @@ model ChatMessage {
   receiver    String
   text        String
   pipeline_id Int
+  chat_message_status String? @default("warm_up")
   created_at  DateTime  @default(now())
   updated_at  DateTime  @updatedAt
   pipeline    Pipelines @relation(fields: [pipeline_id], references: [id])
