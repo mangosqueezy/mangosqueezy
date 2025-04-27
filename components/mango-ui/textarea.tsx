@@ -45,21 +45,53 @@ function classNames(...classes: string[]) {
 	return classes.filter(Boolean).join(" ");
 }
 
-function getEngagementStatus(interactions = 0) {
-	if (interactions >= 3) {
+function getEngagementStatus(messages: ChatMessage[]) {
+	if (!messages.length) {
 		return {
-			label: "Ready",
-			bgColor: "bg-green-100",
-			textColor: "text-green-800",
-			dotColor: "bg-green-400",
+			stage: "warm_up",
+			bgColor: "bg-blue-100",
+			textColor: "text-blue-800",
+			dotColor: "bg-blue-400",
+			label: "Warming Up",
 		};
 	}
-	return {
-		label: "Warming Up",
-		bgColor: "bg-yellow-100",
-		textColor: "text-yellow-800",
-		dotColor: "bg-yellow-400",
-	};
+
+	const latestStatus = messages[0].chat_message_status || "warm_up";
+
+	switch (latestStatus) {
+		case "ready":
+			return {
+				stage: "ready",
+				bgColor: "bg-green-100",
+				textColor: "text-green-800",
+				dotColor: "bg-green-400",
+				label: "Ready to Collaborate",
+			};
+		case "negotiating":
+			return {
+				stage: "negotiating",
+				bgColor: "bg-orange-100",
+				textColor: "text-orange-800",
+				dotColor: "bg-orange-400",
+				label: "Negotiating Terms",
+			};
+		case "engaged":
+			return {
+				stage: "engaged",
+				bgColor: "bg-yellow-100",
+				textColor: "text-yellow-800",
+				dotColor: "bg-yellow-400",
+				label: "Actively Engaged",
+			};
+		default:
+			return {
+				stage: "warm_up",
+				bgColor: "bg-blue-100",
+				textColor: "text-blue-800",
+				dotColor: "bg-blue-400",
+				label: "Warming Up",
+			};
+	}
 }
 
 export default function Textarea({
@@ -157,7 +189,7 @@ export default function Textarea({
 													className="h-4 w-4"
 												/>
 												{(() => {
-													const status = getEngagementStatus(interactions);
+													const status = getEngagementStatus(chatMessages);
 													return (
 														<span
 															className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${status.bgColor} ${status.textColor}`}
