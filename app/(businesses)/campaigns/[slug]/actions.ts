@@ -156,6 +156,8 @@ export async function createChatMessageAction(
 		}) as React.ReactElement,
 	});
 
+	revalidatePath(`/campaigns/${pipeline_id}`);
+
 	return chatMessage;
 }
 

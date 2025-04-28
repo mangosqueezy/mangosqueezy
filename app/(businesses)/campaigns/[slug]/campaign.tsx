@@ -1,17 +1,36 @@
 "use client";
 
-import Textarea from "@/components/mango-ui/textarea";
+import { Button } from "@/components/ui/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { createClient } from "@/lib/supabase/client";
 import type { Products } from "@prisma/client";
 import type { ChatMessage } from "@prisma/client";
 import type { RealtimeChannel } from "@supabase/supabase-js";
-import { Heart, Loader2, MessageCircle, Quote, Repeat2 } from "lucide-react";
+import {
+	Heart,
+	Info,
+	Loader2,
+	MessageCircle,
+	Quote,
+	Repeat2,
+} from "lucide-react";
 import { revalidatePath } from "next/cache";
 import Image from "next/image";
-import { useCallback, useEffect, useId, useMemo, useState } from "react";
+import {
+	useCallback,
+	useEffect,
+	useId,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import {
 	type YouTubeVideo,
-	type YouTubeVideoResponse,
 	createChatMessageAction,
 	deleteAffiliateAction,
 	getAffiliatesAction,
@@ -260,6 +279,43 @@ export default function Campaign({
 		color: "bg-blue-500",
 		label: "Warming Up",
 	});
+	const [showStageMessage, setShowStageMessage] = useState(false);
+	const [isSendingMessage, setIsSendingMessage] = useState(false);
+	const [cooldown, setCooldown] = useState<number>(0);
+	const cooldownInterval = useRef<NodeJS.Timeout | null>(null);
+
+	const affiliateStageButtonConfig = {
+		warm_up: {
+			color: "bg-blue-500 hover:bg-blue-600 text-white",
+			message:
+				"Awesome! We're starting to build a relationship with this creator. We'll engage with their posts over the next few days and update you when it's time to reach out!",
+			label: "Warming Up",
+		},
+		engaged: {
+			color: "bg-yellow-500 hover:bg-yellow-600 text-white",
+			message:
+				"Great! This creator is actively engaging with us. Keep the conversation going and look for opportunities to collaborate.",
+			label: "Actively Engaged",
+		},
+		negotiating: {
+			color: "bg-orange-500 hover:bg-orange-600 text-white",
+			message:
+				"We're negotiating terms with this creator. Stay tuned for updates on the partnership details.",
+			label: "Negotiating Terms",
+		},
+		ready: {
+			color: "bg-green-500 hover:bg-green-600 text-white",
+			message:
+				"This creator is ready to collaborate! Let's finalize the details and launch the campaign together.",
+			label: "Ready to Collaborate",
+		},
+		inactive: {
+			color: "bg-gray-400 text-white cursor-not-allowed",
+			message:
+				"This creator is currently inactive. You can revisit this relationship later or choose another affiliate.",
+			label: "Inactive",
+		},
+	};
 
 	useEffect(() => {
 		let channel: RealtimeChannel;
@@ -343,8 +399,24 @@ export default function Campaign({
 		setInstagramFeed(null);
 	};
 
+	const relevantMessages = useMemo(() => {
+		if (!selectedAffiliate) return [];
+		return chatMessages.filter(
+			(message) =>
+				message.sender === selectedAffiliate.handle ||
+				message.receiver === selectedAffiliate.handle,
+		);
+	}, [selectedAffiliate, chatMessages]);
+
+	useEffect(() => {
+		if (selectedAffiliate) {
+			setAffiliateStage(getAffiliateStage(relevantMessages));
+		}
+	}, [selectedAffiliate, relevantMessages]);
+
 	const handleSendMessage = async () => {
 		if (messages?.text.trim()) {
+			setIsSendingMessage(true);
 			setMessages({
 				sender: "amit@tapasom.com",
 				text: messages.text,
@@ -356,6 +428,8 @@ export default function Campaign({
 				messages.text,
 				selectedAffiliate?.handle as string,
 			);
+			setIsSendingMessage(false);
+			setAffiliateStage(getAffiliateStage(relevantMessages));
 		}
 	};
 
@@ -363,17 +437,6 @@ export default function Campaign({
 		() => affiliates.filter((affiliate) => affiliate.status === "active"),
 		[affiliates],
 	);
-
-	useEffect(() => {
-		if (selectedAffiliate) {
-			const relevantMessages = chatMessages.filter(
-				(message) =>
-					message.sender === selectedAffiliate.handle ||
-					message.receiver === selectedAffiliate.handle,
-			);
-			setAffiliateStage(getAffiliateStage(relevantMessages));
-		}
-	}, [selectedAffiliate, chatMessages]);
 
 	const handleAffiliateSelect = async (affiliate: Affiliate) => {
 		setSelectedAffiliate(affiliate);
@@ -446,6 +509,64 @@ export default function Campaign({
 		});
 	};
 
+	// Find the latest message sent by the current user to the selected affiliate
+	const latestUserMessage = useMemo(() => {
+		if (!selectedAffiliate) return null;
+		return (
+			relevantMessages
+				.filter(
+					(msg) =>
+						msg.sender === "amit@tapasom.com" &&
+						msg.receiver === selectedAffiliate.handle,
+				)
+				.sort(
+					(a, b) =>
+						new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+				)[0] || null
+		);
+	}, [relevantMessages, selectedAffiliate]);
+
+	// Cooldown effect
+	useEffect(() => {
+		if (!latestUserMessage) {
+			setCooldown(0);
+			if (cooldownInterval.current) clearInterval(cooldownInterval.current);
+			return;
+		}
+		const lastSent = new Date(latestUserMessage.created_at).getTime();
+		const now = Date.now();
+		const diff = 24 * 60 * 60 * 1000 - (now - lastSent);
+		if (diff > 0) {
+			setCooldown(diff);
+			if (cooldownInterval.current) clearInterval(cooldownInterval.current);
+			cooldownInterval.current = setInterval(() => {
+				setCooldown((prev) => {
+					if (prev <= 1000) {
+						clearInterval(cooldownInterval.current!);
+						return 0;
+					}
+					return prev - 1000;
+				});
+			}, 1000);
+		} else {
+			setCooldown(0);
+			if (cooldownInterval.current) clearInterval(cooldownInterval.current);
+		}
+		return () => {
+			if (cooldownInterval.current) clearInterval(cooldownInterval.current);
+		};
+	}, [latestUserMessage]);
+
+	function formatCooldown(ms: number) {
+		const totalSeconds = Math.floor(ms / 1000);
+		const hours = Math.floor(totalSeconds / 3600);
+		const minutes = Math.floor((totalSeconds % 3600) / 60);
+		const seconds = totalSeconds % 60;
+		return `${hours.toString().padStart(2, "0")}:${minutes
+			.toString()
+			.padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+	}
+
 	return (
 		<div className="container mx-auto px-4 py-8">
 			{/* Product Header */}
@@ -485,35 +606,67 @@ export default function Campaign({
 				</div>
 			</div>
 
-			{/* Textarea Component */}
-			<div className="mb-8">
-				<Textarea
-					affiliates={activeAffiliates}
-					selectedAffiliate={selectedAffiliate}
-					onAffiliateSelect={handleAffiliateSelect}
-					message={messages?.text || ""}
-					onMessageChange={setMessages}
-					onSendMessage={handleSendMessage}
-					isLoading={isLoading}
-					chatMessages={chatMessages}
-					platform={platform}
-				/>
-			</div>
-
-			{/* Affiliate Management Buttons */}
-			<div className="flex items-center justify-between mb-6">
-				<div className="flex items-center gap-2">
+			<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 w-full gap-4 sm:gap-0">
+				<div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
 					<h3 className="text-lg font-semibold text-gray-900">Affiliates</h3>
-					<span className="px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 rounded-full">
+					<span className="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 text-xs font-medium border border-gray-200">
 						{activeAffiliates.length} / {affiliate_count}
 					</span>
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button
+								variant="secondary"
+								className="ml-0 sm:ml-2 px-3 py-1.5 text-xs font-medium w-full sm:w-auto"
+							>
+								{selectedAffiliate ? (
+									<span className="flex items-center gap-2">
+										<img
+											src={selectedAffiliate.avatar}
+											alt={selectedAffiliate.displayName}
+											className="w-5 h-5 rounded-full"
+										/>
+										{selectedAffiliate.displayName}
+									</span>
+								) : (
+									"Select Affiliate"
+								)}
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="start">
+							{activeAffiliates.length === 0 ? (
+								<DropdownMenuItem disabled>
+									No active affiliates
+								</DropdownMenuItem>
+							) : (
+								activeAffiliates.map((affiliate) => (
+									<DropdownMenuItem
+										key={affiliate.handle}
+										onSelect={() => {
+											setSelectedAffiliate(affiliate);
+											handleAffiliateSelect(affiliate);
+										}}
+										className="flex items-center gap-2"
+									>
+										<span>{affiliate.displayName}</span>
+										<Image
+											src={`/logo-cluster/${platform}${platform.toLowerCase() === "youtube" ? ".jpg" : ".svg"}`}
+											alt={platform}
+											width={20}
+											height={20}
+											className="rounded-full"
+										/>
+									</DropdownMenuItem>
+								))
+							)}
+						</DropdownMenuContent>
+					</DropdownMenu>
 				</div>
-				<div className="flex items-center gap-3">
+				<div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
 					{selectedAffiliate?.status === "active" && (
 						<button
 							type="button"
 							onClick={() => handleDeleteAffiliate(selectedAffiliate.handle)}
-							className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-md transition-colors"
+							className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-md transition-colors w-full sm:w-auto"
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -538,10 +691,12 @@ export default function Campaign({
 							type="button"
 							onClick={handleAddAffiliate}
 							disabled={isAddingAffiliate}
-							className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 disabled:cursor-not-allowed rounded-md transition-colors"
+							className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 disabled:cursor-not-allowed rounded-md transition-colors w-full sm:w-auto"
 						>
 							{isAddingAffiliate ? (
-								<Loader2 className="w-4 h-4 animate-spin" />
+								<>
+									<Loader2 className="w-4 h-4 animate-spin" />
+								</>
 							) : (
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -557,7 +712,11 @@ export default function Campaign({
 									<path d="M12 5v14M5 12h14" />
 								</svg>
 							)}
-							Add New Affiliate
+							{isAddingAffiliate ? (
+								<span>{`searching on ${platform}...`}</span>
+							) : (
+								<span>Add New Affiliate</span>
+							)}
 						</button>
 					)}
 				</div>
@@ -566,8 +725,26 @@ export default function Campaign({
 			{/* Social Media Posts Grid */}
 			<div className="space-y-6">
 				{isLoading ? (
-					<div className="flex items-center justify-center py-12">
-						<Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
+					<div className="flex items-center justify-center py-12 w-full">
+						{/* Shimmer cards */}
+						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+							{[1, 2, 3].map((i) => (
+								<div
+									key={i}
+									className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden animate-pulse"
+								>
+									<div className="p-4">
+										<div className="h-10 w-10 bg-gray-200 rounded-full mb-3" />
+										<div className="h-4 bg-gray-200 rounded w-1/2 mb-2" />
+										<div className="h-3 bg-gray-200 rounded w-1/3 mb-4" />
+										<div className="relative aspect-square mb-4 bg-gray-200 rounded-lg" />
+										<div className="h-3 bg-gray-200 rounded w-full mb-2" />
+										<div className="h-3 bg-gray-200 rounded w-2/3 mb-2" />
+										<div className="h-3 bg-gray-200 rounded w-1/2" />
+									</div>
+								</div>
+							))}
+						</div>
 					</div>
 				) : selectedAffiliate ? (
 					<>
@@ -763,14 +940,56 @@ export default function Campaign({
 													)}
 												</div>
 
-												{/* Affiliate Status */}
-												<div className="flex items-center gap-1.5 mt-2">
-													<div className="w-1.5 h-1.5 rounded-full bg-gray-400" />
-													<span className="text-xs text-gray-600">
-														{selectedAffiliate?.status === "active"
-															? "Not confirmed"
-															: "Pending Confirmation"}
-													</span>
+												{/* Send Affiliate Message Button */}
+												<div className="flex flex-col items-start gap-1.5 mt-2">
+													<Button
+														type="button"
+														className={`rounded-lg px-4 py-1 mt-2 text-xs font-semibold shadow-sm transition-colors flex items-center gap-2 ${affiliateStageButtonConfig[affiliateStage.stage].color}`}
+														onClick={() => {
+															handleSendMessage();
+															setShowStageMessage((prev) => !prev);
+														}}
+														disabled={
+															affiliateStage.stage === "inactive" ||
+															isSendingMessage ||
+															cooldown > 0
+														}
+													>
+														{isSendingMessage ? (
+															<Loader2 className="w-4 h-4 animate-spin" />
+														) : (
+															<MessageCircle className="w-4 h-4 animate-pulse" />
+														)}
+														{cooldown > 0
+															? `Wait ${formatCooldown(cooldown)}`
+															: affiliateStageButtonConfig[affiliateStage.stage]
+																	.label}
+													</Button>
+													<div
+														className={
+															"mt-2 text-xs bg-gray-50 border border-gray-200 rounded-lg p-3 w-full shadow-sm transition-all duration-300 ease-in-out flex items-start gap-2"
+														}
+													>
+														{relevantMessages.length === 0 ? (
+															<span className="flex items-center gap-2 text-gray-400">
+																<Info className="w-4 h-4 flex-shrink-0" />
+																<span className="font-medium">
+																	Not initiated
+																</span>
+															</span>
+														) : (
+															<span className="relative block text-gray-700 min-h-[1.5rem]">
+																<Info className="w-4 h-4 absolute left-0 top-0" />
+																<span className="pl-6 block text-left w-full leading-tight">
+																	{
+																		affiliateStageButtonConfig[
+																			affiliateStage.stage
+																		].message
+																	}
+																</span>
+															</span>
+														)}
+													</div>
 												</div>
 											</div>
 										</div>
@@ -970,6 +1189,12 @@ export default function Campaign({
 								))}
 						</div>
 					</>
+				) : affiliates.length === 0 ? (
+					<div className="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
+						<p className="text-gray-500">
+							No affiliates found for this campaign
+						</p>
+					</div>
 				) : (
 					<div className="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
 						<h3 className="text-lg font-medium text-gray-900 mb-2">
