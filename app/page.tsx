@@ -35,8 +35,8 @@ function Hero() {
 						AI Agent.
 					</h1>
 					<p className="mt-8 max-w-lg text-xl/7 font-medium text-gray-950/75 sm:text-2xl/8">
-						We help you find cold leads on YouTube, Instagram, and Bluesky —
-						warm them up, and build real partnerships.
+						We help you find cold leads on YouTube, and Bluesky — warm them up,
+						and build real partnerships.
 					</p>
 					<div className="mt-12 flex flex-col gap-x-6 gap-y-4 sm:flex-row">
 						<Button href={userId ? "/pipeline" : "/login"}>

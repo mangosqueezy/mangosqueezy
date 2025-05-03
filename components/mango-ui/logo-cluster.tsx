@@ -114,12 +114,12 @@ export function LogoCluster() {
 					top={40}
 					hover={{ x: -2, y: -5, rotate: -6, delay: 0.15 }}
 				/>
-				<Logo
+				{/* <Logo
 					src="/logo-cluster/instagram.svg"
 					left={36}
 					top={56}
 					hover={{ x: -4, y: -5, rotate: -6, delay: 0.35 }}
-				/>
+				/> */}
 			</div>
 		</div>
 	);
