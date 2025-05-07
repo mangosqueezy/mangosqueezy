@@ -2,6 +2,7 @@ import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+	turbopack: {},
 	experimental: {
 		serverActions: {
 			bodySizeLimit: "5mb",

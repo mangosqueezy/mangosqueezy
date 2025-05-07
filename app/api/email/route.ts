@@ -12,7 +12,6 @@ const emailSchema = z.object({
 });
 
 const OPENAI_KEY = process.env.OPENAI_KEY;
-const HELICONE_API_KEY = process.env.HELICONE_API_KEY;
 
 export async function GET() {
 	return NextResponse.json({ result: "email" }, { status: 200 });
@@ -31,12 +30,6 @@ export async function POST(request: Request) {
 			apiKey: OPENAI_KEY,
 			model: "gpt-4o",
 			temperature: 0.9,
-			configuration: {
-				basePath: "https://oai.hconeai.com/v1",
-				defaultHeaders: {
-					"Helicone-Auth": `Bearer ${HELICONE_API_KEY}`,
-				},
-			},
 		});
 
 		const modelWithStructuredOutput = model.withStructuredOutput(emailSchema);

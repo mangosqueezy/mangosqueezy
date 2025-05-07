@@ -23,7 +23,7 @@ export function PlusGridRow({
 		<div
 			className={clsx(
 				className,
-				"group/row relative isolate pt-[calc(theme(spacing.2)+1px)] last:pb-[calc(theme(spacing.2)+1px)]",
+				"group/row relative isolate pt-[calc(--spacing(2)+1px)] last:pb-[calc(--spacing(2)+1px)]",
 			)}
 		>
 			<div

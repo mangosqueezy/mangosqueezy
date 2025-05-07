@@ -330,7 +330,7 @@ export function ConnectifyForm({
 										whileTap={{ scale: 0.98 }}
 										type="submit"
 										disabled={submitting}
-										className={`w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 px-4 
+										className={`w-full bg-linear-to-r from-orange-500 to-orange-600 text-white py-3 px-4 
 											rounded-lg font-medium hover:from-orange-600 hover:to-orange-700 
 											focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 
 											transition duration-200 ${submitting ? "opacity-50 cursor-not-allowed" : ""}`}
@@ -386,7 +386,7 @@ export function ConnectifyForm({
 										whileTap={{ scale: 0.98 }}
 										type="submit"
 										disabled={submitting}
-										className={`w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 px-4 
+										className={`w-full bg-linear-to-r from-orange-500 to-orange-600 text-white py-3 px-4 
 											rounded-lg font-medium hover:from-orange-600 hover:to-orange-700 
 											focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 
 											transition duration-200 ${submitting ? "opacity-50 cursor-not-allowed" : ""}`}
@@ -404,7 +404,7 @@ export function ConnectifyForm({
 					<div className="max-w-md mx-auto space-y-8">
 						{selectedProduct ? (
 							<>
-								<div className="relative aspect-[4/3] rounded-xl overflow-hidden">
+								<div className="relative aspect-4/3 rounded-xl overflow-hidden">
 									<Image
 										src={selectedProduct.image_url || "/product-image.jpg"}
 										alt={selectedProduct.name}

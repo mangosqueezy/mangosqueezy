@@ -11,7 +11,7 @@ export default function AnimatedHeroV0() {
 	}, []);
 
 	return (
-		<div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-orange-50 to-white">
+		<div className="relative min-h-screen overflow-hidden bg-linear-to-b from-orange-50 to-white">
 			{/* Animated background */}
 			<div className="absolute inset-0 overflow-hidden">
 				<div className="absolute inset-0 bg-[linear-gradient(to_right,#e0e7ff2e_1px,transparent_1px),linear-gradient(to_bottom,#e0e7ff2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#4338ca_70%,transparent_100%)]" />
@@ -19,7 +19,7 @@ export default function AnimatedHeroV0() {
 					{[...Array(20)].map((_, i) => (
 						<div
 							key={`bubble-${i}-${Math.random()}`}
-							className="absolute rounded-full bg-gradient-to-b from-orange-200 to-transparent opacity-30 animate-pulse"
+							className="absolute rounded-full bg-linear-to-b from-orange-200 to-transparent opacity-30 animate-pulse"
 							style={{
 								width: `${Math.random() * 200 + 50}px`,
 								height: `${Math.random() * 200 + 50}px`,
@@ -70,7 +70,7 @@ export default function AnimatedHeroV0() {
 								<div className="absolute inset-0 bg-gray-200 animate-pulse" />
 							)}
 						</div>
-						<div className="absolute -bottom-6 -left-6 -right-6 -top-6 rounded-xl bg-gradient-to-br from-orange-200 via-orange-200 to-yellow-200 blur-2xl opacity-30" />
+						<div className="absolute -bottom-6 -left-6 -right-6 -top-6 rounded-xl bg-linear-to-br from-orange-200 via-orange-200 to-yellow-200 blur-2xl opacity-30" />
 					</div>
 				</div>
 			</div>

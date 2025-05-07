@@ -258,7 +258,7 @@ export default function Checkout({
 	};
 
 	return (
-		<div className="min-h-screen bg-gradient-to-b from-[#fafafa] to-[#f5f5f5] dark:from-[#1a1a1a] dark:to-[#141414] flex">
+		<div className="min-h-screen bg-linear-to-b from-[#fafafa] to-[#f5f5f5] dark:from-[#1a1a1a] dark:to-[#141414] flex">
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className="flex w-full">
 					<div className="flex flex-col md:flex-row w-full relative">
@@ -324,7 +324,7 @@ export default function Checkout({
 						<div className="hidden md:block absolute top-0 bottom-0 left-1/2 w-px -translate-x-1/2">
 							<div className="absolute inset-0 bg-[#e6e6e6] dark:bg-[#2f2f2f]" />
 							<div className="absolute inset-0 overflow-hidden">
-								<div className="absolute top-0 w-px h-32 bg-gradient-to-b from-black/0 via-black/20 to-black/0 dark:from-white/0 dark:via-white/20 dark:to-white/0 animate-separator" />
+								<div className="absolute top-0 w-px h-32 bg-linear-to-b from-black/0 via-black/20 to-black/0 dark:from-white/0 dark:via-white/20 dark:to-white/0 animate-separator" />
 							</div>
 						</div>
 

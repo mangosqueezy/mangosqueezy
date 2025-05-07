@@ -69,7 +69,7 @@ ChartContainer.displayName = "Chart";
 
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 	const colorConfig = Object.entries(config).filter(
-		([_, config]) => config.theme || config.color,
+		([, config]) => config.theme || config.color,
 	);
 
 	if (!colorConfig.length) {
@@ -78,7 +78,7 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 
 	return (
 		<style
-			// biome-ignore lint: /security/noDangerouslySetInnerHtml
+			// biome-ignore lint/security/noDangerouslySetInnerHtml:
 			dangerouslySetInnerHTML={{
 				__html: Object.entries(THEMES)
 					.map(
@@ -140,7 +140,7 @@ const ChartTooltipContent = React.forwardRef<
 			}
 
 			const [item] = payload;
-			const key = `${labelKey || item.dataKey || item.name || "value"}`;
+			const key = `${labelKey || item?.dataKey || item?.name || "value"}`;
 			const itemConfig = getPayloadConfigFromPayload(config, item, key);
 			const value =
 				!labelKey && typeof label === "string"
@@ -209,7 +209,7 @@ const ChartTooltipContent = React.forwardRef<
 											!hideIndicator && (
 												<div
 													className={cn(
-														"shrink-0 rounded-[2px] border-[--color-border] bg-[--color-bg]",
+														"shrink-0 rounded-[2px] border-(--color-border) bg-(--color-bg)",
 														{
 															"h-2.5 w-2.5": indicator === "dot",
 															"w-1": indicator === "line",

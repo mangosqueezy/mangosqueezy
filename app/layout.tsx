@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import { Inter as FontSans } from "next/font/google";
 import { PHProvider } from "./providers";
-import "./tailwind.css";
+import "./globals.css";
 
 const PostHogPageView = dynamic(() => import("./posthog-pageview"), {
 	ssr: true,
@@ -76,6 +76,12 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
+			<head>
+				<link
+					rel="stylesheet"
+					href="https://api.fontshare.com/css?f%5B%5D=switzer@400,500,600,700&amp;display=swap"
+				/>
+			</head>
 			<PHProvider>
 				<body
 					className={cn(

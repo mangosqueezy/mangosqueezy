@@ -1,5 +1,5 @@
 import { get } from "@vercel/edge-config";
-import { unstable_flag as flag } from "@vercel/flags/next";
+import { flag } from "flags/next";
 
 export const showManualAffiliateFeature = flag({
 	key: "manual_affiliate_feature",

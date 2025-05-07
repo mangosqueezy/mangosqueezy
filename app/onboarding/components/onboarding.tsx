@@ -146,7 +146,7 @@ export default function ElegantOnboarding({
 				<div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-50" />
 
 				{/* Subtle gradient overlay */}
-				<div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-gray-100 opacity-70" />
+				<div className="absolute inset-0 bg-linear-to-br from-white via-gray-50 to-gray-100 opacity-70" />
 
 				{/* Main content */}
 				<div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200 w-full max-w-4xl flex flex-col lg:flex-row relative z-10">

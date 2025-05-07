@@ -4,8 +4,8 @@ import Image from "next/image";
 function Row({ children }: { children: React.ReactNode }) {
 	return (
 		<div className="group relative">
-			<div className="absolute inset-x-0 top-1/2 h-0.5 bg-gradient-to-r from-white/15 from-[2px] to-[2px] bg-[length:12px_100%]" />
-			<div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-white/5 from-[2px] to-[2px] bg-[length:12px_100%] group-last:hidden" />
+			<div className="absolute inset-x-0 top-1/2 h-0.5 bg-linear-to-r from-white/15 from-[2px] to-[2px] bg-[length:12px_100%]" />
+			<div className="absolute inset-x-0 bottom-0 h-0.5 bg-linear-to-r from-white/5 from-[2px] to-[2px] bg-[length:12px_100%] group-last:hidden" />
 			{children}
 		</div>
 	);
@@ -24,8 +24,8 @@ function Logo({
 		<div
 			className={clsx(
 				className,
-				"absolute top-2 grid grid-cols-[1rem,1fr] items-center gap-2 whitespace-nowrap px-3 py-1",
-				"rounded-full bg-gradient-to-t from-gray-800 from-50% to-gray-700 ring-1 ring-inset ring-white/10",
+				"absolute top-2 grid grid-cols-[1rem_1fr] items-center gap-2 whitespace-nowrap px-3 py-1",
+				"rounded-full bg-linear-to-t from-gray-800 from-50% to-gray-700 ring-1 ring-inset ring-white/10",
 				"[--move-x-from:-100%] [--move-x-to:calc(100%+100cqw)] [animation-iteration-count:infinite] [animation-name:move-x] [animation-play-state:paused] [animation-timing-function:linear] group-hover:[animation-play-state:running]",
 			)}
 		>

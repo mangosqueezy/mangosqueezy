@@ -185,15 +185,15 @@ function PricingTable({
 					<col className="w-3/5 sm:w-2/5" />
 					<col
 						data-selected={selectedTier === tiers[0] ? true : undefined}
-						className="w-2/5 data-[selected]:table-column max-sm:hidden sm:w-1/5"
+						className="w-2/5 data-selected:table-column max-sm:hidden sm:w-1/5"
 					/>
 					<col
 						data-selected={selectedTier === tiers[1] ? true : undefined}
-						className="w-2/5 data-[selected]:table-column max-sm:hidden sm:w-1/5"
+						className="w-2/5 data-selected:table-column max-sm:hidden sm:w-1/5"
 					/>
 					<col
 						data-selected={selectedTier === tiers[2] ? true : undefined}
-						className="w-2/5 data-[selected]:table-column max-sm:hidden sm:w-1/5"
+						className="w-2/5 data-selected:table-column max-sm:hidden sm:w-1/5"
 					/>
 				</colgroup>
 				<thead>
@@ -204,7 +204,7 @@ function PricingTable({
 								key={tier.slug}
 								scope="col"
 								data-selected={selectedTier === tier ? true : undefined}
-								className="p-0 data-[selected]:table-cell max-sm:hidden"
+								className="p-0 data-selected:table-cell max-sm:hidden"
 							>
 								<Subheading as="div">{tier.name}</Subheading>
 							</th>
@@ -220,7 +220,7 @@ function PricingTable({
 									</MenuButton>
 									<MenuItems
 										anchor="bottom start"
-										className="min-w-[--button-width] rounded-lg bg-white p-1 shadow-lg ring-1 ring-gray-200 [--anchor-gap:6px] [--anchor-offset:-4px] [--anchor-padding:10px]"
+										className="min-w-(--button-width) rounded-lg bg-white p-1 shadow-lg ring-1 ring-gray-200 [--anchor-gap:6px] [--anchor-offset:-4px] [--anchor-padding:10px]"
 									>
 										{tiers.map((tier) => (
 											<MenuItem key={tier.slug}>
@@ -230,10 +230,10 @@ function PricingTable({
 													data-selected={
 														tier === selectedTier ? true : undefined
 													}
-													className="group flex items-center gap-2 rounded-md px-2 py-1 data-[focus]:bg-gray-200"
+													className="group flex items-center gap-2 rounded-md px-2 py-1 data-focus:bg-gray-200"
 												>
 													{tier.name}
-													<CheckIcon className="hidden size-4 group-data-[selected]:block" />
+													<CheckIcon className="hidden size-4 group-data-selected:block" />
 												</Link>
 											</MenuItem>
 										))}
@@ -258,7 +258,7 @@ function PricingTable({
 							<td
 								key={tier.slug}
 								data-selected={selectedTier === tier ? true : undefined}
-								className="px-0 pb-0 pt-4 data-[selected]:table-cell max-sm:hidden"
+								className="px-0 pb-0 pt-4 data-selected:table-cell max-sm:hidden"
 							>
 								<Button variant="outline" href={tier.href}>
 									Get started
@@ -306,7 +306,7 @@ function PricingTable({
 													data-selected={
 														selectedTier === tier ? true : undefined
 													}
-													className="p-4 data-[selected]:table-cell max-sm:hidden"
+													className="p-4 data-selected:table-cell max-sm:hidden"
 												>
 													{value === true ? (
 														<>
@@ -348,7 +348,7 @@ function FeatureItem({
 	return (
 		<li
 			data-disabled={disabled ? true : undefined}
-			className="flex items-start gap-4 text-sm/6 text-gray-950/75 data-[disabled]:text-gray-950/25"
+			className="flex items-start gap-4 text-sm/6 text-gray-950/75 data-disabled:text-gray-950/25"
 		>
 			<span className="inline-flex h-6 items-center">
 				<PlusIcon className="size-[0.9375rem] shrink-0 fill-gray-950/25" />
@@ -379,7 +379,7 @@ function Testimonial() {
 									<Image
 										alt=""
 										src="/testimonials/tina-yards.jpg"
-										className="aspect-[3/4] w-full object-cover"
+										className="aspect-3/4 w-full object-cover"
 									/>
 								</div>
 							</div>
@@ -396,7 +396,7 @@ function Testimonial() {
 							<figcaption className="mt-auto">
 								<p className="text-sm/6 font-medium text-white">Tina Yards</p>
 								<p className="text-sm/6 font-medium">
-									<span className="bg-gradient-to-r from-[#fff1be] from-[28%] via-[#ee87cb] via-[70%] to-[#b060ff] bg-clip-text text-transparent">
+									<span className="bg-linear-to-r from-[#fff1be] from-28% via-[#ee87cb] via-70% to-[#b060ff] bg-clip-text text-transparent">
 										VP of Sales, Protocol
 									</span>
 								</p>

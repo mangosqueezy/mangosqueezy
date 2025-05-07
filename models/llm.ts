@@ -1,61 +1,48 @@
 "use server";
-import { z } from "zod";
 import { ChatOpenAI } from "@langchain/openai";
+import { z } from "zod";
 
 const OPENAI_KEY = process.env.OPENAI_KEY;
-const HELICONE_API_KEY = process.env.HELICONE_API_KEY;
 
 export async function mangosqueezyAI(query: string, text: string) {
-  const descriptionSchema = z.object({
-    description: z.string().describe("description"),
-  });
+	const descriptionSchema = z.object({
+		description: z.string().describe("description"),
+	});
 
-  const model = new ChatOpenAI({
-    apiKey: OPENAI_KEY,
-    model: "gpt-4o",
-    temperature: 0.8,
-    configuration: {
-      basePath: "https://oai.hconeai.com/v1",
-      defaultHeaders: {
-        "Helicone-Auth": `Bearer ${HELICONE_API_KEY}`,
-      },
-    },
-  });
+	const model = new ChatOpenAI({
+		apiKey: OPENAI_KEY,
+		model: "gpt-4o",
+		temperature: 0.8,
+	});
 
-  const structuredLlm = model.withStructuredOutput(descriptionSchema, {
-    name: "descriptionSchema",
-  });
+	const structuredLlm = model.withStructuredOutput(descriptionSchema, {
+		name: "descriptionSchema",
+	});
 
-  const result = await structuredLlm.invoke(`${query} : ${text}`);
+	const result = await structuredLlm.invoke(`${query} : ${text}`);
 
-  const { description } = result;
+	const { description } = result;
 
-  return description;
+	return description;
 }
 
 export const getSlug = async (inputText: string) => {
-  const slugSchema = z.object({
-    slug: z.string().describe("Slug name"),
-  });
+	const slugSchema = z.object({
+		slug: z.string().describe("Slug name"),
+	});
 
-  const model = new ChatOpenAI({
-    apiKey: OPENAI_KEY,
-    model: "gpt-4o",
-    temperature: 0,
-    configuration: {
-      basePath: "https://oai.hconeai.com/v1",
-      defaultHeaders: {
-        "Helicone-Auth": `Bearer ${HELICONE_API_KEY}`,
-      },
-    },
-  });
+	const model = new ChatOpenAI({
+		apiKey: OPENAI_KEY,
+		model: "gpt-4o",
+		temperature: 0,
+	});
 
-  const structuredLlm = model.withStructuredOutput(slugSchema);
+	const structuredLlm = model.withStructuredOutput(slugSchema);
 
-  const result = await structuredLlm.invoke(
-    `Give me a one-word fancy name for the slug derived from the email ID mentioned in the text. : ${inputText}`
-  );
+	const result = await structuredLlm.invoke(
+		`Give me a one-word fancy name for the slug derived from the email ID mentioned in the text. : ${inputText}`,
+	);
 
-  const { slug } = result;
-  return slug;
+	const { slug } = result;
+	return slug;
 };

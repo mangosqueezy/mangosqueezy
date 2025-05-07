@@ -94,7 +94,7 @@ export default function Analytics() {
 
 	return (
 		<div>
-			<div className="mx-auto grid max-w-screen-xl gap-5 px-2.5 lg:px-20">
+			<div className="mx-auto grid max-w-(--breakpoint-xl) gap-5 px-2.5 lg:px-20">
 				<div>
 					<Button asChild variant="ghost">
 						<Link href="/metrics">
@@ -199,7 +199,7 @@ export default function Analytics() {
 												dataKey="country"
 												position="insideLeft"
 												offset={8}
-												className="fill-[--color-label]"
+												className="fill-(--color-label)"
 												fontSize={12}
 											/>
 										</Bar>
@@ -261,7 +261,7 @@ export default function Analytics() {
 												dataKey="referer"
 												position="insideLeft"
 												offset={8}
-												className="fill-[--color-label]"
+												className="fill-(--color-label)"
 												fontSize={12}
 											/>
 										</Bar>

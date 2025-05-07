@@ -90,7 +90,7 @@ const FeatureSection = ({
 
 export default function HowItWorks() {
 	return (
-		<div className="bg-gradient-to-b from-white to-gray-50">
+		<div className="bg-linear-to-b from-white to-gray-50">
 			<div>
 				<h2 className="text-4xl font-extrabold text-center mb-16 text-gray-900">
 					How It Works

@@ -57,7 +57,7 @@ function Checkmark() {
 						transition: { ...transition, duration: 0.75 },
 					},
 				}}
-				className="flex size-6 items-center justify-center rounded-full bg-gradient-to-t from-green-500 to-green-300 shadow"
+				className="flex size-6 items-center justify-center rounded-full bg-linear-to-t from-green-500 to-green-300 shadow"
 			>
 				<CheckIcon className="size-4 fill-white" />
 			</motion.div>

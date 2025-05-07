@@ -235,7 +235,7 @@ export default function Home() {
 		<div className="overflow-hidden">
 			<Hero />
 			<main>
-				<div className="bg-gradient-to-b from-white from-50% to-gray-100 py-32">
+				<div className="bg-linear-to-b from-white from-50% to-gray-100 py-32">
 					<HowToUse />
 					<FeatureSection />
 					<BentoSection />

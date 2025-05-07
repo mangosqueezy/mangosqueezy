@@ -251,7 +251,7 @@ export default function Textarea({
 							) : null}
 						</div>
 					</div>
-					<div className="flex-shrink-0">
+					<div className="shrink-0">
 						<button
 							type="submit"
 							disabled={!message.trim() || !selectedAffiliate || isSubmitting}

@@ -19,7 +19,6 @@ import {
 	Quote,
 	Repeat2,
 } from "lucide-react";
-import { revalidatePath } from "next/cache";
 import Image from "next/image";
 import {
 	useCallback,
@@ -336,7 +335,6 @@ export default function Campaign({
 							message: payload.new.remark,
 						});
 						setIsLoading(false);
-						revalidatePath(`/campaigns/${pipeline_id}`);
 					},
 				)
 				.subscribe();
@@ -754,7 +752,7 @@ export default function Campaign({
 								className="relative group"
 								key={`profile-card-${selectedAffiliate.handle}-${uniqueId}`}
 							>
-								<div className="absolute -inset-0.5 bg-gradient-to-r from-blue-100 to-orange-100 rounded-lg blur opacity-20 animate-glow" />
+								<div className="absolute -inset-0.5 bg-linear-to-r from-blue-100 to-orange-100 rounded-lg blur opacity-20 animate-glow" />
 								<div
 									className={`relative bg-white/30 backdrop-blur-lg rounded-lg border border-gray-200/50 shadow-md overflow-hidden ${platform === "youtube" ? "h-[430px]" : ""}`}
 								>
@@ -770,7 +768,7 @@ export default function Campaign({
 												/>
 											</div>
 										) : (
-											<div className="h-14 bg-gradient-to-r from-orange-400/20 to-pink-500/20" />
+											<div className="h-14 bg-linear-to-r from-orange-400/20 to-pink-500/20" />
 										)}
 
 										{/* Profile Section */}
@@ -972,7 +970,7 @@ export default function Campaign({
 													>
 														{relevantMessages.length === 0 ? (
 															<span className="flex items-center gap-2 text-gray-400">
-																<Info className="w-4 h-4 flex-shrink-0" />
+																<Info className="w-4 h-4 shrink-0" />
 																<span className="font-medium">
 																	Not initiated
 																</span>
