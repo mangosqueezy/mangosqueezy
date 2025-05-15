@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { createClient } from "@/lib/supabase/server";
 import { getUserById } from "@/models/business";
-import type { Affiliate_Business } from "@prisma/client";
+import type { Affiliate_Business } from "@/prisma/app/generated/prisma/client";
 import Link from "next/link";
 
 export default async function MetricsPage() {

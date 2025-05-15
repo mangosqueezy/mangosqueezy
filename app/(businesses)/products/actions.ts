@@ -5,7 +5,7 @@ import {
 	deleteProductById,
 	updateProductById,
 } from "@/models/products";
-import type { PriceType } from "@prisma/client";
+import type { PriceType } from "@/prisma/app/generated/prisma/client";
 import { createClient } from "@supabase/supabase-js";
 import { decode } from "base64-arraybuffer";
 import { revalidatePath } from "next/cache";

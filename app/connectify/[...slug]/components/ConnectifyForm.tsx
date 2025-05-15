@@ -3,7 +3,7 @@
 import { CustomToast } from "@/components/mango-ui/custom-toast";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { Products } from "@prisma/client";
+import type { Products } from "@/prisma/app/generated/prisma/client";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useState } from "react";

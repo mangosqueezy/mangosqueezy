@@ -1,33 +1,41 @@
 "use client";
 
+import type { StripeAffiliate } from "@/app/api/stripe/customers/route";
+import {
+	Breadcrumb,
+	BreadcrumbItem,
+	BreadcrumbLink,
+	BreadcrumbList,
+	BreadcrumbPage,
+	BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+	Sheet,
+	SheetContent,
+	SheetDescription,
+	SheetHeader,
+	SheetTitle,
+} from "@/components/ui/sheet";
 import { createClient } from "@/lib/supabase/client";
-import type { Products } from "@prisma/client";
-import type { ChatMessage } from "@prisma/client";
+import { hasFeatureAccess } from "@/lib/utils";
+import type { RunMode } from "@/prisma/app/generated/prisma/client";
+import type { Products } from "@/prisma/app/generated/prisma/client";
+import type { ChatMessage } from "@/prisma/app/generated/prisma/client";
 import type { RealtimeChannel } from "@supabase/supabase-js";
-import {
-	Heart,
-	Info,
-	Loader2,
-	MessageCircle,
-	Quote,
-	Repeat2,
-} from "lucide-react";
+import type { ColumnDef } from "@tanstack/react-table";
+import { Info, Loader2, MessageCircle, Radio, Settings } from "lucide-react";
 import Image from "next/image";
-import {
-	useCallback,
-	useEffect,
-	useId,
-	useMemo,
-	useRef,
-	useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Toaster, toast } from "sonner";
+import { updateRunModeAction } from "../actions";
 import {
 	type YouTubeVideo,
 	createChatMessageAction,
@@ -35,8 +43,15 @@ import {
 	getAffiliatesAction,
 	getAuthorFeedAction,
 	getInstagramFeedAction,
+	getStripeFeedAction,
 	getYoutubeFeedAction,
 } from "./actions";
+import { affiliateColumns, stripeColumns } from "./columns";
+import type {
+	Affiliate as AffiliateColumnType,
+	StripeAffiliate as StripeAffiliateColumnType,
+} from "./columns";
+import { DataTable } from "./data-table";
 
 const supabase = createClient();
 
@@ -81,8 +96,9 @@ export type Affiliate = {
 	tag: string;
 	reason: string;
 	status: "active" | "inactive";
-	platform: "instagram" | "bluesky" | "youtube";
-};
+	platform: "instagram" | "bluesky" | "youtube" | "stripe";
+	runMode: RunMode;
+} & StripeAffiliate;
 
 interface BlueskyPost {
 	post: {
@@ -174,7 +190,7 @@ type YouTubeChannel = {
 	};
 };
 
-export type Platform = "instagram" | "bluesky" | "youtube";
+export type Platform = "instagram" | "bluesky" | "youtube" | "stripe";
 
 export type AffiliateStage = {
 	stage: "warm_up" | "engaged" | "negotiating" | "ready" | "inactive";
@@ -182,6 +198,28 @@ export type AffiliateStage = {
 	color: string;
 	label: string;
 };
+
+type InstagramAffiliateDetails = { data: InstagramFeed; result: string };
+type BlueskyAffiliateDetails = {
+	feed: BlueskyFeed;
+	profileData: BlueskyProfile;
+	result: string;
+};
+type YoutubeAffiliateDetails = {
+	data: YouTubeChannel[];
+	result: string;
+	feedVideo: YouTubeVideo[];
+};
+
+type StripeAffiliateDetails = {
+	result: string;
+};
+
+type AffiliateDetails =
+	| InstagramAffiliateDetails
+	| BlueskyAffiliateDetails
+	| YoutubeAffiliateDetails
+	| StripeAffiliateDetails;
 
 const getAffiliateStage = (messages: ChatMessage[]): AffiliateStage => {
 	if (!messages.length) {
@@ -236,6 +274,7 @@ export default function Campaign({
 	affiliate_count,
 	difficulty,
 	platform,
+	plan,
 }: {
 	pipeline_id: number;
 	affiliates: Affiliate[];
@@ -245,33 +284,14 @@ export default function Campaign({
 	affiliate_count: number;
 	difficulty: string;
 	platform: Platform;
+	plan: string;
 }) {
-	const uniqueId = useId();
 	const [selectedAffiliate, setSelectedAffiliate] = useState<Affiliate | null>(
 		null,
 	);
-	const [messages, setMessages] = useState<{
-		sender: string;
-		text: string;
-		date: Date;
-	}>();
+	const [automatedMode, setAutomatedMode] = useState<RunMode>("Manual");
 	const [isLoading, setIsLoading] = useState(false);
 	const [isAddingAffiliate, setIsAddingAffiliate] = useState(false);
-	const [jobStatus, setJobStatus] = useState({
-		status: "idle",
-		message: "",
-	});
-	const [blueskyFeed, setBlueskyFeed] = useState<BlueskyFeed | null>(null);
-	const [youtubeFeed, setYoutubeFeed] = useState<YouTubeVideo[] | null>(null);
-	const [youtubeProfile, setYoutubeProfile] = useState<YouTubeChannel[] | null>(
-		null,
-	);
-	const [blueskyProfile, setBlueskyProfile] = useState<BlueskyProfile | null>(
-		null,
-	);
-	const [instagramFeed, setInstagramFeed] = useState<InstagramFeed | null>(
-		null,
-	);
 	const [affiliateStage, setAffiliateStage] = useState<AffiliateStage>({
 		stage: "warm_up",
 		progress: 10,
@@ -282,37 +302,51 @@ export default function Campaign({
 	const [isSendingMessage, setIsSendingMessage] = useState(false);
 	const [cooldown, setCooldown] = useState<number>(0);
 	const cooldownInterval = useRef<NodeJS.Timeout | null>(null);
+	const [filter, setFilter] = useState("");
+	const [sheetOpen, setSheetOpen] = useState(false);
+	const [affiliateDetails, setAffiliateDetails] =
+		useState<AffiliateDetails | null>(null);
+	const [loadingDetails, setLoadingDetails] = useState(false);
+	const [isUpdatingRunMode, setIsUpdatingRunMode] = useState(false);
+	const [viewingAffiliateHandle, setViewingAffiliateHandle] = useState<
+		string | null
+	>(null);
 
 	const affiliateStageButtonConfig = {
 		warm_up: {
 			color: "bg-blue-500 hover:bg-blue-600 text-white",
 			message:
 				"Awesome! We're starting to build a relationship with this creator. We'll engage with their posts over the next few days and update you when it's time to reach out!",
-			label: "Warming Up",
+			label: "Send warm up message",
+			status: "Warm up message sent",
 		},
 		engaged: {
 			color: "bg-yellow-500 hover:bg-yellow-600 text-white",
 			message:
 				"Great! This creator is actively engaging with us. Keep the conversation going and look for opportunities to collaborate.",
-			label: "Actively Engaged",
+			label: "Send engaged message",
+			status: "Engaged message sent",
 		},
 		negotiating: {
 			color: "bg-orange-500 hover:bg-orange-600 text-white",
 			message:
 				"We're negotiating terms with this creator. Stay tuned for updates on the partnership details.",
-			label: "Negotiating Terms",
+			label: "Send negotiating message",
+			status: "Negotiating message sent",
 		},
 		ready: {
 			color: "bg-green-500 hover:bg-green-600 text-white",
 			message:
 				"This creator is ready to collaborate! Let's finalize the details and launch the campaign together.",
-			label: "Ready to Collaborate",
+			label: "Send ready to collaborate message",
+			status: "Ready to collaborate message sent",
 		},
 		inactive: {
 			color: "bg-gray-400 text-white cursor-not-allowed",
 			message:
 				"This creator is currently inactive. You can revisit this relationship later or choose another affiliate.",
 			label: "Inactive",
+			status: "Inactive",
 		},
 	};
 
@@ -330,10 +364,6 @@ export default function Campaign({
 						filter: `id=eq.${pipeline_id}`,
 					},
 					(payload) => {
-						setJobStatus({
-							status: payload.new.status,
-							message: payload.new.remark,
-						});
 						setIsLoading(false);
 					},
 				)
@@ -355,13 +385,6 @@ export default function Campaign({
 			nextDifficulty = "medium";
 		} else if (difficulty === "medium") {
 			nextDifficulty = "easy";
-		}
-
-		if (platform === "instagram") {
-			setJobStatus({
-				status: "processing",
-				message: "Searching for affiliates...",
-			});
 		}
 
 		await getAffiliatesAction({
@@ -391,10 +414,8 @@ export default function Campaign({
 			platform,
 		);
 
+		setAffiliateDetails(null);
 		setSelectedAffiliate(null);
-		setBlueskyFeed(null);
-		setBlueskyProfile(null);
-		setInstagramFeed(null);
 	};
 
 	const relevantMessages = useMemo(() => {
@@ -413,18 +434,15 @@ export default function Campaign({
 	}, [selectedAffiliate, relevantMessages]);
 
 	const handleSendMessage = async () => {
-		if (messages?.text.trim()) {
+		const message = affiliateDetails?.result;
+		if (message?.trim()) {
 			setIsSendingMessage(true);
-			setMessages({
-				sender: "amit@tapasom.com",
-				text: messages.text,
-				date: new Date(),
-			});
 
 			await createChatMessageAction(
 				pipeline_id,
-				messages.text,
+				message,
 				selectedAffiliate?.handle as string,
+				affiliateStage.stage,
 			);
 			setIsSendingMessage(false);
 			setAffiliateStage(getAffiliateStage(relevantMessages));
@@ -436,75 +454,66 @@ export default function Campaign({
 		[affiliates],
 	);
 
-	const handleAffiliateSelect = async (affiliate: Affiliate) => {
-		setSelectedAffiliate(affiliate);
-		setIsLoading(true);
-		setBlueskyFeed(null);
-		setInstagramFeed(null);
-		setYoutubeFeed(null);
-		setYoutubeProfile(null);
-
-		try {
-			const price = product?.price || 0;
-			const commissionPercentage = commission;
-			const exampleEarning = (price * commissionPercentage) / 100;
-			if (platform === "bluesky") {
-				const { feed, result, profileData } = await getAuthorFeedAction(
-					affiliate.handle,
-					commissionPercentage,
-					exampleEarning,
-					product?.description || "",
-				);
-				setBlueskyFeed(feed);
-				setBlueskyProfile(profileData);
-				setMessages({
-					sender: "amit@tapasom.com",
-					text: result,
-					date: new Date(),
-				});
-			} else if (platform === "instagram") {
-				const { data, result } = await getInstagramFeedAction(
-					affiliate.handle,
-					commissionPercentage,
-					exampleEarning,
-					product?.description || "",
-				);
-				setInstagramFeed(data);
-				setMessages({
-					sender: "amit@tapasom.com",
-					text: result,
-					date: new Date(),
-				});
-			} else if (platform === "youtube") {
-				const { data, result, feedVideo } = await getYoutubeFeedAction(
-					affiliate.handle,
-					affiliate.channelId as string,
-					commissionPercentage,
-					exampleEarning,
-					product?.description || "",
-				);
-
-				setYoutubeProfile(data);
-				setYoutubeFeed(feedVideo);
-				setMessages({
-					sender: "amit@tapasom.com",
-					text: result,
-					date: new Date(),
-				});
-			}
-		} catch (error) {
-			console.error("Error fetching posts:", error);
-		} finally {
-			setIsLoading(false);
+	const filteredAffiliates = useMemo(() => {
+		if (platform === "stripe") {
+			return activeAffiliates.filter((affiliate) =>
+				affiliate.email.toLowerCase().includes(filter.toLowerCase()),
+			);
 		}
-	};
+		return activeAffiliates.filter((affiliate) =>
+			affiliate.displayName.toLowerCase().includes(filter.toLowerCase()),
+		);
+	}, [activeAffiliates, filter, platform]);
 
-	const formatDate = (dateString: string) => {
-		return new Date(dateString).toLocaleDateString(undefined, {
-			year: "numeric",
-			month: "short",
-			day: "numeric",
-		});
+	const handleViewAffiliate = async (
+		affiliate: Affiliate | (StripeAffiliate & { handle: string }),
+	) => {
+		setViewingAffiliateHandle(affiliate.handle);
+		setSelectedAffiliate(affiliate as Affiliate);
+		setLoadingDetails(true);
+		setAutomatedMode(affiliate?.runMode || "Manual");
+		let details: AffiliateDetails | undefined = undefined;
+		const price = product?.price || 0;
+		const commissionPercentage = commission;
+		const exampleEarning = (price * commissionPercentage) / 100;
+		if (platform === "bluesky") {
+			const { feed, result, profileData } = await getAuthorFeedAction(
+				affiliate.handle,
+				commissionPercentage,
+				exampleEarning,
+				product?.description || "",
+			);
+			details = { feed, profileData, result };
+		} else if (platform === "instagram") {
+			const { data, result } = await getInstagramFeedAction(
+				affiliate.handle,
+				commissionPercentage,
+				exampleEarning,
+				product?.description || "",
+			);
+			details = { data, result };
+		} else if (platform === "youtube") {
+			const { data, result, feedVideo } = await getYoutubeFeedAction(
+				affiliate.handle,
+				(affiliate as Affiliate).channelId as string,
+				commissionPercentage,
+				exampleEarning,
+				product?.description || "",
+			);
+			details = { data, result, feedVideo };
+		} else if (platform === "stripe") {
+			const text = await getStripeFeedAction(
+				(affiliate as StripeAffiliate).email as string,
+				commissionPercentage,
+				exampleEarning,
+				product?.description || "",
+			);
+			details = { result: text };
+		}
+		setAffiliateDetails(details || null);
+		setLoadingDetails(false);
+		setSheetOpen(true);
+		setViewingAffiliateHandle(null);
 	};
 
 	// Find the latest message sent by the current user to the selected affiliate
@@ -524,7 +533,11 @@ export default function Campaign({
 		);
 	}, [relevantMessages, selectedAffiliate]);
 
-	// Cooldown effect
+	const outreachEnabled = useMemo(
+		() => hasFeatureAccess(plan, "Features", "Outreach") as boolean,
+		[plan],
+	);
+
 	useEffect(() => {
 		if (!latestUserMessage) {
 			setCooldown(0);
@@ -533,7 +546,10 @@ export default function Campaign({
 		}
 		const lastSent = new Date(latestUserMessage.created_at).getTime();
 		const now = Date.now();
-		const diff = 24 * 60 * 60 * 1000 - (now - lastSent);
+		const diff =
+			platform === "stripe"
+				? 3 * 24 * 60 * 60 * 1000 - (now - lastSent)
+				: 24 * 60 * 60 * 1000 - (now - lastSent);
 		if (diff > 0) {
 			setCooldown(diff);
 			if (cooldownInterval.current) clearInterval(cooldownInterval.current);
@@ -553,7 +569,7 @@ export default function Campaign({
 		return () => {
 			if (cooldownInterval.current) clearInterval(cooldownInterval.current);
 		};
-	}, [latestUserMessage]);
+	}, [latestUserMessage, platform]);
 
 	function formatCooldown(ms: number) {
 		const totalSeconds = Math.floor(ms / 1000);
@@ -566,135 +582,142 @@ export default function Campaign({
 	}
 
 	return (
-		<div className="container mx-auto px-4 py-8">
-			{/* Product Header */}
-			<div className="mb-8 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-				<div className="flex flex-col lg:flex-row gap-8 items-center">
-					<div className="w-full lg:w-1/4">
-						<div className="relative aspect-square w-full">
-							<Image
-								src={product?.image_url || ""}
-								alt="Product"
-								width={100}
-								height={100}
-								className="rounded-lg object-cover w-full h-full"
-							/>
-						</div>
-					</div>
+		<>
+			<Toaster position="top-right" />
 
-					<div className="w-full lg:w-1/2">
-						<h1 className="text-2xl font-bold mb-4">{product?.name}</h1>
-						<p className="text-gray-700">{product?.description}</p>
-					</div>
-
-					<div className="w-full lg:w-1/4 flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg border border-gray-200">
-						<div className="text-center mb-4">
-							<p className="text-3xl font-bold text-orange-500">
-								{commission}%
-							</p>
-							<p className="text-sm text-gray-600">Commission Rate</p>
-						</div>
-						<div className="text-center">
-							<p className="text-2xl font-bold text-gray-800">
-								{affiliate_count}
-							</p>
-							<p className="text-sm text-gray-600">No of Affiliates</p>
-						</div>
+			<div className="mb-8">
+				<Breadcrumb>
+					<BreadcrumbList>
+						<BreadcrumbItem>
+							<BreadcrumbLink
+								href="/campaigns"
+								className="flex items-center gap-2"
+							>
+								<Radio className="size-4" />
+								Campaigns
+							</BreadcrumbLink>
+						</BreadcrumbItem>
+						<BreadcrumbSeparator />
+						<BreadcrumbItem>
+							<BreadcrumbPage>{`Campaign ${pipeline_id}`}</BreadcrumbPage>
+						</BreadcrumbItem>
+					</BreadcrumbList>
+				</Breadcrumb>
+				<div className="flex flex-col sm:flex-row sm:items-center gap-4 my-4">
+					<div className="flex items-center gap-2">
+						<h3 className="text-lg font-semibold text-gray-900">Affiliates</h3>
+						<span className="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 text-xs font-medium border border-gray-200">
+							{activeAffiliates.length} / {affiliate_count}
+						</span>
 					</div>
 				</div>
-			</div>
 
-			<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 w-full gap-4 sm:gap-0">
-				<div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
-					<h3 className="text-lg font-semibold text-gray-900">Affiliates</h3>
-					<span className="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 text-xs font-medium border border-gray-200">
-						{activeAffiliates.length} / {affiliate_count}
-					</span>
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<Button
-								variant="secondary"
-								className="ml-0 sm:ml-2 px-3 py-1.5 text-xs font-medium w-full sm:w-auto"
-							>
-								{selectedAffiliate ? (
-									<span className="flex items-center gap-2">
-										<img
-											src={selectedAffiliate.avatar}
-											alt={selectedAffiliate.displayName}
-											className="w-5 h-5 rounded-full"
-										/>
-										{selectedAffiliate.displayName}
-									</span>
-								) : (
-									"Select Affiliate"
-								)}
-							</Button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align="start">
-							{activeAffiliates.length === 0 ? (
-								<DropdownMenuItem disabled>
-									No active affiliates
-								</DropdownMenuItem>
-							) : (
-								activeAffiliates.map((affiliate) => (
-									<DropdownMenuItem
-										key={affiliate.handle}
-										onSelect={() => {
-											setSelectedAffiliate(affiliate);
-											handleAffiliateSelect(affiliate);
-										}}
-										className="flex items-center gap-2"
-									>
-										<span>{affiliate.displayName}</span>
-										<Image
-											src={`/logo-cluster/${platform}${platform.toLowerCase() === "youtube" ? ".jpg" : ".svg"}`}
-											alt={platform}
-											width={20}
-											height={20}
-											className="rounded-full"
-										/>
-									</DropdownMenuItem>
-								))
-							)}
-						</DropdownMenuContent>
-					</DropdownMenu>
-				</div>
-				<div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
-					{selectedAffiliate?.status === "active" && (
-						<button
-							type="button"
-							onClick={() => handleDeleteAffiliate(selectedAffiliate.handle)}
-							className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-md transition-colors w-full sm:w-auto"
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								className="w-4 h-4"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								strokeWidth="2"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-							>
-								<title>Delete icon</title>
-								<path d="M3 6h18" />
-								<path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-								<path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-							</svg>
-							Remove Affiliate
-						</button>
-					)}
+				{platform === "stripe" ? (
+					<DataTable
+						columns={
+							stripeColumns.map((col) =>
+								col.id === "actions"
+									? ({
+											...col,
+											cell: ({ row }) => {
+												const original =
+													row.original as StripeAffiliateColumnType;
+												return (
+													<div className="flex gap-2">
+														<Button
+															variant="outline"
+															size="sm"
+															onClick={() => original.onRemove?.(original)}
+														>
+															Remove
+														</Button>
+														<Button
+															variant="default"
+															size="sm"
+															onClick={() => original.onView?.(original)}
+															disabled={
+																viewingAffiliateHandle === original.handle
+															}
+														>
+															{viewingAffiliateHandle === original.handle ? (
+																<Loader2 className="w-4 h-4 animate-spin" />
+															) : (
+																"View"
+															)}
+														</Button>
+													</div>
+												);
+											},
+										} as ColumnDef<StripeAffiliateColumnType>)
+									: col,
+							) as ColumnDef<StripeAffiliateColumnType>[]
+						}
+						data={filteredAffiliates.map((a) => {
+							const handle = a.handle ?? a.email;
+							return {
+								...a,
+								handle,
+								onRemove: () => handleDeleteAffiliate(handle),
+								onView: () => handleViewAffiliate({ ...a, handle }),
+							};
+						})}
+					/>
+				) : (
+					<DataTable
+						columns={
+							affiliateColumns.map((col) =>
+								col.id === "actions"
+									? ({
+											...col,
+											cell: ({ row }) => {
+												const original = row.original as AffiliateColumnType;
+												return (
+													<div className="flex gap-2">
+														<Button
+															variant="outline"
+															size="sm"
+															onClick={() => original.onRemove?.(original)}
+														>
+															Remove
+														</Button>
+														<Button
+															variant="default"
+															size="sm"
+															onClick={() => original.onView?.(original)}
+															disabled={
+																viewingAffiliateHandle === original.handle
+															}
+														>
+															{viewingAffiliateHandle === original.handle ? (
+																<Loader2 className="w-4 h-4 animate-spin" />
+															) : (
+																"View"
+															)}
+														</Button>
+													</div>
+												);
+											},
+										} as ColumnDef<AffiliateColumnType>)
+									: col,
+							) as ColumnDef<AffiliateColumnType>[]
+						}
+						data={filteredAffiliates.map((a) => ({
+							...a,
+							onRemove: () => handleDeleteAffiliate(a.handle),
+							onView: () => handleViewAffiliate(a),
+						}))}
+					/>
+				)}
+				<div className="flex justify-end mt-4">
 					{activeAffiliates.length < affiliate_count && (
 						<button
 							type="button"
 							onClick={handleAddAffiliate}
 							disabled={isAddingAffiliate}
-							className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 disabled:cursor-not-allowed rounded-md transition-colors w-full sm:w-auto"
+							className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 disabled:cursor-not-allowed rounded-md transition-colors"
 						>
 							{isAddingAffiliate ? (
-								<>
-									<Loader2 className="w-4 h-4 animate-spin" />
-								</>
+								<Loader2 className="w-4 h-4 animate-spin" />
 							) : (
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -718,492 +741,198 @@ export default function Campaign({
 						</button>
 					)}
 				</div>
-			</div>
-
-			{/* Social Media Posts Grid */}
-			<div className="space-y-6">
-				{isLoading ? (
-					<div className="flex items-center justify-center py-12 w-full">
-						{/* Shimmer cards */}
-						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-							{[1, 2, 3].map((i) => (
-								<div
-									key={i}
-									className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden animate-pulse"
-								>
-									<div className="p-4">
-										<div className="h-10 w-10 bg-gray-200 rounded-full mb-3" />
-										<div className="h-4 bg-gray-200 rounded w-1/2 mb-2" />
-										<div className="h-3 bg-gray-200 rounded w-1/3 mb-4" />
-										<div className="relative aspect-square mb-4 bg-gray-200 rounded-lg" />
-										<div className="h-3 bg-gray-200 rounded w-full mb-2" />
-										<div className="h-3 bg-gray-200 rounded w-2/3 mb-2" />
-										<div className="h-3 bg-gray-200 rounded w-1/2" />
-									</div>
-								</div>
-							))}
-						</div>
-					</div>
-				) : selectedAffiliate ? (
-					<>
-						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-							{/* Profile Card */}
-							<div
-								className="relative group"
-								key={`profile-card-${selectedAffiliate.handle}-${uniqueId}`}
-							>
-								<div className="absolute -inset-0.5 bg-linear-to-r from-blue-100 to-orange-100 rounded-lg blur opacity-20 animate-glow" />
-								<div
-									className={`relative bg-white/30 backdrop-blur-lg rounded-lg border border-gray-200/50 shadow-md overflow-hidden ${platform === "youtube" ? "h-[430px]" : ""}`}
-								>
-									<div className="relative">
-										{/* Banner - using a gradient as placeholder */}
-										{platform === "bluesky" && blueskyProfile?.banner ? (
-											<div className="h-14 relative">
-												<Image
-													src={blueskyProfile.banner}
-													alt="Profile banner"
-													fill
-													className="object-cover"
-												/>
-											</div>
-										) : (
-											<div className="h-14 bg-linear-to-r from-orange-400/20 to-pink-500/20" />
-										)}
-
-										{/* Profile Section */}
-										<div className="px-4 pb-4">
-											{/* Avatar */}
-											<div className="relative -mt-10 mb-2">
-												<div className="w-20 h-20 rounded-full border-4 border-white shadow-md overflow-hidden">
-													<Image
-														src={selectedAffiliate?.avatar || ""}
-														alt={selectedAffiliate?.displayName || "Profile"}
-														width={80}
-														height={80}
-														className="object-cover"
-													/>
+				<Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+					<SheetContent className="max-w-lg w-full px-5">
+						<ScrollArea className="h-96 md:h-full">
+							<SheetHeader className="px-0">
+								<SheetTitle>Affiliate Details</SheetTitle>
+								<SheetDescription>
+									{selectedAffiliate &&
+									typeof selectedAffiliate === "object" &&
+									"avatar" in selectedAffiliate &&
+									"displayName" in selectedAffiliate ? (
+										<div className="flex items-center gap-3 mb-4">
+											<Image
+												src={selectedAffiliate.avatar}
+												alt={selectedAffiliate.displayName}
+												className="w-10 h-10 rounded-full border"
+												width={40}
+												height={40}
+											/>
+											<div>
+												<div className="font-semibold text-base">
+													{selectedAffiliate.displayName}
 												</div>
-											</div>
-
-											{/* Profile Info */}
-											<div className="space-y-2.5">
-												<div>
-													<h2 className="text-lg font-bold text-gray-900">
-														{selectedAffiliate?.displayName}
-													</h2>
-													<p className="text-sm text-gray-500">
-														@{selectedAffiliate?.handle}
-													</p>
-												</div>
-
-												{/* Add this after the Profile Info section, before Stats Grid */}
-												{selectedAffiliate && (
-													<div className="mb-4">
-														<div className="flex items-center justify-between mb-2">
-															<span className="text-sm font-medium text-gray-700">
-																Engagement Progress
-															</span>
-															<span
-																className="text-sm font-medium"
-																style={{ color: affiliateStage.color }}
-															>
-																{affiliateStage.progress}%
-															</span>
-														</div>
-														<div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-															<div
-																className={`h-full ${affiliateStage.color} transition-all duration-500 ease-in-out`}
-																style={{ width: `${affiliateStage.progress}%` }}
-															/>
-														</div>
-														<div className="mt-1 flex items-center gap-1.5">
-															<div
-																className={`w-1.5 h-1.5 rounded-full ${affiliateStage.color} animate-pulse`}
-															/>
-															<span className="text-xs text-gray-600">
-																{affiliateStage.label}
-															</span>
-														</div>
-													</div>
-												)}
-
-												{/* Stats Grid */}
-												<div className="grid grid-cols-3 gap-2 py-2 border-y border-gray-100">
-													{platform === "instagram" && instagramFeed && (
-														<>
-															<div className="text-center">
-																<p className="text-base font-semibold text-gray-900">
-																	{instagramFeed.business_discovery.followers_count.toLocaleString()}
-																</p>
-																<p className="text-xs text-gray-500">
-																	Followers
-																</p>
-															</div>
-															<div className="text-center">
-																<p className="text-base font-semibold text-gray-900">
-																	{instagramFeed.business_discovery.media_count.toLocaleString()}
-																</p>
-																<p className="text-xs text-gray-500">Posts</p>
-															</div>
-															<div className="text-center">
-																<p className="text-base font-semibold text-gray-900">
-																	{commission}%
-																</p>
-																<p className="text-xs text-gray-500">
-																	Commission
-																</p>
-															</div>
-														</>
-													)}
-													{platform === "bluesky" && blueskyProfile && (
-														<>
-															<div className="text-center">
-																<p className="text-base font-semibold text-gray-900">
-																	{blueskyProfile.followersCount.toLocaleString()}
-																</p>
-																<p className="text-xs text-gray-500">
-																	Followers
-																</p>
-															</div>
-															<div className="text-center">
-																<p className="text-base font-semibold text-gray-900">
-																	{blueskyProfile.postsCount.toLocaleString()}
-																</p>
-																<p className="text-xs text-gray-500">Posts</p>
-															</div>
-															<div className="text-center">
-																<p className="text-base font-semibold text-gray-900">
-																	{commission}%
-																</p>
-																<p className="text-xs text-gray-500">
-																	Commission
-																</p>
-															</div>
-														</>
-													)}
-													{platform === "youtube" &&
-														youtubeProfile &&
-														youtubeFeed && (
-															<>
-																<div className="text-center">
-																	<p className="text-base font-semibold text-gray-900">
-																		{youtubeProfile[0].statistics
-																			.subscriberCount || "-"}
-																	</p>
-																	<p className="text-xs text-gray-500">
-																		Subscribers
-																	</p>
-																</div>
-																<div className="text-center">
-																	<p className="text-base font-semibold text-gray-900">
-																		{youtubeProfile[0].statistics.videoCount ||
-																			"-"}
-																	</p>
-																	<p className="text-xs text-gray-500">
-																		Videos
-																	</p>
-																</div>
-																<div className="text-center">
-																	<p className="text-base font-semibold text-gray-900">
-																		{commission}%
-																	</p>
-																	<p className="text-xs text-gray-500">
-																		Commission
-																	</p>
-																</div>
-															</>
-														)}
-												</div>
-
-												{/* Bio Section */}
-												<div>
-													<h3 className="text-sm font-medium text-gray-900 mb-1">
-														Bio
-													</h3>
-													{platform === "instagram" && instagramFeed ? (
-														<p className="text-sm text-gray-700 line-clamp-2">
-															{instagramFeed.business_discovery.biography}
-														</p>
-													) : platform === "bluesky" && blueskyProfile ? (
-														<p className="text-sm text-gray-700 line-clamp-2">
-															{blueskyProfile.description}
-														</p>
-													) : platform === "youtube" && youtubeFeed ? (
-														<p className="text-sm text-gray-700 line-clamp-2">
-															{youtubeFeed[0].snippet.description}
-														</p>
-													) : (
-														<div className="h-3 bg-gray-200/50 rounded animate-pulse" />
-													)}
-												</div>
-
-												{/* Send Affiliate Message Button */}
-												<div className="flex flex-col items-start gap-1.5 mt-2">
-													<Button
-														type="button"
-														className={`rounded-lg px-4 py-1 mt-2 text-xs font-semibold shadow-sm transition-colors flex items-center gap-2 ${affiliateStageButtonConfig[affiliateStage.stage].color}`}
-														onClick={() => {
-															handleSendMessage();
-															setShowStageMessage((prev) => !prev);
-														}}
-														disabled={
-															affiliateStage.stage === "inactive" ||
-															isSendingMessage ||
-															cooldown > 0
-														}
-													>
-														{isSendingMessage ? (
-															<Loader2 className="w-4 h-4 animate-spin" />
-														) : (
-															<MessageCircle className="w-4 h-4 animate-pulse" />
-														)}
-														{cooldown > 0
-															? `Wait ${formatCooldown(cooldown)}`
-															: affiliateStageButtonConfig[affiliateStage.stage]
-																	.label}
-													</Button>
-													<div
-														className={
-															"mt-2 text-xs bg-gray-50 border border-gray-200 rounded-lg p-3 w-full shadow-sm transition-all duration-300 ease-in-out flex items-start gap-2"
-														}
-													>
-														{relevantMessages.length === 0 ? (
-															<span className="flex items-center gap-2 text-gray-400">
-																<Info className="w-4 h-4 shrink-0" />
-																<span className="font-medium">
-																	Not initiated
-																</span>
-															</span>
-														) : (
-															<span className="relative block text-gray-700 min-h-[1.5rem]">
-																<Info className="w-4 h-4 absolute left-0 top-0" />
-																<span className="pl-6 block text-left w-full leading-tight">
-																	{
-																		affiliateStageButtonConfig[
-																			affiliateStage.stage
-																		].message
-																	}
-																</span>
-															</span>
-														)}
-													</div>
+												<div className="text-xs text-gray-500">
+													@{selectedAffiliate.handle}
 												</div>
 											</div>
 										</div>
-									</div>
+									) : selectedAffiliate &&
+										typeof selectedAffiliate === "object" &&
+										"email" in selectedAffiliate ? (
+										<div className="flex items-center gap-3 mb-4">
+											<div className="font-semibold text-base">
+												{(selectedAffiliate as { email: string }).email}
+											</div>
+										</div>
+									) : null}
+								</SheetDescription>
+							</SheetHeader>
+
+							<div className="flex flex-col items-start gap-1.5 mb-2">
+								{automatedMode === "Manual" && (
+									<Button
+										type="button"
+										className={`rounded-lg px-4 py-1 text-xs font-semibold shadow-sm transition-colors flex items-center gap-2 ${affiliateStageButtonConfig[affiliateStage.stage].color}`}
+										onClick={() => {
+											handleSendMessage();
+											setShowStageMessage((prev) => !prev);
+										}}
+										disabled={
+											affiliateStage.stage === "inactive" ||
+											isSendingMessage ||
+											cooldown > 0
+										}
+									>
+										{isSendingMessage ? (
+											<Loader2 className="w-4 h-4 animate-spin" />
+										) : (
+											<MessageCircle className="w-4 h-4 animate-pulse" />
+										)}
+										{cooldown > 0
+											? `Wait ${formatCooldown(cooldown)}`
+											: affiliateStageButtonConfig[affiliateStage.stage].label}
+									</Button>
+								)}
+
+								<div className="mt-2 text-xs bg-gray-50 border border-gray-200 rounded-lg p-3 w-full shadow-sm transition-all duration-300 ease-in-out flex flex-col gap-2 items-start">
+									{automatedMode === "Auto" && relevantMessages.length > 0 && (
+										<div className="flex items-center gap-2 text-sm">
+											<div
+												className={`animate-pulse w-2 h-2 rounded-full ${affiliateStageButtonConfig[affiliateStage.stage].color.replace("bg-", "bg-")}`}
+											/>
+											<span className="font-medium text-muted-foreground">
+												{
+													affiliateStageButtonConfig[affiliateStage.stage]
+														.status
+												}
+											</span>
+										</div>
+									)}
+									{relevantMessages.length === 0 ? (
+										<span className="flex items-center gap-2 text-gray-400">
+											<Info className="w-4 h-4 flex-shrink-0" />
+											<span className="font-medium">Not initiated</span>
+										</span>
+									) : (
+										<span className="relative block text-gray-700 min-h-[1.5rem]">
+											<Info className="w-4 h-4 absolute left-0 top-0" />
+											<span className="pl-6 block text-left w-full leading-tight">
+												{
+													affiliateStageButtonConfig[affiliateStage.stage]
+														.message
+												}
+											</span>
+										</span>
+									)}
 								</div>
 							</div>
-							{platform === "bluesky" &&
-								blueskyFeed?.map((item: BlueskyPost) => (
-									<div
-										key={item.post.uri}
-										className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
-									>
-										<div className="p-4">
-											<div className="flex items-center gap-3 mb-3">
-												<img
-													src={item.post.author.avatar}
-													alt={item.post.author.displayName}
-													className="w-10 h-10 rounded-full"
-												/>
-												<div>
-													<p className="font-medium text-gray-900">
-														{item.post.author.displayName}
-													</p>
-													<p className="text-sm text-gray-500">
-														@{item.post.author.handle}
-													</p>
+
+							<div className="mb-6">
+								<div className="flex items-center justify-between">
+									<div className="font-semibold">Messages</div>
+									<Popover>
+										<PopoverTrigger asChild>
+											<Button variant="ghost" size="icon" className="h-8 w-8">
+												<Settings className="size-4" />
+											</Button>
+										</PopoverTrigger>
+										<PopoverContent className="w-56">
+											<div className="space-y-4">
+												<div className="space-y-2 text-sm text-muted-foreground">
+													<div className="font-medium text-gray-900">
+														Chat Mode
+													</div>
+													<RadioGroup
+														defaultValue={automatedMode}
+														onValueChange={(value) => {
+															setAutomatedMode(value as RunMode);
+														}}
+													>
+														<div className="flex items-center space-x-2">
+															<RadioGroupItem value="Manual" id="Manual" />
+															<label htmlFor="Manual">Manual</label>
+														</div>
+														<div className="flex items-center space-x-2">
+															<RadioGroupItem
+																value="Auto"
+																id="Auto"
+																disabled={!outreachEnabled}
+															/>
+															<label htmlFor="Auto">Automatic</label>
+														</div>
+													</RadioGroup>
 												</div>
-											</div>
-
-											<p className="text-gray-900 text-sm mb-4">
-												{item.post.record.text}
-											</p>
-
-											{item.post.embed?.record?.embeds?.[0]?.$type ===
-												"app.bsky.embed.images#view" && (
-												<div className="relative aspect-square mb-4">
-													<Image
-														src={
-															item.post.embed.record.embeds[0].images?.[0]
-																.fullsize || ""
+												<Button
+													size="sm"
+													className="w-full"
+													onClick={async () => {
+														setIsUpdatingRunMode(true);
+														try {
+															await updateRunModeAction({
+																affiliates,
+																email: selectedAffiliate?.email ?? "",
+																handle: selectedAffiliate?.handle ?? "",
+																run_mode: automatedMode,
+																platform,
+																difficulty,
+																pipeline_id: pipeline_id,
+															});
+															toast.success("Run mode updated");
+														} finally {
+															setIsUpdatingRunMode(false);
 														}
-														alt="Post image"
-														fill
-														className="object-cover rounded-lg"
-													/>
-												</div>
-											)}
+													}}
+													disabled={isUpdatingRunMode}
+												>
+													{isUpdatingRunMode ? (
+														<Loader2 className="w-4 h-4 animate-spin mx-auto" />
+													) : (
+														"Save"
+													)}
+												</Button>
+											</div>
+										</PopoverContent>
+									</Popover>
+								</div>
 
-											<div className="flex items-center justify-between text-sm text-gray-500 pt-3 border-t">
-												<div className="flex items-center gap-4">
-													<div className="flex items-center gap-1">
-														<MessageCircle className="w-4 h-4" />
-														<span>{item.post.replyCount}</span>
-													</div>
-													<div className="flex items-center gap-1">
-														<Repeat2 className="w-4 h-4" />
-														<span>{item.post.repostCount}</span>
-													</div>
-													<div className="flex items-center gap-1">
-														<Heart className="w-4 h-4" />
-														<span>{item.post.likeCount}</span>
-													</div>
-													<div className="flex items-center gap-1">
-														<Quote className="w-4 h-4" />
-														<span>{item.post.quoteCount}</span>
-													</div>
-												</div>
-												<time className="text-xs">
-													{formatDate(item.post.indexedAt)}
-												</time>
+								{relevantMessages.length === 0 ? (
+									<div className="text-gray-400 text-sm">No messages yet.</div>
+								) : (
+									relevantMessages.map((msg) => (
+										<div
+											key={
+												msg.id ??
+												`${msg.sender}-${msg.receiver}-${msg.created_at}`
+											}
+											className="my-5"
+										>
+											<div className="text-xs text-gray-500">
+												{msg.sender} &rarr; {msg.receiver}
+											</div>
+											<div className="text-sm text-gray-900">{msg.text}</div>
+											<div className="text-xs text-gray-400">
+												{new Date(msg.created_at).toLocaleString()}
 											</div>
 										</div>
-									</div>
-								))}
-
-							{platform === "instagram" &&
-								instagramFeed?.business_discovery.media.data.map((post) => (
-									<div
-										key={post.id}
-										className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
-									>
-										<div className="p-4">
-											<div className="flex items-center gap-3 mb-3">
-												<img
-													src={
-														instagramFeed.business_discovery.profile_picture_url
-													}
-													alt={instagramFeed.business_discovery.name}
-													className="w-10 h-10 rounded-full"
-												/>
-												<div>
-													<p className="font-medium text-gray-900">
-														{instagramFeed.business_discovery.name}
-													</p>
-													<p className="text-sm text-gray-500">
-														{instagramFeed.business_discovery.followers_count}{" "}
-														followers
-													</p>
-												</div>
-											</div>
-
-											<div className="relative aspect-square mb-4 bg-gray-100 rounded-lg overflow-hidden">
-												<Image
-													src={post.thumbnail_url || post.media_url}
-													alt="Instagram post"
-													fill
-													className="object-cover"
-												/>
-											</div>
-
-											<p className="text-gray-900 text-sm mb-4 line-clamp-3">
-												{post.caption}
-											</p>
-
-											<div className="flex items-center justify-between text-sm text-gray-500 pt-3 border-t">
-												<div className="flex items-center gap-4">
-													<div className="flex items-center gap-1">
-														<Heart className="w-4 h-4" />
-														<span>{post.like_count}</span>
-													</div>
-													<div className="flex items-center gap-1">
-														<MessageCircle className="w-4 h-4" />
-														<span>{post.comments_count}</span>
-													</div>
-												</div>
-												<time className="text-xs">
-													{formatDate(post.timestamp)}
-												</time>
-											</div>
-										</div>
-									</div>
-								))}
-
-							{platform === "youtube" &&
-								youtubeFeed?.map((item) => (
-									<div
-										key={item.id}
-										className={`bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden ${platform === "youtube" ? "h-[430px]" : ""}`}
-									>
-										<div className="p-4">
-											<div className="flex items-center gap-3 mb-3">
-												<img
-													src={item.snippet.thumbnails.default.url}
-													alt={item.snippet.channelTitle}
-													className="w-10 h-10 rounded-full"
-												/>
-												<div>
-													<p className="font-medium text-gray-900">
-														{item.snippet.channelTitle}
-													</p>
-													<p className="text-sm text-gray-500">
-														@{selectedAffiliate?.handle}
-													</p>
-												</div>
-											</div>
-
-											<div className="relative aspect-video mb-4 bg-gray-100 rounded-lg overflow-hidden">
-												<Image
-													src={item.snippet.thumbnails.high.url}
-													alt="YouTube thumbnail"
-													fill
-													className="object-cover"
-												/>
-											</div>
-
-											<div className="relative aspect-video mb-4 h-48">
-												<iframe
-													src={`https://www.youtube.com/embed/${item.id}`}
-													title={item.snippet.title}
-													allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-													allowFullScreen
-													className="absolute top-0 left-0 w-full h-full rounded-lg"
-												/>
-											</div>
-
-											<p className="text-gray-900 text-sm mb-4 line-clamp-3">
-												{item.snippet.description}
-											</p>
-
-											<div className="flex items-center justify-between text-sm text-gray-500 pt-3 border-t">
-												<div className="flex items-center gap-4">
-													<div className="flex items-center gap-1">
-														<MessageCircle className="w-4 h-4" />
-														<span>{item.statistics?.commentCount || "-"}</span>
-													</div>
-													<div className="flex items-center gap-1">
-														<Heart className="w-4 h-4" />
-														<span>{item.statistics?.likeCount || "-"}</span>
-													</div>
-												</div>
-												<time className="text-xs">
-													{formatDate(item.snippet.publishedAt)}
-												</time>
-											</div>
-										</div>
-									</div>
-								))}
-						</div>
-					</>
-				) : affiliates.length === 0 ? (
-					<div className="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
-						<p className="text-gray-500">
-							No affiliates found for this campaign
-						</p>
-					</div>
-				) : (
-					<div className="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
-						<h3 className="text-lg font-medium text-gray-900 mb-2">
-							Select an Affiliate
-						</h3>
-						<p className="text-gray-500">
-							Choose an affiliate to view their recent posts
-						</p>
-					</div>
-				)}
+									))
+								)}
+							</div>
+						</ScrollArea>
+					</SheetContent>
+				</Sheet>
 			</div>
-		</div>
+		</>
 	);
 }

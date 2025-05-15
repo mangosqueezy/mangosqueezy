@@ -1,12 +1,22 @@
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["multiSchema"]
+  output   = "app/generated/prisma/client"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DIRECT_URL")
   schemas  = ["public"]
+}
+
+enum PricePlan {
+  Trial
+  Starter
+  Growth
+  Enterprise
+
+  @@schema("public")
 }
 
 model Business {
@@ -25,6 +35,11 @@ model Business {
   updated_at                DateTime             @updatedAt
   affiliate_hub_description String?
   svix_consumer_app_id      String?
+  stripe_connected_account  String?
+  price_plan                PricePlan?           @default(Trial)
+  trial_ends_at             DateTime?
+  stripe_customer_id        String?
+  stripe_subscription_id    String?
   payment_preference        PaymentPreference    @default(FullFiat)
   affiliate_business        Affiliate_Business[]
   messages                  Messages[]
@@ -143,6 +158,12 @@ model Products {
   @@schema("public")
 }
 
+enum RunMode {
+  Manual
+  Auto
+
+  @@schema("public")
+}
 model Pipelines {
   id              Int      @id @default(autoincrement())
   prompt          String?
@@ -156,6 +177,8 @@ model Pipelines {
   heygen_video_id String?
   ig_post_id      String?
   ig_post_url     String?
+  run_mode        RunMode? @default(Manual)
+  workflow        String?
   created_at      DateTime @default(now())
 
   business           Business?            @relation(fields: [business_id], references: [id])
@@ -165,7 +188,6 @@ model Pipelines {
 
   @@schema("public")
 }
-
 model ChatMessage {
   id          Int       @id @default(autoincrement())
   sender      String

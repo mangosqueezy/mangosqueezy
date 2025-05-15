@@ -65,9 +65,10 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { useJune } from "@/hooks/useJune";
+import { hasFeatureAccess } from "@/lib/utils";
+import type { Business, Products } from "@/prisma/app/generated/prisma/client";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { Business, Products } from "@prisma/client";
 import { Loader2, MoreHorizontal, PlusCircle } from "lucide-react";
 import { useActionState, useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
@@ -116,7 +117,10 @@ const FormSchema = z.object({
 		}),
 });
 
-export type TBusiness = Pick<Business, "id"> & {
+export type TBusiness = Pick<
+	Business,
+	"id" | "stripe_customer_id" | "stripe_subscription_id"
+> & {
 	products: Array<Products>;
 };
 
@@ -160,8 +164,12 @@ const initialState: TFormInitialState = {
 
 export default function Product({
 	user,
+	productCount,
+	plan,
 }: {
 	user: TBusiness | null | undefined;
+	productCount: number;
+	plan: string;
 }) {
 	const analytics = useJune(process.env.NEXT_PUBLIC_JUNE_API_KEY!);
 	const [open, setOpen] = useState(false);
@@ -202,6 +210,20 @@ export default function Product({
 			isShippable: true,
 		},
 	});
+
+	const openSheetHandler = (flag: boolean) => {
+		const productLimit = hasFeatureAccess(
+			plan,
+			"Features",
+			"Products",
+		) as number;
+
+		if (productCount >= productLimit) {
+			toast("You have reached the maximum number of products.");
+			return;
+		}
+		setOpen(flag);
+	};
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
 		setIsSaving(true);
@@ -316,7 +338,7 @@ export default function Product({
 
 			<div className="flex min-h-screen w-full flex-col">
 				<div className="ml-auto flex items-center gap-2 mb-5">
-					<Sheet open={open} onOpenChange={setOpen}>
+					<Sheet open={open} onOpenChange={openSheetHandler}>
 						<SheetTrigger asChild>
 							<Button size="sm" className="h-8 gap-1">
 								<PlusCircle className="h-3.5 w-3.5" />
@@ -325,7 +347,7 @@ export default function Product({
 								</span>
 							</Button>
 						</SheetTrigger>
-						<SheetContent>
+						<SheetContent className="px-3">
 							<ScrollArea className="h-96 md:h-full">
 								<Form {...form}>
 									<form onSubmit={form.handleSubmit(onSubmit)}>
@@ -575,7 +597,7 @@ export default function Product({
 															<span className="sr-only">Toggle menu</span>
 														</Button>
 													</DropdownMenuTrigger>
-													<DropdownMenuContent align="end">
+													<DropdownMenuContent align="end" className="bg-white">
 														<DropdownMenuLabel>Actions</DropdownMenuLabel>
 														<DropdownMenuItem
 															onClick={() => {

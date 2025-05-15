@@ -1,6 +1,7 @@
+import { GeistMono } from "geist/font/mono";
+import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
-import { Inter as FontSans } from "next/font/google";
 import { PHProvider } from "./providers";
 import "./globals.css";
 
@@ -9,11 +10,6 @@ const PostHogPageView = dynamic(() => import("./posthog-pageview"), {
 });
 
 import { cn } from "@/lib/utils";
-
-const fontSans = FontSans({
-	subsets: ["latin"],
-	variable: "--font-sans",
-});
 
 export const metadata: Metadata = {
 	title: "mangosqueezy affiliates tool",
@@ -76,17 +72,11 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
-			<head>
-				<link
-					rel="stylesheet"
-					href="https://api.fontshare.com/css?f%5B%5D=switzer@400,500,600,700&amp;display=swap"
-				/>
-			</head>
 			<PHProvider>
 				<body
 					className={cn(
-						"min-h-screen bg-background font-sans antialiased",
-						fontSans.variable,
+						"min-h-screen bg-background antialiased",
+						`${GeistSans.variable} ${GeistMono.variable}`,
 					)}
 				>
 					<PostHogPageView />

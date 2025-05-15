@@ -1,21 +1,8 @@
 "use client";
 
-import {
-	AudioWaveform,
-	BookOpen,
-	Bot,
-	Command,
-	Frame,
-	GalleryVerticalEnd,
-	Map as MapIcon,
-	PieChart,
-	Settings2,
-	SquareTerminal,
-} from "lucide-react";
-import type * as React from "react";
-
+import { getUser } from "@/app/(businesses)/actions";
+import { getSubscriptionData } from "@/app/actions";
 import { NavMain } from "@/components/nav-main";
-import { NavProjects } from "@/components/nav-projects";
 import { NavUser } from "@/components/nav-user";
 import { TeamSwitcher } from "@/components/team-switcher";
 import {
@@ -25,149 +12,137 @@ import {
 	SidebarHeader,
 	SidebarRail,
 } from "@/components/ui/sidebar";
+import { getPlanFromPriceId } from "@/lib/utils";
+import { differenceInDays } from "date-fns";
+import {
+	ChartSpline,
+	ClipboardPenLine,
+	Radio,
+	ShoppingBag,
+	UserRound,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import type * as React from "react";
+import { useEffect, useState } from "react";
 
-// This is sample data.
 const data = {
 	user: {
-		name: "shadcn",
-		email: "m@example.com",
-		avatar: "/avatars/shadcn.jpg",
+		name: "",
+		email: "",
+		avatar: "",
 	},
 	teams: [
 		{
-			name: "Acme Inc",
-			logo: GalleryVerticalEnd,
-			plan: "Enterprise",
-		},
-		{
-			name: "Acme Corp.",
-			logo: AudioWaveform,
-			plan: "Startup",
-		},
-		{
-			name: "Evil Corp.",
-			logo: Command,
+			name: "Team 1",
+			logo: UserRound,
 			plan: "Free",
 		},
 	],
 	navMain: [
 		{
-			title: "Playground",
-			url: "#",
-			icon: SquareTerminal,
+			title: "Campaigns",
+			url: "/campaigns",
+			icon: Radio,
 			isActive: true,
-			items: [
-				{
-					title: "History",
-					url: "#",
-				},
-				{
-					title: "Starred",
-					url: "#",
-				},
-				{
-					title: "Settings",
-					url: "#",
-				},
-			],
 		},
 		{
-			title: "Models",
-			url: "#",
-			icon: Bot,
-			items: [
-				{
-					title: "Genesis",
-					url: "#",
-				},
-				{
-					title: "Explorer",
-					url: "#",
-				},
-				{
-					title: "Quantum",
-					url: "#",
-				},
-			],
+			title: "Metrics",
+			url: "/metrics",
+			icon: ChartSpline,
 		},
 		{
-			title: "Documentation",
-			url: "#",
-			icon: BookOpen,
-			items: [
-				{
-					title: "Introduction",
-					url: "#",
-				},
-				{
-					title: "Get Started",
-					url: "#",
-				},
-				{
-					title: "Tutorials",
-					url: "#",
-				},
-				{
-					title: "Changelog",
-					url: "#",
-				},
-			],
+			title: "Orders",
+			url: "/orders",
+			icon: ClipboardPenLine,
 		},
 		{
-			title: "Settings",
-			url: "#",
-			icon: Settings2,
-			items: [
-				{
-					title: "General",
-					url: "#",
-				},
-				{
-					title: "Team",
-					url: "#",
-				},
-				{
-					title: "Billing",
-					url: "#",
-				},
-				{
-					title: "Limits",
-					url: "#",
-				},
-			],
-		},
-	],
-	projects: [
-		{
-			name: "Design Engineering",
-			url: "#",
-			icon: Frame,
-		},
-		{
-			name: "Sales & Marketing",
-			url: "#",
-			icon: PieChart,
-		},
-		{
-			name: "Travel",
-			url: "#",
-			icon: MapIcon,
+			title: "Products",
+			url: "/products",
+			icon: ShoppingBag,
 		},
 	],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+	const router = useRouter();
+	const [user, setUser] = useState<{
+		name: string;
+		email: string;
+		avatar: string;
+	} | null>(null);
+	const [teams, setTeams] = useState<
+		{
+			name: string;
+			logo: React.ElementType;
+			plan: string;
+		}[]
+	>([]);
+
+	useEffect(() => {
+		const fetchUser = async () => {
+			const user = await getUser();
+			if (user) {
+				const parsedUser = {
+					name: user.first_name ?? "",
+					email: user.email,
+					avatar: "",
+				};
+				setUser(parsedUser);
+
+				const subscription = await getSubscriptionData(
+					user?.stripe_subscription_id as string,
+				);
+				const plan = getPlanFromPriceId(subscription.price_id);
+
+				if (subscription.status === "trialing") {
+					const days = subscription.trial_end
+						? differenceInDays(
+								new Date(subscription.trial_end * 1000),
+								new Date(),
+							)
+						: 0;
+
+					setTeams([
+						{
+							name: user.first_name ?? "",
+							logo: UserRound,
+							plan: `Trial (${days} days left)`,
+						},
+					]);
+				} else {
+					setTeams([
+						{
+							name: user.first_name ?? "",
+							logo: UserRound,
+							plan: plan,
+						},
+					]);
+				}
+			}
+		};
+
+		fetchUser();
+	}, []);
+
+	const handleLogout = async () => {
+		const response = await fetch("https://www.mangosqueezy.com/api/logout", {
+			method: "POST",
+		});
+		if (response.ok) {
+			router.push("/");
+		}
+	};
+
 	return (
 		<Sidebar collapsible="icon" {...props}>
 			<SidebarHeader>
-				<TeamSwitcher teams={data.teams} />
+				<TeamSwitcher teams={teams} />
 			</SidebarHeader>
 			<SidebarContent>
 				<NavMain items={data.navMain} />
-				<NavProjects projects={data.projects} />
 			</SidebarContent>
 			<SidebarFooter>
-				<NavUser user={data.user} />
+				<NavUser user={user ?? data.user} handleLogout={handleLogout} />
 			</SidebarFooter>
 			<SidebarRail />
 		</Sidebar>

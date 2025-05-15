@@ -1,5 +1,7 @@
+import { getSubscriptionData } from "@/app/actions";
+import { getPlanFromPriceId } from "@/lib/utils";
 import { getChatMessages } from "@/models/chat_message";
-import type { ChatMessage } from "@prisma/client";
+import type { ChatMessage } from "@/prisma/app/generated/prisma/client";
 import { Redis } from "@upstash/redis";
 import { getUser } from "../../actions";
 import Campaign, { type Platform, type Affiliate } from "./campaign";
@@ -38,9 +40,14 @@ export default async function CampaignsPage(props: {
 	const potentialAffiliates = (await redis.smembers(
 		slug,
 	)) as potentialAffiliates[];
-	const affiliate = potentialAffiliates[0].affiliates;
-	const difficulty = potentialAffiliates[0].difficulty;
-	const platform = potentialAffiliates[0].platform;
+	const affiliate = potentialAffiliates[0]?.affiliates || [];
+	const difficulty = potentialAffiliates[0]?.difficulty || "difficulty";
+	const platform = potentialAffiliates[0]?.platform;
+
+	const subscription = await getSubscriptionData(
+		user?.stripe_subscription_id as string,
+	);
+	const plan = getPlanFromPriceId(subscription.price_id);
 
 	return (
 		<div className="container mx-auto px-4 py-8">
@@ -53,6 +60,7 @@ export default async function CampaignsPage(props: {
 				affiliate_count={pipeline?.affiliate_count || 0}
 				difficulty={difficulty}
 				platform={platform as Platform}
+				plan={plan}
 			/>
 		</div>
 	);

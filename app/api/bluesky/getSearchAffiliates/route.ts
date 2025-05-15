@@ -1,4 +1,5 @@
 import { getProductById } from "@/models/products";
+import type { RunMode } from "@/prisma/app/generated/prisma/client";
 import { Redis } from "@upstash/redis";
 import { NextResponse } from "next/server";
 import { type Difficulty, evalAi } from "./evalAi";
@@ -20,6 +21,7 @@ export type Affiliate = {
 	tag: string;
 	reason: string;
 	status: "active" | "inactive";
+	runMode: RunMode;
 };
 
 export type potentialAffiliates = {
@@ -335,6 +337,7 @@ export async function GET(request: Request) {
 				reason: result.reason,
 				tag: result.tag,
 				status: "active",
+				runMode: "Manual",
 			}));
 
 		// Add existing affiliates from Redis only if they exist
@@ -350,6 +353,7 @@ export async function GET(request: Request) {
 					reason: affiliate.reason,
 					tag: affiliate.tag,
 					status: affiliate.status,
+					runMode: "Manual",
 				});
 			}
 		}

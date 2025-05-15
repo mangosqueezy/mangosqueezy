@@ -2,6 +2,9 @@
 import crypto from "crypto";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import type { Tables } from "@/typings/types_db";
+import { PRICE_IDS } from "./stripe/config";
+import { tiers } from "@/app/pricing/page";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -92,4 +95,134 @@ export function isAccessTokenExpiring(expiresAt: string) {
 	}
 
 	return false;
+}
+
+type Price = Tables<"prices">;
+
+export const postData = async ({
+	url,
+	data,
+}: {
+	url: string;
+	data?: { price: Price };
+}) => {
+	const res = await fetch(url, {
+		method: "POST",
+		headers: new Headers({ "Content-Type": "application/json" }),
+		credentials: "same-origin",
+		body: JSON.stringify(data),
+	});
+
+	return res.json();
+};
+
+export const toDateTime = (secs: number) => {
+	const t = new Date(+0); // Unix epoch start.
+	t.setSeconds(secs);
+	return t;
+};
+
+export const calculateTrialEndUnixTimestamp = (
+	trialPeriodDays: number | null | undefined,
+) => {
+	// Check if trialPeriodDays is null, undefined, or less than 2 days
+	if (
+		trialPeriodDays === null ||
+		trialPeriodDays === undefined ||
+		trialPeriodDays < 2
+	) {
+		return undefined;
+	}
+
+	const currentDate = new Date(); // Current date and time
+	const trialEnd = new Date(
+		currentDate.getTime() + (trialPeriodDays + 1) * 24 * 60 * 60 * 1000,
+	); // Add trial days
+	return Math.floor(trialEnd.getTime() / 1000); // Convert to Unix timestamp in seconds
+};
+
+const toastKeyMap: { [key: string]: string[] } = {
+	status: ["status", "status_description"],
+	error: ["error", "error_description"],
+};
+
+const getToastRedirect = (
+	path: string,
+	toastType: string,
+	toastName: string,
+	toastDescription = "",
+	disableButton = false,
+	arbitraryParams = "",
+): string => {
+	const [nameKey, descriptionKey] = toastKeyMap[toastType];
+
+	let redirectPath = `${path}?${nameKey}=${encodeURIComponent(toastName)}`;
+
+	if (toastDescription) {
+		redirectPath += `&${descriptionKey}=${encodeURIComponent(toastDescription)}`;
+	}
+
+	if (disableButton) {
+		redirectPath += "&disable_button=true";
+	}
+
+	if (arbitraryParams) {
+		redirectPath += `&${arbitraryParams}`;
+	}
+
+	return redirectPath;
+};
+
+export const getStatusRedirect = (
+	path: string,
+	statusName: string,
+	statusDescription = "",
+	disableButton = false,
+	arbitraryParams = "",
+) =>
+	getToastRedirect(
+		path,
+		"status",
+		statusName,
+		statusDescription,
+		disableButton,
+		arbitraryParams,
+	);
+
+export const getErrorRedirect = (
+	path: string,
+	errorName: string,
+	errorDescription = "",
+	disableButton = false,
+	arbitraryParams = "",
+) =>
+	getToastRedirect(
+		path,
+		"error",
+		errorName,
+		errorDescription,
+		disableButton,
+		arbitraryParams,
+	);
+
+export const getPlanFromPriceId = (priceId: string): keyof typeof PRICE_IDS => {
+	const plan = Object.entries(PRICE_IDS).find(
+		([_, id]) => id === priceId,
+	)?.[0] as keyof typeof PRICE_IDS;
+	return plan;
+};
+
+export function hasFeatureAccess(
+	plan: string,
+	section: string,
+	featureName: string,
+): boolean | string | number {
+	const tier = tiers.find((t) => t.slug === plan);
+	if (!tier) return false;
+	const feature = tier.features.find(
+		(f) => f.section === section && f.name === featureName,
+	);
+	if (!feature) return false;
+
+	return feature.value;
 }

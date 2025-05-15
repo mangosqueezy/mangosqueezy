@@ -1,6 +1,10 @@
+import { PRICE_IDS } from "@/lib/stripe/config";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
+import Stripe from "stripe";
+
+const stripe = new Stripe(process.env.STRIPE_SK!);
 
 export async function updateSession(request: NextRequest) {
 	const response = NextResponse.next({
@@ -43,8 +47,51 @@ export async function updateSession(request: NextRequest) {
 
 	const { data } = await supabase
 		.from("Business")
-		.select("commission")
+		.select(
+			"commission, price_plan, stripe_subscription_id, trial_ends_at, stripe_customer_id",
+		)
 		.eq("id", result.data.user?.id);
+
+	const business = data?.[0];
+	const hasNoStripeCustomer = !business?.stripe_customer_id;
+
+	if (business && hasNoStripeCustomer) {
+		// create a new subscription
+		const customer = await stripe.customers.create({
+			email: result.data.user?.email,
+		});
+
+		const subscription = await stripe.subscriptions.create({
+			customer: customer.id,
+			items: [
+				{
+					price: PRICE_IDS.Starter,
+				},
+			],
+			trial_period_days: 14,
+		});
+
+		await supabase
+			.from("Business")
+			.update({
+				stripe_customer_id: customer.id,
+				trial_ends_at: subscription.trial_end
+					? new Date(subscription.trial_end * 1000)
+					: null,
+				stripe_subscription_id: subscription.id,
+			})
+			.eq("id", result.data.user?.id);
+	}
+
+	const subscription = await stripe.subscriptions.retrieve(
+		data?.[0]?.stripe_subscription_id,
+	);
+
+	if (subscription.status !== "active" && subscription.status !== "trialing") {
+		return NextResponse.redirect(new URL("/billing", request.url), {
+			headers: request.headers,
+		});
+	}
 
 	const pathname = new URL(request.url).pathname;
 	if (data && data[0]?.commission <= 0 && pathname !== "/onboarding") {

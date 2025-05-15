@@ -58,7 +58,7 @@ export default function ElegantOnboarding({
 				<CustomToast t={t} message={user.error} variant="error" />
 			));
 		} else {
-			router.push("/pipeline");
+			router.push("/campaigns");
 		}
 		setIsLoading(false);
 	};

@@ -6,7 +6,7 @@ export default async function Page() {
 	const user = await getUser();
 
 	if (user?.commission && user?.commission > 0) {
-		redirect("/pipeline");
+		redirect("/campaigns");
 	}
 
 	return (

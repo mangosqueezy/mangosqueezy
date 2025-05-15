@@ -31,7 +31,7 @@ function Hero() {
 			<Container className="relative">
 				<Navbar userId={userId} />
 				<div className="pb-24 pt-16 sm:pb-32 sm:pt-24 md:pb-48 md:pt-32">
-					<h1 className="font-display text-balance text-6xl/[0.9] font-medium tracking-tight text-gray-950 sm:text-8xl/[0.8] md:text-9xl/[0.8]">
+					<h1 className="text-balance text-6xl/[0.9] font-medium tracking-tight text-gray-950 sm:text-8xl/[0.8] md:text-9xl/[0.8]">
 						AI Agent.
 					</h1>
 					<p className="mt-8 max-w-lg text-xl/7 font-medium text-gray-950/75 sm:text-2xl/8">
@@ -39,8 +39,8 @@ function Hero() {
 						and build real partnerships.
 					</p>
 					<div className="mt-12 flex flex-col gap-x-6 gap-y-4 sm:flex-row">
-						<Button href={userId ? "/pipeline" : "/login"}>
-							{userId ? "Pipeline" : "Get Started"}
+						<Button href={userId ? "/campaigns" : "/login"}>
+							{userId ? "Campaigns" : "Get Started"}
 						</Button>
 						<Button variant="secondary" href="/pricing">
 							See pricing
@@ -60,9 +60,9 @@ function FeatureSection() {
 					A snapshot of your AI affiliate finder.
 				</Heading>
 				<Screenshot
-					width={1200}
+					width={1300}
 					height={768}
-					src="/screenshots/dashboard.jpeg"
+					src="/screenshots/dashboard.png"
 					className="mt-16 h-[36rem] sm:h-auto sm:w-[76rem]"
 				/>
 			</Container>
@@ -128,6 +128,7 @@ function BentoSection() {
 	);
 }
 
+// TODO: update this
 function HowToUse() {
 	return (
 		<Container className="pb-24">
@@ -236,7 +237,6 @@ export default function Home() {
 			<Hero />
 			<main>
 				<div className="bg-linear-to-b from-white from-50% to-gray-100 py-32">
-					<HowToUse />
 					<FeatureSection />
 					<BentoSection />
 				</div>

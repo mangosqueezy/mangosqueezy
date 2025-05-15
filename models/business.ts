@@ -1,6 +1,5 @@
 import prisma from "@/lib/prisma";
-import type { Business } from "@prisma/client";
-import isEmpty from "lodash/isEmpty";
+import type { Business } from "@/prisma/app/generated/prisma/client";
 
 export async function getUserById(id: Business["id"]) {
 	try {

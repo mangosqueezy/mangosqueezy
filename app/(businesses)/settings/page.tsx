@@ -1,4 +1,5 @@
 "use client";
+import stripeLogo from "@/assets/stripe.png";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -9,8 +10,10 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { Business, Products } from "@prisma/client";
-import { Copy, Mail, Share2 } from "lucide-react";
+import type { Business, Products } from "@/prisma/app/generated/prisma/client";
+import { Copy, CreditCard, Mail, Share2 } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { getUser } from "../actions";
@@ -157,6 +160,46 @@ export default function Settings() {
 									</Button>
 								</div>
 							)}
+						</CardContent>
+					</Card>
+				</div>
+
+				{/* Connect Apps Section */}
+				<div>
+					<Card className="border border-orange-200 bg-orange-20">
+						<CardHeader>
+							<div className="flex items-center gap-2">
+								<CreditCard className="size-5 text-muted-foreground" />
+								<CardTitle>Connect Apps</CardTitle>
+							</div>
+							<CardDescription>
+								Connect third-party apps to enhance your business capabilities.
+							</CardDescription>
+						</CardHeader>
+						<CardContent>
+							<div className="space-y-4">
+								<div className="flex items-center justify-between p-4 border rounded bg-white">
+									<div className="flex items-center gap-3">
+										<Image
+											src={stripeLogo.src}
+											alt="Stripe"
+											width={100}
+											height={100}
+										/>
+									</div>
+									{loggedInUser?.stripe_connected_account !== null &&
+									loggedInUser?.stripe_connected_account !== undefined ? (
+										<p>Connected</p>
+									) : (
+										<Link
+											className="border bg-blue-500 text-white px-4 py-2 rounded-md text-center"
+											href="https://connect.stripe.com/oauth/authorize?response_type=code&client_id=ca_SIlYUYnEmJy1CaNTUa7mUFKyXLEFLN1C&scope=read_write"
+										>
+											Connect
+										</Link>
+									)}
+								</div>
+							</div>
 						</CardContent>
 					</Card>
 				</div>

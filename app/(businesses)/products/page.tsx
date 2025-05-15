@@ -1,4 +1,6 @@
+import { getSubscriptionData } from "@/app/actions";
 import { createClient } from "@/lib/supabase/server";
+import { getPlanFromPriceId } from "@/lib/utils";
 import { getUserById } from "@/models/business";
 import Product, { type TBusiness } from "./components/product";
 
@@ -10,5 +12,11 @@ export default async function ProductsPage() {
 	const userId = data?.user?.id as string;
 	const user: TBusiness | undefined | null = await getUserById(userId);
 
-	return <Product user={user} />;
+	const productCount = user?.products?.length ?? 0;
+	const subscription = await getSubscriptionData(
+		user?.stripe_subscription_id as string,
+	);
+	const plan = getPlanFromPriceId(subscription.price_id);
+
+	return <Product user={user} productCount={productCount} plan={plan} />;
 }

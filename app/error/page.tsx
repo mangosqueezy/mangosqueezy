@@ -7,16 +7,9 @@ export default function Page() {
 						We apologize
 					</h1>
 					<p className="mt-6 text-base leading-7 text-gray-600">
-						{`Thank you for your recent order with us. We're sorry to inform you
-            that we encountered an issue processing your order. Our team is
-            currently investigating the issue and we will provide an update as
-            soon as possible.`}
-					</p>
-					<p className="mt-6 text-base leading-7 text-gray-600">
-						{`We understand how frustrating this can be and we apologize for any
-            inconvenience caused. We're working hard to resolve the issue as
-            quickly as we can and ensure that your order is processed
-            successfully.`}
+						{
+							"Something went wrong. We apologize for the inconvenience. Please reach out to us"
+						}
 					</p>
 
 					<p className="mt-6 text-base leading-7 text-gray-600">

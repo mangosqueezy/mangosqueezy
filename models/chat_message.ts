@@ -1,9 +1,9 @@
 import prisma from "@/lib/prisma";
-import type { ChatMessage } from "@prisma/client";
+import type { ChatMessage } from "@/prisma/app/generated/prisma/client";
 
 type TChatMessage = Pick<
 	ChatMessage,
-	"pipeline_id" | "text" | "sender" | "receiver"
+	"pipeline_id" | "text" | "sender" | "receiver" | "chat_message_status"
 >;
 
 export async function createChatMessage({
@@ -11,6 +11,7 @@ export async function createChatMessage({
 	text,
 	sender,
 	receiver,
+	chat_message_status,
 }: TChatMessage) {
 	return prisma.chatMessage.create({
 		data: {
@@ -18,6 +19,7 @@ export async function createChatMessage({
 			text,
 			sender,
 			receiver,
+			chat_message_status,
 		},
 	});
 }

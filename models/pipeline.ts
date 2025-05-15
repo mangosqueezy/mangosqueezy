@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import type { Pipelines } from "@prisma/client";
+import type { Pipelines } from "@/prisma/app/generated/prisma/client";
 
 export async function createPipeline({
 	product_id,
@@ -7,12 +7,14 @@ export async function createPipeline({
 	affiliate_count,
 	location,
 	business_id,
+	workflow,
 }: {
 	product_id: number;
 	prompt: string;
 	affiliate_count: number;
 	location: string;
 	business_id: string;
+	workflow: string;
 }) {
 	try {
 		return await prisma.pipelines.create({
@@ -23,6 +25,7 @@ export async function createPipeline({
 				affiliate_count,
 				location,
 				remark: "mangosqueezy is working on this",
+				workflow,
 			},
 		});
 	} catch (err) {

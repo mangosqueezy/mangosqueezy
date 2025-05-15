@@ -136,12 +136,14 @@ export async function createChatMessageAction(
 	pipeline_id: number,
 	message: string,
 	receiver: string,
+	chat_message_status: string,
 ) {
 	const chatMessage = await createChatMessage({
 		pipeline_id,
 		text: message,
 		sender: "amit@tapasom.com",
 		receiver: receiver,
+		chat_message_status,
 	});
 
 	// temporary email notification
@@ -408,6 +410,49 @@ Write a reply for ${handle} that:
 				"You are a social media expert who writes authentic, human-like comments and replies for Instagram. Your goal is to help brands build real connections with people by understanding their posts and responding in a friendly, thoughtful way — just like a human social media manager would.";
 		}
 
+		const { text } = await generateText({
+			model: openai("gpt-4o-mini"),
+			system: systemPrompt,
+			prompt,
+		});
+
+		return text;
+	} catch (error) {
+		console.error("Error generating draft post:", error);
+		throw error;
+	}
+}
+
+export async function getStripeFeedAction(
+	email: string,
+	commissionPercentage: number,
+	exampleEarning: number,
+	productDescription: string,
+) {
+	try {
+		const systemPrompt =
+			"You are a email expert who writes friendly, human-like partnership messages. Your goal is to introduce an affiliate program in a genuine and natural way.";
+
+		const prompt = `Write a warm, personal email inviting ${email} to join our affiliate program.
+
+Product: ${productDescription}
+Commission: ${commissionPercentage}%
+Potential Earnings: around $${exampleEarning} per sale.
+
+Please add a line break after the every new sentence use '\n\n'.
+
+Make it:
+- Simple and clear.
+- Friendly and human-sounding.
+- Focused on their benefit.
+- Ending with a soft invitation to chat or learn more.
+
+In closing email signature, use the following format:
+
+Cheers,
+Amit
+mangosqueezy.com
+`;
 		const { text } = await generateText({
 			model: openai("gpt-4o-mini"),
 			system: systemPrompt,

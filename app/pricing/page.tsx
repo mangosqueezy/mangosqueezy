@@ -1,3 +1,5 @@
+"use client";
+import { getUser } from "@/app/(businesses)/actions";
 import { Button } from "@/components/mango-ui/button";
 import { Container } from "@/components/mango-ui/container";
 import { Footer } from "@/components/mango-ui/footer";
@@ -5,40 +7,43 @@ import { Gradient, GradientBackground } from "@/components/mango-ui/gradient";
 import { Link } from "@/components/mango-ui/link";
 import { Navbar } from "@/components/mango-ui/navbar";
 import { Heading, Lead, Subheading } from "@/components/mango-ui/text";
+import { PRICE_IDS } from "@/lib/stripe/config";
+import { cn, getPlanFromPriceId } from "@/lib/utils";
+import type { PricePlan } from "@/prisma/app/generated/prisma/client";
+import { useStore } from "@/store";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import {
 	CheckIcon,
 	ChevronUpDownIcon,
 	MinusIcon,
 } from "@heroicons/react/16/solid";
-import type { Metadata } from "next";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useState } from "react";
+import { getSubscriptionData } from "../actions";
 
-export const metadata: Metadata = {
-	title: "Pricing",
-	description:
-		"AI affiliate agent to find affiliates for your SaaS business. Sign up today and start growing your business smarter.",
-};
-
-const tiers = [
+export const tiers = [
 	{
 		name: "Starter" as const,
-		slug: "starter",
+		slug: "Starter",
 		description: "Everything you need to start.",
-		priceMonthly: 0,
+		priceMonthly: 19,
+		stripePriceId: PRICE_IDS.Starter,
 		href: "/login",
 		highlights: [
-			{ description: "Free while in beta." },
-			// { description: "Up to 5 deal progress boards" },
-			// { description: "Source leads from select platforms" },
-			// { description: "mangosqueezyAI integrations", disabled: true },
-			// { description: "Competitor analysis", disabled: true },
+			{ description: "Up to 5 referral accounts" },
+			{ description: "Up to 5 affiliate programs" },
+			{ description: "Up to 5 products created" },
+			{ description: "Up to 2 third party apps integrations" },
+			{ description: "Automated outreach", disabled: true },
 		],
 		features: [
-			{ section: "Features", name: "Accounts", value: 3 },
-			{ section: "Features", name: "Deal progress boards", value: 5 },
-			{ section: "Features", name: "Sourcing platforms", value: "Select" },
-			{ section: "Features", name: "Contacts", value: 100 },
+			{ section: "Features", name: "Referrals", value: 5 },
+			{ section: "Features", name: "Programs", value: 5 },
+			{ section: "Features", name: "Products", value: 5 },
+			{ section: "Features", name: "Integrations", value: 2 },
+			{ section: "Features", name: "Outreach", value: false },
 			{ section: "Features", name: "AI assisted outreach", value: false },
 			{ section: "Analysis", name: "Competitor analysis", value: false },
 			{ section: "Analysis", name: "Dashboard reporting", value: false },
@@ -49,62 +54,66 @@ const tiers = [
 			{ section: "Support", name: "Dedicated account manager", value: false },
 		],
 	},
-	// {
-	// 	name: "Growth" as const,
-	// 	slug: "growth",
-	// 	description: "All the extras for your growing team.",
-	// 	priceMonthly: 149,
-	// 	href: "#",
-	// 	highlights: [
-	// 		{ description: "Up to 10 team members" },
-	// 		{ description: "Unlimited deal progress boards" },
-	// 		{ description: "Source leads from over 50 verified platforms" },
-	// 		{ description: "mangosqueezyAI integrations" },
-	// 		{ description: "5 competitor analyses per month" },
-	// 	],
-	// 	features: [
-	// 		{ section: "Features", name: "Accounts", value: 10 },
-	// 		{ section: "Features", name: "Deal progress boards", value: "Unlimited" },
-	// 		{ section: "Features", name: "Sourcing platforms", value: "100+" },
-	// 		{ section: "Features", name: "Contacts", value: 1000 },
-	// 		{ section: "Features", name: "AI assisted outreach", value: true },
-	// 		{ section: "Analysis", name: "Competitor analysis", value: "5 / month" },
-	// 		{ section: "Analysis", name: "Dashboard reporting", value: true },
-	// 		{ section: "Analysis", name: "Community insights", value: true },
-	// 		{ section: "Analysis", name: "Performance analysis", value: true },
-	// 		{ section: "Support", name: "Email support", value: true },
-	// 		{ section: "Support", name: "24 / 7 call center support", value: true },
-	// 		{ section: "Support", name: "Dedicated account manager", value: false },
-	// 	],
-	// },
-	// {
-	// 	name: "Enterprise" as const,
-	// 	slug: "enterprise",
-	// 	description: "Added flexibility to close deals at scale.",
-	// 	priceMonthly: 299,
-	// 	href: "#",
-	// 	highlights: [
-	// 		{ description: "Unlimited active team members" },
-	// 		{ description: "Unlimited deal progress boards" },
-	// 		{ description: "Source leads from over 100 verified platforms" },
-	// 		{ description: "mangosqueezyAI integrations" },
-	// 		{ description: "Unlimited competitor analyses" },
-	// 	],
-	// 	features: [
-	// 		{ section: "Features", name: "Accounts", value: "Unlimited" },
-	// 		{ section: "Features", name: "Deal progress boards", value: "Unlimited" },
-	// 		{ section: "Features", name: "Sourcing platforms", value: "100+" },
-	// 		{ section: "Features", name: "Contacts", value: "Unlimited" },
-	// 		{ section: "Features", name: "AI assisted outreach", value: true },
-	// 		{ section: "Analysis", name: "Competitor analysis", value: "Unlimited" },
-	// 		{ section: "Analysis", name: "Dashboard reporting", value: true },
-	// 		{ section: "Analysis", name: "Community insights", value: true },
-	// 		{ section: "Analysis", name: "Performance analysis", value: true },
-	// 		{ section: "Support", name: "Email support", value: true },
-	// 		{ section: "Support", name: "24 / 7 call center support", value: true },
-	// 		{ section: "Support", name: "Dedicated account manager", value: true },
-	// 	],
-	// },
+	{
+		name: "Growth" as const,
+		slug: "Growth",
+		description: "All the extras for your growing team.",
+		priceMonthly: 39,
+		stripePriceId: PRICE_IDS.Growth,
+		href: "/login",
+		highlights: [
+			{ description: "Up to 30 referral accounts" },
+			{ description: "Up to 30 affiliate programs" },
+			{ description: "Up to 30 products created" },
+			{ description: "Up to 5 third party apps integrations" },
+			{ description: "Automated outreach" },
+		],
+		features: [
+			{ section: "Features", name: "Referrals", value: 30 },
+			{ section: "Features", name: "Programs", value: 30 },
+			{ section: "Features", name: "Products", value: 30 },
+			{ section: "Features", name: "Integrations", value: 5 },
+			{ section: "Features", name: "Outreach", value: true },
+			{ section: "Analysis", name: "Competitor analysis", value: "5 / month" },
+			{ section: "Analysis", name: "Dashboard reporting", value: true },
+			{ section: "Analysis", name: "Community insights", value: true },
+			{ section: "Analysis", name: "Performance analysis", value: true },
+			{ section: "Support", name: "Email support", value: true },
+			{ section: "Support", name: "24 / 7 call center support", value: true },
+			{ section: "Support", name: "Dedicated account manager", value: false },
+		],
+	},
+	{
+		name: "Enterprise" as const,
+		slug: "Enterprise",
+		description: "Added flexibility to close deals at scale.",
+		priceMonthly: 69,
+		stripePriceId: PRICE_IDS.Enterprise,
+		href: "/login",
+		highlights: [
+			{ description: "Unlimited referral accounts" },
+			{ description: "Unlimited affiliate programs" },
+			{ description: "Unlimited products created" },
+			{ description: "Unlimited third party apps integrations" },
+			{ description: "Automated outreach" },
+			{ description: "Priority support" },
+			{ description: "Competitor analysis" },
+		],
+		features: [
+			{ section: "Features", name: "Referrals", value: "Unlimited" },
+			{ section: "Features", name: "Programs", value: "Unlimited" },
+			{ section: "Features", name: "Products", value: "Unlimited" },
+			{ section: "Features", name: "Integrations", value: "Unlimited" },
+			{ section: "Features", name: "Outreach", value: true },
+			{ section: "Analysis", name: "Competitor analysis", value: "Unlimited" },
+			{ section: "Analysis", name: "Dashboard reporting", value: true },
+			{ section: "Analysis", name: "Community insights", value: true },
+			{ section: "Analysis", name: "Performance analysis", value: true },
+			{ section: "Support", name: "Email support", value: true },
+			{ section: "Support", name: "24 / 7 call center support", value: true },
+			{ section: "Support", name: "Dedicated account manager", value: true },
+		],
+	},
 ];
 
 function Header() {
@@ -112,21 +121,32 @@ function Header() {
 		<Container className="mt-16">
 			<Heading as="h1">Simple Pricing</Heading>
 			<Lead className="mt-6 max-w-3xl">
-				AI affiliate agent to find affiliates for your SaaS business. Sign up
-				today and start growing your business smarter.
+				AI affiliate agent to find affiliates for your business. Sign up today
+				and start growing your business smarter.
 			</Lead>
 		</Container>
 	);
 }
 
-function PricingCards() {
+function PricingCards({
+	plan,
+	userId,
+}: {
+	plan: PricePlan | null | undefined;
+	userId: string | null | undefined;
+}) {
 	return (
 		<div className="relative py-24">
 			<Gradient className="absolute inset-x-2 bottom-0 top-48 rounded-4xl ring-1 ring-inset ring-black/5" />
 			<Container className="relative">
-				<div className="grid grid-cols-1">
+				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 					{tiers.map((tier, tierIndex) => (
-						<PricingCard key={`tier-${tierIndex}-${tier.name}`} tier={tier} />
+						<PricingCard
+							key={`tier-${tierIndex}-${tier.name}`}
+							tier={tier}
+							plan={plan}
+							userId={userId}
+						/>
 					))}
 				</div>
 			</Container>
@@ -134,9 +154,20 @@ function PricingCards() {
 	);
 }
 
-function PricingCard({ tier }: { tier: (typeof tiers)[number] }) {
+function PricingCard({
+	tier,
+	plan,
+	userId,
+}: {
+	tier: (typeof tiers)[number];
+	plan: PricePlan | null | undefined;
+	userId: string | null | undefined;
+}) {
+	const setPricePlan = useStore((state) => state.setPricePlan);
+	const router = useRouter();
+
 	return (
-		<div className="-m-2 grid grid-cols-1 rounded-4xl shadow-[inset_0_0_2px_1px_#ffffff4d] ring-1 ring-black/5 max-lg:mx-auto max-lg:w-full max-lg:max-w-md">
+		<div className="grid grid-cols-1 rounded-4xl shadow-[inset_0_0_2px_1px_#ffffff4d] ring-1 ring-black/5 max-lg:mx-auto max-lg:w-full max-lg:max-w-md">
 			<div className="grid grid-cols-1 rounded-4xl p-2 shadow-md shadow-black/5">
 				<div className="rounded-3xl bg-white p-10 pb-9 shadow-2xl ring-1 ring-black/5">
 					<Subheading>{tier.name}</Subheading>
@@ -151,7 +182,31 @@ function PricingCard({ tier }: { tier: (typeof tiers)[number] }) {
 						</div>
 					</div>
 					<div className="mt-8">
-						<Button href={tier.href}>Start a free trial</Button>
+						<Button
+							variant={
+								!userId
+									? "primary"
+									: plan === tier.slug
+										? "secondary"
+										: "primary"
+							}
+							className={cn(plan === tier.slug && "cursor-not-allowed")}
+							onClick={() => {
+								setPricePlan(tier.slug);
+								if (userId) {
+									router.push("/billing");
+								} else {
+									router.push(tier.href);
+								}
+							}}
+							disabled={!!userId && plan === tier.slug}
+						>
+							{!userId
+								? "Start a free trial"
+								: plan === tier.slug
+									? "Current plan"
+									: "Upgrade"}
+						</Button>
 					</div>
 					<div className="mt-8">
 						<h3 className="text-sm/6 font-medium text-gray-950">
@@ -177,6 +232,8 @@ function PricingTable({
 }: {
 	selectedTier: (typeof tiers)[number];
 }) {
+	const setPricePlan = useStore((state) => state.setPricePlan);
+
 	return (
 		<Container className="py-24">
 			<table className="w-full text-left">
@@ -260,7 +317,13 @@ function PricingTable({
 								data-selected={selectedTier === tier ? true : undefined}
 								className="px-0 pb-0 pt-4 data-selected:table-cell max-sm:hidden"
 							>
-								<Button variant="outline" href={tier.href}>
+								<Button
+									onClick={() => {
+										setPricePlan(tier.slug);
+									}}
+									variant="outline"
+									href={tier.href}
+								>
 									Get started
 								</Button>
 							</td>
@@ -380,6 +443,8 @@ function Testimonial() {
 										alt=""
 										src="/testimonials/tina-yards.jpg"
 										className="aspect-3/4 w-full object-cover"
+										width={384}
+										height={512}
 									/>
 								</div>
 							</div>
@@ -388,7 +453,7 @@ function Testimonial() {
 					<div className="flex max-lg:mt-16 lg:col-span-2 lg:px-16">
 						<figure className="mx-auto flex max-w-xl flex-col gap-16 max-lg:text-center">
 							<blockquote>
-								<p className="relative text-3xl tracking-tight text-white before:absolute before:-translate-x-full before:content-['“'] after:absolute after:content-['”'] lg:text-4xl">
+								<p className="relative text-3xl tracking-tight text-white before:absolute before:-translate-x-full before:content-['\\201C'] after:absolute after:content-['\\201D'] lg:text-4xl">
 									Thanks to mangosqueezy, we&apos;re finding new leads that we
 									never would have found with legal methods.
 								</p>
@@ -478,15 +543,34 @@ function FrequentlyAskedQuestions() {
 }
 
 export default function Pricing() {
+	const [userId, setUserId] = useState<string | null>(null);
+	const [plan, setPlan] = useState<PricePlan | null | undefined>(null);
+	useEffect(() => {
+		const fetchUser = async () => {
+			const user = await getUser();
+			setUserId(user?.id as string);
+
+			if (user?.stripe_subscription_id) {
+				const subscription = await getSubscriptionData(
+					user?.stripe_subscription_id as string,
+				);
+				const plan = getPlanFromPriceId(subscription.price_id);
+				setPlan(plan);
+			}
+		};
+
+		fetchUser();
+	}, []);
+
 	return (
 		<main className="overflow-hidden">
 			<GradientBackground />
 			<Container>
-				<Navbar />
+				<Navbar userId={userId} />
 			</Container>
 			<Header />
-			<PricingCards />
-			{/* <PricingTable selectedTier={tier} /> */}
+			<PricingCards plan={plan} userId={userId} />
+			{/* <PricingTable selectedTier={tiers[0]} /> */}
 			{/* <Testimonial /> */}
 			<FrequentlyAskedQuestions />
 			<Footer />

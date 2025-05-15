@@ -80,7 +80,7 @@ export function Navbar({
 
 	if (userId) {
 		links.push({ href: "/pricing", label: "Pricing" });
-		links.push({ href: "/pipeline", label: "Pipeline" });
+		links.push({ href: "/campaigns", label: "Campaigns" });
 	} else {
 		links.push({ href: "/pricing", label: "Pricing" });
 		links.push({ href: "/login", label: "Login" });

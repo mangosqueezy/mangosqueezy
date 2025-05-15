@@ -13,6 +13,6 @@
 		}
 	},
 	"files": {
-		"ignore": ["node_modules", ".vscode/*"]
+		"ignore": ["node_modules", ".vscode/*", "prisma/app/generated/*"]
 	}
 }

@@ -5,19 +5,21 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { auth } from "./actions";
 
 export default function Page() {
-	const [state, loginAction, isPending] = useActionState(auth, null);
 	const router = useRouter();
+	const [isPending, setIsPending] = useState(false);
+	const [state, setState] = useState<string | null>(null);
+	const emailRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
 		const fetchUser = async () => {
 			const user = await getUser();
 			if (user?.id) {
-				router.push("/pipeline");
+				router.push("/campaigns");
 			}
 		};
 		fetchUser();
@@ -42,11 +44,24 @@ export default function Page() {
 							Login to Dashboard
 						</p>
 
-						<form className="my-8" action={loginAction}>
+						<form
+							className="my-8"
+							onSubmit={async (e) => {
+								e.preventDefault();
+								setIsPending(true);
+								const formData = new FormData();
+								formData.append("email", emailRef.current?.value || "");
+
+								const state = await auth(formData);
+								setState(state);
+								setIsPending(false);
+							}}
+						>
 							<LabelInputContainer className="mb-4">
 								<Label htmlFor="email">Email Address</Label>
 								<Input
 									id="email"
+									ref={emailRef}
 									name="email"
 									placeholder="partner@mangosqueezy.com"
 									type="email"

@@ -1,4 +1,5 @@
 import { getProductById } from "@/models/products";
+import type { RunMode } from "@/prisma/app/generated/prisma/client";
 import { Redis } from "@upstash/redis";
 import { NextResponse } from "next/server";
 import { type Difficulty, evalAi } from "./evalAi";
@@ -28,6 +29,7 @@ export type Affiliate = {
 		viewCount: string;
 		videoCount: string;
 	};
+	runMode: RunMode;
 };
 
 export type potentialAffiliates = {
@@ -164,6 +166,7 @@ export async function GET(request: Request) {
 						viewCount: channel.statistics.viewCount,
 						videoCount: channel.statistics.videoCount,
 					},
+					runMode: "Manual",
 					...result,
 				};
 			}),
