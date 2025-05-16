@@ -11,9 +11,21 @@ export async function getUserById(id: Business["id"]) {
 						affiliate: true,
 					},
 				},
-				products: true,
-				orders: true,
-				pipelines: true,
+				products: {
+					orderBy: {
+						created_at: "desc",
+					},
+				},
+				orders: {
+					orderBy: {
+						created_at: "desc",
+					},
+				},
+				pipelines: {
+					orderBy: {
+						created_at: "desc",
+					},
+				},
 			},
 		});
 	} catch (err) {

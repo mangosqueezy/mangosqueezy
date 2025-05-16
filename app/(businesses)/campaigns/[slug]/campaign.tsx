@@ -290,7 +290,6 @@ export default function Campaign({
 		null,
 	);
 	const [automatedMode, setAutomatedMode] = useState<RunMode>("Manual");
-	const [isLoading, setIsLoading] = useState(false);
 	const [isAddingAffiliate, setIsAddingAffiliate] = useState(false);
 	const [affiliateStage, setAffiliateStage] = useState<AffiliateStage>({
 		stage: "warm_up",
@@ -298,15 +297,12 @@ export default function Campaign({
 		color: "bg-blue-500",
 		label: "Warming Up",
 	});
-	const [showStageMessage, setShowStageMessage] = useState(false);
 	const [isSendingMessage, setIsSendingMessage] = useState(false);
 	const [cooldown, setCooldown] = useState<number>(0);
 	const cooldownInterval = useRef<NodeJS.Timeout | null>(null);
 	const [filter, setFilter] = useState("");
 	const [sheetOpen, setSheetOpen] = useState(false);
-	const [affiliateDetails, setAffiliateDetails] =
-		useState<AffiliateDetails | null>(null);
-	const [loadingDetails, setLoadingDetails] = useState(false);
+	const [draftMessage, setDraftMessage] = useState("");
 	const [isUpdatingRunMode, setIsUpdatingRunMode] = useState(false);
 	const [viewingAffiliateHandle, setViewingAffiliateHandle] = useState<
 		string | null
@@ -363,9 +359,7 @@ export default function Campaign({
 						table: "Pipelines",
 						filter: `id=eq.${pipeline_id}`,
 					},
-					(payload) => {
-						setIsLoading(false);
-					},
+					(payload) => {},
 				)
 				.subscribe();
 		}
@@ -414,7 +408,7 @@ export default function Campaign({
 			platform,
 		);
 
-		setAffiliateDetails(null);
+		setDraftMessage("");
 		setSelectedAffiliate(null);
 	};
 
@@ -434,13 +428,12 @@ export default function Campaign({
 	}, [selectedAffiliate, relevantMessages]);
 
 	const handleSendMessage = async () => {
-		const message = affiliateDetails?.result;
-		if (message?.trim()) {
+		if (draftMessage?.trim()) {
 			setIsSendingMessage(true);
 
 			await createChatMessageAction(
 				pipeline_id,
-				message,
+				draftMessage,
 				selectedAffiliate?.handle as string,
 				affiliateStage.stage,
 			);
@@ -470,7 +463,6 @@ export default function Campaign({
 	) => {
 		setViewingAffiliateHandle(affiliate.handle);
 		setSelectedAffiliate(affiliate as Affiliate);
-		setLoadingDetails(true);
 		setAutomatedMode(affiliate?.runMode || "Manual");
 		let details: AffiliateDetails | undefined = undefined;
 		const price = product?.price || 0;
@@ -510,13 +502,11 @@ export default function Campaign({
 			);
 			details = { result: text };
 		}
-		setAffiliateDetails(details || null);
-		setLoadingDetails(false);
+		setDraftMessage(details?.result || "");
 		setSheetOpen(true);
 		setViewingAffiliateHandle(null);
 	};
 
-	// Find the latest message sent by the current user to the selected affiliate
 	const latestUserMessage = useMemo(() => {
 		if (!selectedAffiliate) return null;
 		return (
@@ -787,7 +777,6 @@ export default function Campaign({
 										className={`rounded-lg px-4 py-1 text-xs font-semibold shadow-sm transition-colors flex items-center gap-2 ${affiliateStageButtonConfig[affiliateStage.stage].color}`}
 										onClick={() => {
 											handleSendMessage();
-											setShowStageMessage((prev) => !prev);
 										}}
 										disabled={
 											affiliateStage.stage === "inactive" ||

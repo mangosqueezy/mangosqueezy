@@ -94,98 +94,94 @@ export async function GET(request: Request) {
 		const { searchParams } = new URL(request.url);
 		const product_id = searchParams.get("product_id") || "";
 		const pipeline_id = searchParams.get("pipeline_id") || "";
-		const affiliate_count = searchParams.get("affiliate_count") || "10";
+		const affiliate_count = Number.parseInt(
+			searchParams.get("affiliate_count") || "10",
+			10,
+		);
 		const difficulty: string = searchParams.get("difficulty") || "hard";
-		const channels: YouTubeSearchResult[] = [];
+		const location = searchParams.get("location") || "";
+		const locationRadius = searchParams.get("locationRadius") || "100km";
 
 		const product = await getProductById(Number.parseInt(product_id));
 		const { keywords: searchKeywords } = await getKeywords({
 			description: product?.description || "",
 		});
 
-		// Search for channels based on keywords
+		const validResults: Affiliate[] = [];
+		let foundCount = 0;
+
 		for (const keyword of searchKeywords) {
-			const searchResponse = await fetch(
-				`https://youtube.googleapis.com/youtube/v3/search?part=snippet&q=${keyword}&key=${YOUTUBE_API_KEY}&type=channel&maxResults=20`,
-			);
+			if (foundCount >= affiliate_count) break;
+
+			const type = location ? "video" : "channel";
+			let url = `https://youtube.googleapis.com/youtube/v3/search?part=snippet&q=${keyword}&key=${YOUTUBE_API_KEY}&type=${type}&maxResults=30`;
+			if (location) {
+				url += `&location=${location}&locationRadius=${locationRadius}`;
+			}
+
+			const searchResponse = await fetch(url);
 			const response: YouTubeSearchResponse = await searchResponse.json();
-			channels.push(...response.items);
-		}
+			const channels = response.items;
 
-		// Get channel details and evaluate them
-		const channelDetailsResponses = await Promise.allSettled(
-			channels.map((channel) =>
-				fetch(
-					`https://youtube.googleapis.com/youtube/v3/channels?part=statistics,snippet&key=${YOUTUBE_API_KEY}&id=${channel.id.channelId}`,
-				),
-			),
-		);
+			for (const channel of channels) {
+				if (foundCount >= affiliate_count) break;
 
-		const channelDetails = (
-			await Promise.allSettled(
-				channelDetailsResponses
-					.filter((response) => response.status === "fulfilled")
-					.map((response) =>
-						(response as PromiseFulfilledResult<Response>).value.json(),
-					),
-			)
-		)
-			.filter((result) => result.status === "fulfilled")
-			.map(
-				(result) =>
-					(result as PromiseFulfilledResult<YouTubeChannelResponse>).value,
-			);
+				const channelId = location
+					? channel.snippet.channelId
+					: channel.id.channelId;
+				if (!channelId) continue;
 
-		const evaluationResults = await Promise.all(
-			channelDetails.map(async (details, index) => {
-				const channel = details.items[0];
-				if (!channel) return null;
+				const detailsUrl = `https://youtube.googleapis.com/youtube/v3/channels?part=statistics,snippet&key=${YOUTUBE_API_KEY}&id=${channelId}`;
+				const detailsResponse = await fetch(detailsUrl);
+				const detailsJson: YouTubeChannelResponse =
+					await detailsResponse.json();
+				const channelDetails = detailsJson.items[0];
+				if (!channelDetails) continue;
 
 				const metrics = {
 					replyCount: 0,
 					repostCount: 0,
-					likeCount: Number.parseInt(channel.statistics.subscriberCount) || 0,
-					quoteCount: Number.parseInt(channel.statistics.viewCount) || 0,
+					likeCount:
+						Number.parseInt(channelDetails.statistics.subscriberCount) || 0,
+					quoteCount: Number.parseInt(channelDetails.statistics.viewCount) || 0,
 				};
 
 				const result = await evalAi({
-					handle: channels[index].snippet.channelTitle,
+					handle: channel.snippet.channelTitle,
 					postMetrics: metrics,
 					difficulty: difficulty as Difficulty,
 				});
 
-				return {
-					handle: channels[index].snippet.channelTitle,
-					displayName: channel.snippet.title,
-					avatar: channel.snippet.thumbnails.default.url,
-					channelId: channels[index].id.channelId,
-					videoId: channels[index].id.videoId,
-					status: "active",
-					statistics: {
-						subscriberCount: channel.statistics.subscriberCount,
-						viewCount: channel.statistics.viewCount,
-						videoCount: channel.statistics.videoCount,
-					},
-					runMode: "Manual",
-					...result,
-				};
-			}),
-		);
+				if (result.evaluation === "Yes") {
+					validResults.push({
+						handle: channel.snippet.channelTitle,
+						displayName: channelDetails.snippet.title,
+						avatar: channelDetails.snippet.thumbnails.default.url,
+						channelId,
+						videoId: channel.id.videoId,
+						status: "active",
+						statistics: {
+							subscriberCount: channelDetails.statistics.subscriberCount,
+							viewCount: channelDetails.statistics.viewCount,
+							videoCount: channelDetails.statistics.videoCount,
+						},
+						runMode: "Manual",
+						evaluation: "Yes",
+						tag: result.tag,
+						reason: result.reason,
+					} as Affiliate);
+					foundCount++;
+				}
+			}
+		}
 
-		// Filter out null results and those that don't meet criteria
-		const validResults = evaluationResults
-			.filter((result): result is NonNullable<typeof result> => result !== null)
-			.filter((result) => result.evaluation === "Yes")
-			.slice(0, Number.parseInt(affiliate_count));
-
-		// Store results in Redis
-		const result = await redis.sadd(pipeline_id, {
+		const redisResult = await redis.sadd(pipeline_id, {
 			platform: "youtube",
 			difficulty,
 			affiliates: validResults,
 		});
 
-		return NextResponse.json(result, { status: 200 });
+		return NextResponse.json(redisResult, { status: 200 });
 	} catch (error) {
 		console.error("Error:", error);
 		return NextResponse.json(

@@ -24,14 +24,20 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { hasFeatureAccess } from "@/lib/utils";
+import { cn, hasFeatureAccess } from "@/lib/utils";
 import { CreditCard, Handshake, Loader } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import {
+	useDeferredValue,
+	useEffect,
+	useRef,
+	useState,
+	useTransition,
+} from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { createCampaignAction } from "./actions";
+import { createCampaignAction, getGooglePlacesAction } from "./actions";
 
 const TYPE_OPTIONS = ["social_media", "stripe"] as const;
 
@@ -55,6 +61,12 @@ type FormValues = {
 	platform?: string;
 };
 
+interface GooglePlaceSuggestion {
+	place_id: string;
+	description: string;
+	geometry: { location: { lat: number; lng: number } };
+}
+
 export default function CampaignForm({
 	products,
 	type,
@@ -66,6 +78,16 @@ export default function CampaignForm({
 	const router = useRouter();
 	const [isLoading, setIsLoading] = useState(false);
 	const [open, setOpen] = useState(false);
+	const [location, setLocation] = useState("");
+	const deferredQuery = useDeferredValue(location);
+	const [locationLoading, setLocationLoading] = useState(false);
+	const [locationError, setLocationError] = useState("");
+	const [selectedPlatform, setSelectedPlatform] = useState<string>("");
+	const [isPending, startTransition] = useTransition();
+	const [suggestions, setSuggestions] = useState<GooglePlaceSuggestion[]>([]);
+	const [showSuggestions, setShowSuggestions] = useState(false);
+	const [placeId, setPlaceId] = useState<string | null>(null);
+	const inputRef = useRef<HTMLInputElement>(null);
 
 	const form = useForm<FormValues>({
 		defaultValues: {
@@ -120,12 +142,49 @@ export default function CampaignForm({
 			count: Number.parseInt(values.count),
 			platform,
 			connected_account_id: stripeConnectedAccountId as string,
+			placeId:
+				type === "social_media" && platform === "youtube" && placeId
+					? placeId
+					: undefined,
 		};
 		await createCampaignAction(data);
 		router.refresh();
 		setIsLoading(false);
 		setOpen(false);
 		toast.dismiss(toastId);
+	};
+
+	useEffect(() => {
+		const searchPlaces = async () => {
+			try {
+				const data = await getGooglePlacesAction(deferredQuery);
+				if (data.status === "OK" && data.predictions.length > 0) {
+					startTransition(() => {
+						setSuggestions(data.predictions as GooglePlaceSuggestion[]);
+						setShowSuggestions(true);
+					});
+				} else {
+					setSuggestions([]);
+					setShowSuggestions(false);
+					setLocationError("No results found");
+				}
+			} catch (err) {
+				setSuggestions([]);
+				setShowSuggestions(false);
+				setLocationError("Failed to fetch suggestions");
+			} finally {
+				setLocationLoading(false);
+			}
+		};
+		if (deferredQuery !== "") {
+			searchPlaces();
+		}
+	}, [deferredQuery]);
+
+	const handleSelectSuggestion = (suggestion: GooglePlaceSuggestion) => {
+		setLocation(suggestion.description);
+		setPlaceId(suggestion.place_id);
+		setShowSuggestions(false);
 	};
 
 	return (
@@ -228,7 +287,10 @@ export default function CampaignForm({
 											<FormControl>
 												<Select
 													value={field.value}
-													onValueChange={field.onChange}
+													onValueChange={(val) => {
+														field.onChange(val);
+														setSelectedPlatform(val);
+													}}
 													defaultValue=""
 												>
 													<SelectTrigger className="w-full">
@@ -248,9 +310,70 @@ export default function CampaignForm({
 									)}
 								/>
 							)}
-							<Button type="submit" className="w-full" disabled={isLoading}>
+							{type === "social_media" && selectedPlatform === "youtube" && (
+								<FormItem className="relative">
+									<FormLabel>Location</FormLabel>
+									<FormControl>
+										<div>
+											<Input
+												ref={inputRef}
+												placeholder="Enter a location (city, address, etc.)"
+												value={location}
+												onChange={(e) => {
+													const value = e.target.value;
+													setLocation(value);
+													setLocationError("");
+												}}
+												autoComplete="off"
+											/>
+											{showSuggestions && suggestions.length > 0 && (
+												<ul className="absolute z-10 bg-white border border-gray-200 w-full mt-1 rounded shadow max-h-48 overflow-auto">
+													{suggestions.map((s, idx) => (
+														<li
+															key={s.place_id || idx}
+															className="px-0 py-0 text-sm text-neutral-800"
+														>
+															<button
+																type="button"
+																className="w-full text-left px-3 py-2 cursor-pointer hover:bg-gray-100"
+																onClick={() => handleSelectSuggestion(s)}
+																onKeyDown={(e) => {
+																	if (e.key === "Enter" || e.key === " ") {
+																		e.preventDefault();
+																		handleSelectSuggestion(s);
+																	}
+																}}
+															>
+																{s.description}
+															</button>
+														</li>
+													))}
+												</ul>
+											)}
+										</div>
+									</FormControl>
+									{(locationLoading || isPending) && (
+										<div className="text-xs text-gray-500">
+											Fetching suggestions...
+										</div>
+									)}
+									{locationError && (
+										<div className="text-xs text-red-500">{locationError}</div>
+									)}
+								</FormItem>
+							)}
+							<Button
+								type="submit"
+								className={cn(
+									type === "social_media"
+										? "bg-yellow-400 hover:bg-yellow-600"
+										: "bg-lime-300 hover:bg-lime-600",
+									"w-full font-bold text-muted-foreground hover:text-white",
+								)}
+								disabled={isLoading}
+							>
 								{isLoading ? (
-									<span className="flex items-center justify-center">
+									<span className="flex items-center justify-center text-muted-foreground">
 										<Loader className="size-4 mr-2 animate-spin" />
 										Submitting...
 									</span>

@@ -35,12 +35,13 @@ export async function createCampaignAction(data: {
 	business_id: string;
 	product_id: number;
 	connected_account_id: string;
+	placeId?: string;
 }) {
 	const pipeline = await createPipeline({
 		product_id: data.product_id,
 		prompt: "prompt",
 		affiliate_count: data.count,
-		location: "EARTH",
+		location: data.placeId ? data.placeId : "EARTH",
 		business_id: data.business_id,
 		workflow: data.platform || "Social Media",
 	});
@@ -61,15 +62,40 @@ export async function createCampaignAction(data: {
 			},
 		);
 	} else if (platform_name === "youtube") {
-		await fetch(
-			`https://www.mangosqueezy.com/api/youtube/getSearchAffiliates?product_id=${data.product_id}&limit=100&pipeline_id=${pipeline?.id}&affiliate_count=${data.count}`,
-			{
-				method: "GET",
-			},
-		);
+		let url = `https://www.mangosqueezy.com/api/youtube/getSearchAffiliates?product_id=${data.product_id}&limit=100&pipeline_id=${pipeline?.id}&affiliate_count=${data.count}`;
+		if (data.placeId) {
+			const params = new URLSearchParams({
+				place_id: data.placeId,
+				key: process.env.GOOGLE_MAP_API_KEY!,
+				fields: "geometry",
+			});
+
+			const response = await fetch(
+				`https://maps.googleapis.com/maps/api/place/details/json?${params}`,
+			);
+
+			const geometryResponse = await response.json();
+
+			const location = geometryResponse.result.geometry.location;
+
+			const coordinates = {
+				lat: location.lat,
+				lng: location.lng,
+			};
+
+			if (coordinates) {
+				const location = `${coordinates.lat},${coordinates.lng}`;
+
+				url += `&location=${location}&locationRadius=100km`;
+			}
+		}
+
+		await fetch(url, {
+			method: "GET",
+		});
 	} else if (platform_name === "stripe") {
 		await fetch(
-			`http://www.mangosqueezy.com/api/stripe/customers?product_id=${data.product_id}&limit=100&pipeline_id=${pipeline?.id}&affiliate_count=${data.count}&connected_account_id=${data.connected_account_id}`,
+			`https://www.mangosqueezy.com/api/stripe/customers?product_id=${data.product_id}&limit=100&pipeline_id=${pipeline?.id}&affiliate_count=${data.count}&connected_account_id=${data.connected_account_id}`,
 			{
 				method: "GET",
 			},
@@ -123,4 +149,19 @@ export async function updateRunModeAction(data: {
 	revalidatePath(`/campaigns/${data.pipeline_id}`);
 
 	return true;
+}
+
+export async function getGooglePlacesAction(location: string) {
+	const params = new URLSearchParams({
+		input: location,
+		key: process.env.GOOGLE_MAP_API_KEY!,
+		types: "geocode",
+		language: "en",
+	});
+
+	const response = await fetch(
+		`https://maps.googleapis.com/maps/api/place/autocomplete/json?${params}`,
+	);
+	const data = await response.json();
+	return data;
 }

@@ -26,7 +26,7 @@ export default async function CampaignsPage() {
 	const plan = getPlanFromPriceId(subscription.price_id);
 
 	return (
-		<div className="flex flex-col">
+		<div className="flex flex-col min-h-screen">
 			<Toaster position="top-right" />
 
 			<div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mb-8 mt-2">
