@@ -31,47 +31,75 @@ interface BlueskyPost {
 	};
 }
 
-type YouTubeThumbnail = {
-	url: string;
-	width?: number;
-	height?: number;
-};
-
-type YouTubeThumbnails = {
-	default: YouTubeThumbnail;
-	medium: YouTubeThumbnail;
-	high: YouTubeThumbnail;
-};
-
-type YouTubeSearchResult = {
-	kind: string;
-	etag: string;
-	id: {
-		kind: string;
-		channelId?: string;
-		videoId?: string;
-	};
-	snippet: {
-		publishedAt: string;
-		channelId: string;
-		title: string;
-		description: string;
-		thumbnails: YouTubeThumbnails;
-		channelTitle: string;
-		publishTime: string;
-	};
-};
-
-type YouTubeSearchResponse = {
-	items: YouTubeSearchResult[];
-};
-
 export interface YouTubeVideoResponse {
 	kind: string;
 	etag: string;
 	items: YouTubeVideo[];
 	pageInfo: PageInfo;
 }
+
+export type YouTubePlaylistItem = {
+	kind: string;
+	etag: string;
+	id: string;
+	snippet: {
+		publishedAt: string;
+		channelId: string;
+		title: string;
+		description: string;
+		thumbnails: {
+			default: {
+				url: string;
+				width: number;
+				height: number;
+			};
+			medium: {
+				url: string;
+				width: number;
+				height: number;
+			};
+			high: {
+				url: string;
+				width: number;
+				height: number;
+			};
+			standard: {
+				url: string;
+				width: number;
+				height: number;
+			};
+			maxres: {
+				url: string;
+				width: number;
+				height: number;
+			};
+		};
+		channelTitle: string;
+		playlistId: string;
+		position: number;
+		resourceId: {
+			kind: string;
+			videoId: string;
+		};
+		videoOwnerChannelTitle: string;
+		videoOwnerChannelId: string;
+	};
+	contentDetails: {
+		videoId: string;
+		videoPublishedAt: string;
+	};
+};
+
+export type YouTubePlaylistResponse = {
+	kind: string;
+	etag: string;
+	nextPageToken: string;
+	items: YouTubePlaylistItem[];
+	pageInfo: {
+		totalResults: number;
+		resultsPerPage: number;
+	};
+};
 
 export interface YouTubeVideo {
 	kind: string;
@@ -137,6 +165,7 @@ export async function createChatMessageAction(
 	message: string,
 	receiver: string,
 	chat_message_status: string,
+	videoId?: string,
 ) {
 	const chatMessage = await createChatMessage({
 		pipeline_id,
@@ -146,12 +175,17 @@ export async function createChatMessageAction(
 		chat_message_status,
 	});
 
+	let subject = `New message to ${receiver} for pipeline ${pipeline_id}`;
+	if (videoId) {
+		subject = `New message to ${receiver} for pipeline ${pipeline_id} with video ${videoId}`;
+	}
+
 	// temporary email notification
 	const resend = new Resend(process.env.RESEND_API_KEY);
 	await resend.emails.send({
 		from: "mangosqueezy <amit@tapasom.com>",
 		to: ["amit@tapasom.com"],
-		subject: `New message to ${receiver} for pipeline ${pipeline_id}`,
+		subject,
 		react: EmailTemplate({
 			firstName: "there",
 			text: message,
@@ -298,68 +332,36 @@ export async function getYoutubeFeedAction(
 	productDescription: string,
 ) {
 	const response = await fetch(
-		`https://youtube.googleapis.com/youtube/v3/channels?part=statistics,snippet&key=${YOUTUBE_API_KEY}&id=${channelId}`,
+		`https://youtube.googleapis.com/youtube/v3/channels?part=statistics,snippet,topicDetails,status,brandingSettings,contentDetails,contentOwnerDetails&key=${YOUTUBE_API_KEY}&id=${channelId}`,
 	);
 
-	const youtubeSearchResponse = await fetch(
-		`https://youtube.googleapis.com/youtube/v3/search?part=snippet&key=${YOUTUBE_API_KEY}&type=channel,video,playlist&channelId=${channelId}`,
+	const playlistId = (await response.json())?.items[0]?.contentDetails
+		?.relatedPlaylists?.uploads;
+
+	const youtubePlaylistResponse = await fetch(
+		`https://youtube.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&key=${YOUTUBE_API_KEY}&playlistId=${playlistId}&maxResults=20`,
 	);
 
-	const youtubeSearchData: YouTubeSearchResponse =
-		await youtubeSearchResponse.json();
+	const youtubePlaylistData: YouTubePlaylistResponse =
+		await youtubePlaylistResponse.json();
 
-	const youtubeSearchItems = youtubeSearchData.items;
+	const feedVideo = youtubePlaylistData.items || [];
 
-	let videoData: YouTubeVideoResponse = {
-		items: [],
-		kind: "",
-		etag: "",
-		pageInfo: { totalResults: 0, resultsPerPage: 0 },
-	};
-	const videoPromises = youtubeSearchItems
-		.slice(0, Math.min(youtubeSearchItems.length, 10))
-		.map(async (item) => {
-			if (item.id.videoId) {
-				const youtubeVideoResponse = await fetch(
-					`https://youtube.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${item.id.videoId}&key=${YOUTUBE_API_KEY}`,
-				);
-				return youtubeVideoResponse.json();
-			}
-			return null;
-		});
-
-	const videoResults = await Promise.all(videoPromises);
-	const validVideoResults = videoResults.filter(
-		(result): result is YouTubeVideoResponse => result !== null,
+	let caption = "";
+	let videoId = "";
+	const firstVideoWithDescription = feedVideo.find(
+		(video) => video?.snippet?.description,
 	);
+	const firstVideoWithTitle = feedVideo.find((video) => video?.snippet?.title);
 
-	if (validVideoResults.length > 0) {
-		// Combine all valid video results into a single response
-		videoData = {
-			kind: validVideoResults[0].kind,
-			etag: validVideoResults[0].etag,
-			items: validVideoResults.reduce(
-				(acc, curr) => acc.concat(curr.items),
-				[] as YouTubeVideo[],
-			),
-			pageInfo: {
-				totalResults: validVideoResults.reduce(
-					(acc, curr) => acc + curr.pageInfo.totalResults,
-					0,
-				),
-				resultsPerPage: validVideoResults.reduce(
-					(acc, curr) => acc + curr.pageInfo.resultsPerPage,
-					0,
-				),
-			},
-		};
+	if (firstVideoWithDescription) {
+		caption = firstVideoWithDescription.snippet.description;
+		videoId = firstVideoWithDescription.contentDetails.videoId;
+	} else if (firstVideoWithTitle) {
+		caption = firstVideoWithTitle.snippet.title;
+		videoId = firstVideoWithTitle.contentDetails.videoId;
 	}
 
-	const feed = await response.json();
-	const data = feed.items;
-	const feedVideo = videoData?.items || [];
-
-	const caption = videoData?.items?.[0]?.snippet.description || "";
 	const result = await generateDraftPostAction(
 		handle,
 		caption,
@@ -368,7 +370,7 @@ export async function getYoutubeFeedAction(
 		exampleEarning,
 	);
 
-	return { data, result, feedVideo };
+	return { result, feedVideo, videoId };
 }
 
 export async function generateDraftPostAction(

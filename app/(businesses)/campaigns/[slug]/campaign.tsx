@@ -37,7 +37,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Toaster, toast } from "sonner";
 import { updateRunModeAction } from "../actions";
 import {
-	type YouTubeVideo,
+	type YouTubePlaylistItem,
 	createChatMessageAction,
 	deleteAffiliateAction,
 	getAffiliatesAction,
@@ -207,8 +207,9 @@ type BlueskyAffiliateDetails = {
 };
 type YoutubeAffiliateDetails = {
 	data: YouTubeChannel[];
+	videoId: string;
 	result: string;
-	feedVideo: YouTubeVideo[];
+	feedVideo: YouTubePlaylistItem[];
 };
 
 type StripeAffiliateDetails = {
@@ -289,6 +290,7 @@ export default function Campaign({
 	const [selectedAffiliate, setSelectedAffiliate] = useState<Affiliate | null>(
 		null,
 	);
+	const [videoId, setVideoId] = useState<string>("");
 	const [automatedMode, setAutomatedMode] = useState<RunMode>("Manual");
 	const [isAddingAffiliate, setIsAddingAffiliate] = useState(false);
 	const [affiliateStage, setAffiliateStage] = useState<AffiliateStage>({
@@ -436,6 +438,7 @@ export default function Campaign({
 				draftMessage,
 				selectedAffiliate?.handle as string,
 				affiliateStage.stage,
+				videoId,
 			);
 			setIsSendingMessage(false);
 			setAffiliateStage(getAffiliateStage(relevantMessages));
@@ -485,14 +488,15 @@ export default function Campaign({
 			);
 			details = { data, result };
 		} else if (platform === "youtube") {
-			const { data, result, feedVideo } = await getYoutubeFeedAction(
+			const { result, feedVideo, videoId } = await getYoutubeFeedAction(
 				affiliate.handle,
 				(affiliate as Affiliate).channelId as string,
 				commissionPercentage,
 				exampleEarning,
 				product?.description || "",
 			);
-			details = { data, result, feedVideo };
+			setVideoId(videoId);
+			details = { result, feedVideo, videoId };
 		} else if (platform === "stripe") {
 			const text = await getStripeFeedAction(
 				(affiliate as StripeAffiliate).email as string,

@@ -87,7 +87,7 @@ export const tiers = [
 		name: "Enterprise" as const,
 		slug: "Enterprise",
 		description: "Added flexibility to close deals at scale.",
-		priceMonthly: 69,
+		priceMonthly: 75,
 		stripePriceId: PRICE_IDS.Enterprise,
 		href: "/login",
 		highlights: [
@@ -202,7 +202,7 @@ function PricingCard({
 							disabled={!!userId && plan === tier.slug}
 						>
 							{!userId
-								? "Start a free trial"
+								? "Start 14 day free trial"
 								: plan === tier.slug
 									? "Current plan"
 									: "Upgrade"}
