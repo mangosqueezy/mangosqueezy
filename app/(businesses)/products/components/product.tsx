@@ -66,9 +66,9 @@ import {
 } from "@/components/ui/table";
 import { useJune } from "@/hooks/useJune";
 import { hasFeatureAccess } from "@/lib/utils";
-import type { Business, Products } from "@/prisma/app/generated/prisma/client";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { Business, Products } from "@prisma/client";
 import { Loader2, MoreHorizontal, PlusCircle } from "lucide-react";
 import { useActionState, useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";

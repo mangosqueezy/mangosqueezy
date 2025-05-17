@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import type { ChatMessage } from "@/prisma/app/generated/prisma/client";
+import type { ChatMessage } from "@prisma/client";
 
 type TChatMessage = Pick<
 	ChatMessage,

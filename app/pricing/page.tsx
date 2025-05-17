@@ -9,7 +9,6 @@ import { Navbar } from "@/components/mango-ui/navbar";
 import { Heading, Lead, Subheading } from "@/components/mango-ui/text";
 import { PRICE_IDS } from "@/lib/stripe/config";
 import { cn, getPlanFromPriceId } from "@/lib/utils";
-import type { PricePlan } from "@/prisma/app/generated/prisma/client";
 import { useStore } from "@/store";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import {
@@ -17,6 +16,7 @@ import {
 	ChevronUpDownIcon,
 	MinusIcon,
 } from "@heroicons/react/16/solid";
+import type { PricePlan } from "@prisma/client";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";

@@ -1,5 +1,5 @@
 import { getProductById } from "@/models/products";
-import type { RunMode } from "@/prisma/app/generated/prisma/client";
+import type { RunMode } from "@prisma/client";
 import { Redis } from "@upstash/redis";
 import { NextResponse } from "next/server";
 import { type Difficulty, evalAi } from "./evalAi";

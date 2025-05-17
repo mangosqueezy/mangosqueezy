@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import type { Pipelines } from "@/prisma/app/generated/prisma/client";
+import type { Pipelines } from "@prisma/client";
 
 export async function createPipeline({
 	product_id,

@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/table";
 import { createClient } from "@/lib/supabase/server";
 import { getUserById } from "@/models/business";
-import type { Orders } from "@/prisma/app/generated/prisma/client";
+import type { Orders } from "@prisma/client";
 import Menu from "./components/menu";
 
 export default async function OrdersPage() {

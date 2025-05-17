@@ -11,8 +11,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { useJune } from "@/hooks/useJune";
 import { cn } from "@/lib/utils";
-import type { Products } from "@/prisma/app/generated/prisma/client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { Products } from "@prisma/client";
 import {
 	ChevronDown,
 	ChevronUp,

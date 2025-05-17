@@ -1,7 +1,7 @@
 import { getSubscriptionData } from "@/app/actions";
 import { getPlanFromPriceId } from "@/lib/utils";
 import { getChatMessages } from "@/models/chat_message";
-import type { ChatMessage } from "@/prisma/app/generated/prisma/client";
+import type { ChatMessage } from "@prisma/client";
 import { Redis } from "@upstash/redis";
 import { getUser } from "../../actions";
 import Campaign, { type Platform, type Affiliate } from "./campaign";

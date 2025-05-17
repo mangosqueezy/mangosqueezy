@@ -1,9 +1,9 @@
 "use server";
 import prisma from "@/lib/prisma";
-import type { PriceType, Products } from "@/prisma/app/generated/prisma/client";
-import { Prisma } from "@/prisma/app/generated/prisma/client";
 import { PrismaVectorStore } from "@langchain/community/vectorstores/prisma";
 import { OpenAIEmbeddings } from "@langchain/openai";
+import type { PriceType, Products } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 export async function createProduct(
 	name: string,

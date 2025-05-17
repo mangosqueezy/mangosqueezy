@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import type { Messages } from "@/prisma/app/generated/prisma/client";
+import type { Messages } from "@prisma/client";
 
 type TMessages = Pick<
 	Messages,

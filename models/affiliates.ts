@@ -1,13 +1,10 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { Prisma } from "@/prisma/app/generated/prisma/client";
-import type {
-	Affiliate_Business,
-	Affiliates,
-} from "@/prisma/app/generated/prisma/client";
 import { PrismaVectorStore } from "@langchain/community/vectorstores/prisma";
 import { OpenAIEmbeddings } from "@langchain/openai";
+import { Prisma } from "@prisma/client";
+import type { Affiliate_Business, Affiliates } from "@prisma/client";
 
 type TAffiliates = Pick<
 	Affiliates,

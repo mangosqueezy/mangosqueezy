@@ -26,9 +26,9 @@ import {
 } from "@/components/ui/sheet";
 import { createClient } from "@/lib/supabase/client";
 import { hasFeatureAccess } from "@/lib/utils";
-import type { RunMode } from "@/prisma/app/generated/prisma/client";
-import type { Products } from "@/prisma/app/generated/prisma/client";
-import type { ChatMessage } from "@/prisma/app/generated/prisma/client";
+import type { RunMode } from "@prisma/client";
+import type { Products } from "@prisma/client";
+import type { ChatMessage } from "@prisma/client";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Info, Loader2, MessageCircle, Radio, Settings } from "lucide-react";

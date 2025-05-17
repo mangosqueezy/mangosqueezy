@@ -1,6 +1,5 @@
 "use client";
 
-import type { ChatMessage } from "@/prisma/app/generated/prisma/client";
 import {
 	Listbox,
 	ListboxButton,
@@ -9,6 +8,7 @@ import {
 } from "@headlessui/react";
 import { UserCircleIcon } from "@heroicons/react/20/solid";
 import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
+import type { ChatMessage } from "@prisma/client";
 import React, { useEffect } from "react";
 
 interface Affiliate {

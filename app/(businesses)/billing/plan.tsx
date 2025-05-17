@@ -6,7 +6,7 @@ import { Subheading } from "@/components/mango-ui/text";
 import { PRICE_IDS } from "@/lib/stripe/config";
 import { createStripePortal } from "@/lib/stripe/server";
 import { cn } from "@/lib/utils";
-import type { PricePlan } from "@/prisma/app/generated/prisma/client";
+import type { PricePlan } from "@prisma/client";
 import { Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
