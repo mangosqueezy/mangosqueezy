@@ -2,6 +2,7 @@ generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["multiSchema"]
   output          = "app/generated/prisma/client"
+  binaryTargets   = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
