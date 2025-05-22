@@ -264,17 +264,19 @@ export default function Checkout({
 
 	return (
 		<>
-			<div className="flex items-center gap-2">
-				<img
-					src={partner.image}
-					alt={partner.name}
-					className="size-6 rounded-full"
-				/>
-				<p>
-					{partner.name} referred you to Acme and gave you {discount.amount}{" "}
-					{discount.type} off
-				</p>
-			</div>
+			{partner && (
+				<div className="flex items-center gap-2">
+					<img
+						src={partner?.image}
+						alt={partner?.name}
+						className="size-6 rounded-full"
+					/>
+					<p>
+						{partner?.name} referred you to mangosqueezy and gave you{" "}
+						{discount?.amount} {discount?.type} off
+					</p>
+				</div>
+			)}
 
 			<div className="min-h-screen bg-linear-to-b from-[#fafafa] to-[#f5f5f5] dark:from-[#1a1a1a] dark:to-[#141414] flex">
 				<Form {...form}>
