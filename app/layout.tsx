@@ -85,7 +85,7 @@ export default function RootLayout({
 						data-api-host="/_proxy/squzy"
 						data-domains='{"refer":"go.squzy.link"}'
 						defer
-						strategy="afterInteractive"
+						strategy="beforeInteractive"
 					/>
 					<PostHogPageView />
 					{children}
