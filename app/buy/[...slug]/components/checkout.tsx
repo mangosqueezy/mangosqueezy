@@ -34,10 +34,8 @@ import { Label } from "@/components/ui/label";
 
 import Cookies from "js-cookie";
 
-const squzyPartnerData = Cookies.get("squzy_partner_data");
-const { partner, discount } = squzyPartnerData
-	? JSON.parse(squzyPartnerData)
-	: {};
+const dubPartnerData = Cookies.get("dub_partner_data");
+const { partner, discount } = dubPartnerData ? JSON.parse(dubPartnerData) : {};
 
 const formDefaultValues = {
 	email: "",
