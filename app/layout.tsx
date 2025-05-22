@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
@@ -8,9 +9,6 @@ import "./globals.css";
 const PostHogPageView = dynamic(() => import("./posthog-pageview"), {
 	ssr: true,
 });
-
-import { cn } from "@/lib/utils";
-import Head from "next/head";
 
 export const metadata: Metadata = {
 	title: "mangosqueezy affiliates tool",
@@ -73,14 +71,6 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
-			<Head>
-				<script
-					src="/_proxy/squzy/script.js"
-					data-api-host="/_proxy/squzy"
-					data-domains='{"refer":"go.squzy.link"}'
-					defer
-				/>
-			</Head>
 			<PHProvider>
 				<body
 					className={cn(
@@ -88,6 +78,12 @@ export default function RootLayout({
 						`${GeistSans.variable} ${GeistMono.variable}`,
 					)}
 				>
+					<script
+						src="/_proxy/squzy/script.js"
+						data-api-host="/_proxy/squzy"
+						data-domains='{"refer":"go.squzy.link"}'
+						defer
+					/>
 					<PostHogPageView />
 					{children}
 				</body>
