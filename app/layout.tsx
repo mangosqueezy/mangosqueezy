@@ -2,6 +2,7 @@ import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
+import Script from "next/script";
 import { PHProvider } from "./providers";
 import "./globals.css";
 
@@ -79,10 +80,12 @@ export default function RootLayout({
 						`${GeistSans.variable} ${GeistMono.variable}`,
 					)}
 				>
-					<script
-						src="https://pub-de4924ae66c74c129209cb58768d12fb.r2.dev/script.js"
+					<Script
+						src="/_proxy/squzy/script.js"
+						data-api-host="/_proxy/squzy"
 						data-domains='{"refer":"go.squzy.link"}'
 						defer
+						strategy="afterInteractive"
 					/>
 					<PostHogPageView />
 					{children}
