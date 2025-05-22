@@ -2,7 +2,6 @@ import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
-import Script from "next/script";
 import { PHProvider } from "./providers";
 import "./globals.css";
 
@@ -11,6 +10,7 @@ const PostHogPageView = dynamic(() => import("./posthog-pageview"), {
 });
 
 import { cn } from "@/lib/utils";
+import Head from "next/head";
 
 export const metadata: Metadata = {
 	title: "mangosqueezy affiliates tool",
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 	openGraph: {
 		title: "mangosqueezy | Affiliates marketing tool",
 		description:
-			"mangosqueezy helps SaaS companies find affiliates and measure their progress.",
+			"mangosqueezy helps companies find affiliates and measure their progress.",
 		url: "https://mangosqueezy.com",
 		siteName: "mangosqueezy | Affiliates marketing tool",
 		locale: "en_US",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
 	twitter: {
 		title: "mangosqueezy | Affiliates marketing tool",
 		description:
-			"mangosqueezy helps SaaS companies find affiliates and measure their progress.",
+			"mangosqueezy helps companies find affiliates and measure their progress.",
 		images: [
 			{
 				url: "https://lkjqkobxmgqedqtidcws.supabase.co/storage/v1/object/public/mangosqueezy/twitter-image.jpg",
@@ -73,6 +73,14 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
+			<Head>
+				<script
+					src="/_proxy/squzy/script.js"
+					data-api-host="/_proxy/squzy"
+					data-domains='{"refer":"go.squzy.link"}'
+					defer
+				/>
+			</Head>
 			<PHProvider>
 				<body
 					className={cn(
@@ -80,13 +88,6 @@ export default function RootLayout({
 						`${GeistSans.variable} ${GeistMono.variable}`,
 					)}
 				>
-					<Script
-						src="/_proxy/squzy/script.js"
-						data-api-host="/_proxy/squzy"
-						data-domains='{"refer":"go.squzy.link"}'
-						defer
-						strategy="beforeInteractive"
-					/>
 					<PostHogPageView />
 					{children}
 				</body>
