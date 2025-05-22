@@ -52,6 +52,19 @@ const nextConfig: NextConfig = {
 			},
 		],
 	},
+	async rewrites() {
+		return [
+			{
+				source: "/_proxy/squzy/track/:path",
+				destination: "https://api.squzy.link/track/:path",
+			},
+			{
+				source: "/_proxy/squzy/script.js",
+				destination:
+					"https://pub-de4924ae66c74c129209cb58768d12fb.r2.dev/script.js",
+			},
+		];
+	},
 };
 
 export default withSentryConfig(nextConfig, {
