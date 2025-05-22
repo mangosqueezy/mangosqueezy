@@ -30,12 +30,8 @@ import { z } from "zod";
 import { createOrderAction, navigate } from "../actions";
 
 import { Editor } from "@/components/mango-ui/editor";
+import ReferralBanner from "@/components/mango-ui/referral-banner";
 import { Label } from "@/components/ui/label";
-
-import Cookies from "js-cookie";
-
-const dubPartnerData = Cookies.get("dub_partner_data");
-const { partner, discount } = dubPartnerData ? JSON.parse(dubPartnerData) : {};
 
 const formDefaultValues = {
 	email: "",
@@ -264,19 +260,7 @@ export default function Checkout({
 
 	return (
 		<>
-			{partner && (
-				<div className="flex items-center gap-2">
-					<img
-						src={partner?.image}
-						alt={partner?.name}
-						className="size-6 rounded-full"
-					/>
-					<p>
-						{partner?.name} referred you to mangosqueezy and gave you{" "}
-						{discount?.amount} {discount?.type} off
-					</p>
-				</div>
-			)}
+			<ReferralBanner />
 
 			<div className="min-h-screen bg-linear-to-b from-[#fafafa] to-[#f5f5f5] dark:from-[#1a1a1a] dark:to-[#141414] flex">
 				<Form {...form}>

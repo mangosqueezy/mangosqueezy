@@ -50,6 +50,10 @@ const nextConfig: NextConfig = {
 				protocol: "https",
 				hostname: "scontent-yyz1-1.cdninstagram.com",
 			},
+			{
+				protocol: "https",
+				hostname: "pub-e9d43e34bbf64163a2631d60382642e0.r2.dev",
+			},
 		],
 	},
 	async rewrites() {
