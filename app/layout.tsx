@@ -79,7 +79,7 @@ export default function RootLayout({
 					)}
 				>
 					<script
-						src="/_proxy/squzy/script.js"
+						src="https://pub-de4924ae66c74c129209cb58768d12fb.r2.dev/script.js"
 						data-api-host="/_proxy/squzy"
 						data-domains='{"refer":"go.squzy.link"}'
 						defer
