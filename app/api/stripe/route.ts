@@ -22,6 +22,9 @@ export async function POST(request: Request) {
 		},
 	};
 
+	const paymentMode =
+		price_type === "Subscription" ? "subscription" : "payment";
+
 	if (price_type === "Subscription") {
 		priceObject = {
 			...priceObject,
@@ -33,7 +36,7 @@ export async function POST(request: Request) {
 
 	const price = await stripe.prices.create(priceObject);
 
-	const session = await stripe.checkout.sessions.create({
+	let sessionParams: Stripe.Checkout.SessionCreateParams = {
 		customer_email: email,
 		line_items: [
 			{
@@ -44,25 +47,33 @@ export async function POST(request: Request) {
 		automatic_tax: {
 			enabled: true,
 		},
-		invoice_creation: {
-			enabled: true,
-			invoice_data: {
-				metadata: {
-					customerEmail: email,
-					businessId,
-					affiliateId,
-					productId,
-					amount,
-					quantity: quantity ? Number(quantity) : 0,
-					customer_address,
-				},
-			},
-		},
 		allow_promotion_codes: true,
-		mode: "payment",
+		mode: paymentMode as Stripe.Checkout.SessionCreateParams.Mode,
 		success_url: "https://mangosqueezy.com/success",
 		cancel_url: "https://mangosqueezy.com/error",
-	});
+	};
+
+	if (paymentMode === "payment") {
+		sessionParams = {
+			...sessionParams,
+			invoice_creation: {
+				enabled: true,
+				invoice_data: {
+					metadata: {
+						customerEmail: email,
+						businessId,
+						affiliateId,
+						productId,
+						amount,
+						quantity: quantity ? Number(quantity) : 0,
+						customer_address,
+					},
+				},
+			},
+		};
+	}
+
+	const session = await stripe.checkout.sessions.create(sessionParams);
 
 	return Response.json(session.url);
 }
