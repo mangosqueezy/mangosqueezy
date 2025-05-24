@@ -35,11 +35,30 @@ export async function POST(request: Request) {
 					html: `
             <div class="container">
               <p>Dear Customer,</p>
-              <p>We are delighted to inform you that your subscription payment has been successfully processed. Thank you for choosing mangosqueezy as your preferred service provider.</p>
-              <p>Your subscription is now active, and you can enjoy uninterrupted access to our service. We greatly value your continued support and trust in our services.</p>
-              <p>If you have any questions regarding your subscription, billing, or if you encounter any issues, please do not hesitate to contact our customer support team at amit@tapasom.com. We are here to assist you and ensure you have a seamless experience.</p>
+              <p>We are delighted to inform you that your payment has been successfully processed. Thank you for choosing mangosqueezy.</p>
+              <p>If you have any questions regarding your payment, or if you encounter any issues, please do not hesitate to contact our customer support team at amit@tapasom.com. We are here to assist you and ensure you have a seamless experience.</p>
               <p>Once again, thank you for being a part of mangosqueezy. We look forward to serving you and providing you with an exceptional experience.</p>
               <p>Best regards,</p>
+              <p>mangosqueezy</p>
+            </div>
+          `,
+				});
+			}
+		} else if (event.type === "payment_intent.succeeded") {
+			const stripeEventResult: Stripe.PaymentIntent = event.data.object;
+			const customer_email = stripeEventResult.customer as Stripe.Customer;
+
+			if (!isEmpty(customer_email.email)) {
+				await resend.emails.send({
+					from: "amit@tapasom.com",
+					to: customer_email.email!,
+					subject: "Payment Confirmation",
+					html: `
+            <div class="container">
+              <p>Dear Customer,</p>
+              <p>We are delighted to inform you that your payment has been successfully processed. Thank you for choosing mangosqueezy.</p>
+              <p>If you have any questions regarding your payment, or if you encounter any issues, please do not hesitate to contact our customer support team at amit@tapasom.com. We are here to assist you and ensure you have a seamless experience.</p>
+			  <p>Best regards,</p>
               <p>mangosqueezy</p>
             </div>
           `,
