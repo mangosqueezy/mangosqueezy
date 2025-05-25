@@ -36,19 +36,19 @@ export function LinksImported({
 	return (
 		<Html>
 			<Head />
-			<Preview>Your {provider} links have been imported</Preview>
+			<Preview>Your campaigns have been imported</Preview>
 			<Tailwind>
 				<Body className="mx-auto my-auto bg-white font-sans">
 					<Container className="mx-auto my-10 max-w-[600px] rounded border border-solid border-neutral-200 px-10 py-5">
 						<Heading className="mx-0 my-7 p-0 text-lg font-medium text-black">
-							Your {provider} links have been imported
+							Your campaigns have been imported
 						</Heading>
 						<Text className="text-sm leading-6 text-black">
 							We have successfully{" "}
 							<strong>
 								imported {Intl.NumberFormat("en-us").format(count)} campaigns
 							</strong>{" "}
-							from {provider} into your mangosqueezy workspace, , for the{" "}
+							into your mangosqueezy workspace, , for the{" "}
 							{pluralize("campaign", campaignNames.length)}{" "}
 							<strong>{campaignNames.join(", ")}</strong>.
 						</Text>

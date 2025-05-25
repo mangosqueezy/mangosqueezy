@@ -42,22 +42,22 @@ export function LinksImportErrors({
 	return (
 		<Html>
 			<Head />
-			<Preview>Your {provider} links have been imported</Preview>
+			<Preview>Your campaigns have been imported</Preview>
 			<Tailwind>
 				<Body className="mx-auto my-auto bg-white font-sans">
 					<Container className="mx-auto my-10 max-w-[600px] rounded border border-solid border-neutral-200 px-10 py-5">
 						<Heading className="mx-0 my-7 p-0 text-lg font-medium text-black">
-							Some {provider} links have failed to import
+							Some campaigns have failed to import
 						</Heading>
 						<Text className="text-sm leading-6 text-black">
 							The following{" "}
-							{Intl.NumberFormat("en-us").format(errorLinks.length)} links from{" "}
-							{provider} failed to import into your mangosqueezy workspace.
+							{Intl.NumberFormat("en-us").format(errorLinks.length)} campaigns
+							failed to import into your mangosqueezy workspace.
 						</Text>
 						<Section>
 							<Row className="pb-2">
 								<Column align="left" className="text-sm text-neutral-500">
-									Link
+									Campaign
 								</Column>
 								<Column align="right" className="text-sm text-neutral-500">
 									Error

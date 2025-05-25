@@ -8,7 +8,7 @@ import { Link } from "@/components/mango-ui/link";
 import { Navbar } from "@/components/mango-ui/navbar";
 import { Heading, Lead, Subheading } from "@/components/mango-ui/text";
 import { PRICE_IDS } from "@/lib/stripe/config";
-import { cn, getPlanFromPriceId } from "@/lib/utils";
+import { TIERS, cn, getPlanFromPriceId } from "@/lib/utils";
 import { useStore } from "@/store";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import {
@@ -22,99 +22,6 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useState } from "react";
 import { getSubscriptionData } from "../actions";
-
-export const tiers = [
-	{
-		name: "Starter" as const,
-		slug: "Starter",
-		description: "Everything you need to start.",
-		priceMonthly: 19,
-		stripePriceId: PRICE_IDS.Starter,
-		href: "/login",
-		highlights: [
-			{ description: "Up to 5 referral accounts" },
-			{ description: "Up to 5 affiliate programs" },
-			{ description: "Up to 5 products created" },
-			{ description: "Up to 2 third party apps integrations" },
-			{ description: "Automated outreach", disabled: true },
-		],
-		features: [
-			{ section: "Features", name: "Referrals", value: 5 },
-			{ section: "Features", name: "Programs", value: 5 },
-			{ section: "Features", name: "Products", value: 5 },
-			{ section: "Features", name: "Integrations", value: 2 },
-			{ section: "Features", name: "Outreach", value: false },
-			{ section: "Features", name: "AI assisted outreach", value: false },
-			{ section: "Analysis", name: "Competitor analysis", value: false },
-			{ section: "Analysis", name: "Dashboard reporting", value: false },
-			{ section: "Analysis", name: "Community insights", value: false },
-			{ section: "Analysis", name: "Performance analysis", value: false },
-			{ section: "Support", name: "Email support", value: true },
-			{ section: "Support", name: "24 / 7 call center support", value: false },
-			{ section: "Support", name: "Dedicated account manager", value: false },
-		],
-	},
-	{
-		name: "Growth" as const,
-		slug: "Growth",
-		description: "All the extras for your growing team.",
-		priceMonthly: 39,
-		stripePriceId: PRICE_IDS.Growth,
-		href: "/login",
-		highlights: [
-			{ description: "Up to 30 referral accounts" },
-			{ description: "Up to 30 affiliate programs" },
-			{ description: "Up to 30 products created" },
-			{ description: "Up to 5 third party apps integrations" },
-			{ description: "Automated outreach" },
-		],
-		features: [
-			{ section: "Features", name: "Referrals", value: 30 },
-			{ section: "Features", name: "Programs", value: 30 },
-			{ section: "Features", name: "Products", value: 30 },
-			{ section: "Features", name: "Integrations", value: 5 },
-			{ section: "Features", name: "Outreach", value: true },
-			{ section: "Analysis", name: "Competitor analysis", value: "5 / month" },
-			{ section: "Analysis", name: "Dashboard reporting", value: true },
-			{ section: "Analysis", name: "Community insights", value: true },
-			{ section: "Analysis", name: "Performance analysis", value: true },
-			{ section: "Support", name: "Email support", value: true },
-			{ section: "Support", name: "24 / 7 call center support", value: true },
-			{ section: "Support", name: "Dedicated account manager", value: false },
-		],
-	},
-	{
-		name: "Enterprise" as const,
-		slug: "Enterprise",
-		description: "Added flexibility to close deals at scale.",
-		priceMonthly: 75,
-		stripePriceId: PRICE_IDS.Enterprise,
-		href: "/login",
-		highlights: [
-			{ description: "Unlimited referral accounts" },
-			{ description: "Unlimited affiliate programs" },
-			{ description: "Unlimited products created" },
-			{ description: "Unlimited third party apps integrations" },
-			{ description: "Automated outreach" },
-			{ description: "Priority support" },
-			{ description: "Competitor analysis" },
-		],
-		features: [
-			{ section: "Features", name: "Referrals", value: "Unlimited" },
-			{ section: "Features", name: "Programs", value: "Unlimited" },
-			{ section: "Features", name: "Products", value: "Unlimited" },
-			{ section: "Features", name: "Integrations", value: "Unlimited" },
-			{ section: "Features", name: "Outreach", value: true },
-			{ section: "Analysis", name: "Competitor analysis", value: "Unlimited" },
-			{ section: "Analysis", name: "Dashboard reporting", value: true },
-			{ section: "Analysis", name: "Community insights", value: true },
-			{ section: "Analysis", name: "Performance analysis", value: true },
-			{ section: "Support", name: "Email support", value: true },
-			{ section: "Support", name: "24 / 7 call center support", value: true },
-			{ section: "Support", name: "Dedicated account manager", value: true },
-		],
-	},
-];
 
 function Header() {
 	return (
@@ -140,7 +47,7 @@ function PricingCards({
 			<Gradient className="absolute inset-x-2 bottom-0 top-48 rounded-4xl ring-1 ring-inset ring-black/5" />
 			<Container className="relative">
 				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-					{tiers.map((tier, tierIndex) => (
+					{TIERS.map((tier, tierIndex) => (
 						<PricingCard
 							key={`tier-${tierIndex}-${tier.name}`}
 							tier={tier}
@@ -159,7 +66,7 @@ function PricingCard({
 	plan,
 	userId,
 }: {
-	tier: (typeof tiers)[number];
+	tier: (typeof TIERS)[number];
 	plan: PricePlan | null | undefined;
 	userId: string | null | undefined;
 }) {
@@ -230,7 +137,7 @@ function PricingCard({
 function PricingTable({
 	selectedTier,
 }: {
-	selectedTier: (typeof tiers)[number];
+	selectedTier: (typeof TIERS)[number];
 }) {
 	const setPricePlan = useStore((state) => state.setPricePlan);
 
@@ -241,22 +148,22 @@ function PricingTable({
 				<colgroup>
 					<col className="w-3/5 sm:w-2/5" />
 					<col
-						data-selected={selectedTier === tiers[0] ? true : undefined}
+						data-selected={selectedTier === TIERS[0] ? true : undefined}
 						className="w-2/5 data-selected:table-column max-sm:hidden sm:w-1/5"
 					/>
 					<col
-						data-selected={selectedTier === tiers[1] ? true : undefined}
+						data-selected={selectedTier === TIERS[1] ? true : undefined}
 						className="w-2/5 data-selected:table-column max-sm:hidden sm:w-1/5"
 					/>
 					<col
-						data-selected={selectedTier === tiers[2] ? true : undefined}
+						data-selected={selectedTier === TIERS[2] ? true : undefined}
 						className="w-2/5 data-selected:table-column max-sm:hidden sm:w-1/5"
 					/>
 				</colgroup>
 				<thead>
 					<tr className="max-sm:hidden">
 						<td className="p-0" />
-						{tiers.map((tier) => (
+						{TIERS.map((tier) => (
 							<th
 								key={tier.slug}
 								scope="col"
@@ -279,7 +186,7 @@ function PricingTable({
 										anchor="bottom start"
 										className="min-w-(--button-width) rounded-lg bg-white p-1 shadow-lg ring-1 ring-gray-200 [--anchor-gap:6px] [--anchor-offset:-4px] [--anchor-padding:10px]"
 									>
-										{tiers.map((tier) => (
+										{TIERS.map((tier) => (
 											<MenuItem key={tier.slug}>
 												<Link
 													scroll={false}
@@ -311,7 +218,7 @@ function PricingTable({
 						<th className="p-0" scope="row">
 							<span className="sr-only">Get started</span>
 						</th>
-						{tiers.map((tier) => (
+						{TIERS.map((tier) => (
 							<td
 								key={tier.slug}
 								data-selected={selectedTier === tier ? true : undefined}
@@ -330,7 +237,7 @@ function PricingTable({
 						))}
 					</tr>
 				</thead>
-				{[...new Set(tiers[0].features.map(({ section }) => section))].map(
+				{[...new Set(TIERS[0].features.map(({ section }) => section))].map(
 					(section) => (
 						<tbody key={section} className="group">
 							<tr>
@@ -344,7 +251,7 @@ function PricingTable({
 									</div>
 								</th>
 							</tr>
-							{tiers[0].features
+							{TIERS[0].features
 								.filter((feature) => feature.section === section)
 								.map(({ name }) => (
 									<tr
@@ -357,7 +264,7 @@ function PricingTable({
 										>
 											{name}
 										</th>
-										{tiers.map((tier) => {
+										{TIERS.map((tier) => {
 											const value = tier.features.find(
 												(feature) =>
 													feature.section === section && feature.name === name,

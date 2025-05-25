@@ -211,7 +211,8 @@ const mapCsvRowToLink = (
 		}
 
 		if (mapping.affiliate_count) {
-			const affiliateCount = Number(mapping.affiliate_count);
+			const affiliateCount = getValueByKey(mapping.affiliate_count);
+			const parsedAffiliateCount = Number(affiliateCount);
 
 			const referralLimit = hasFeatureAccess(
 				plan,
@@ -219,7 +220,7 @@ const mapCsvRowToLink = (
 				"Referrals",
 			) as number;
 
-			if (affiliateCount >= referralLimit) {
+			if (parsedAffiliateCount >= referralLimit) {
 				return {
 					success: false,
 					error: "You have reached the maximum number of affiliates.",
@@ -227,7 +228,7 @@ const mapCsvRowToLink = (
 			}
 
 			if (affiliateCount) {
-				productMap.affiliate_count = affiliateCount.toString();
+				productMap.affiliate_count = parsedAffiliateCount.toString();
 			}
 		}
 
@@ -300,10 +301,13 @@ const processMappedProducts = async ({
 			.from("Products")
 			.upsert({
 				name: mappedProduct.data?.product_name ?? "",
-				price: mappedProduct.data?.product_price ?? "",
+				price: Number.parseFloat(mappedProduct.data?.product_price ?? "0"),
 				description: mappedProduct.data?.product_description ?? "",
 				html_description: mappedProduct.data?.product_description ?? "",
 				price_type: mappedProduct.data?.product_price_type ?? "OneTime",
+				business_id: userId,
+				created_at: new Date().toISOString(),
+				updated_at: new Date().toISOString(),
 			})
 			.select();
 
@@ -315,9 +319,11 @@ const processMappedProducts = async ({
 						product_id: data[0]?.id,
 						business_id: userId,
 						prompt: mappedProduct.data?.product_description ?? "",
-						affiliate_count: mappedProduct.data?.affiliate_count ?? 1,
+						affiliate_count: mappedProduct.data?.affiliate_count
+							? Number(mappedProduct.data.affiliate_count) || 1
+							: 1,
 						location: mappedProduct.data?.location ?? "US",
-						workflow: "youtube",
+						workflow: "social_media",
 						lead: Number(mappedProduct.data?.lead) ?? 0,
 						click: Number(mappedProduct.data?.click) ?? 0,
 						sale: Number(mappedProduct.data?.sale) ?? 0,
@@ -336,9 +342,13 @@ const processMappedProducts = async ({
 				await callYoutubeApi({
 					productId: data[0]?.id,
 					pipelineId: campaign[0]?.id,
-					affiliateCount: Number(mappedProduct.data?.affiliate_count) ?? 1,
+					affiliateCount: mappedProduct.data?.affiliate_count
+						? Number(mappedProduct.data.affiliate_count) || 1
+						: 1,
 					place: mappedProduct.data?.location ?? "US",
 				});
+
+				await redis.incrby(`${redisKey}:created`, 1);
 			}
 
 			if (productError || campaignError) {

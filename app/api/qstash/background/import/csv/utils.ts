@@ -63,7 +63,7 @@ export async function sendCsvImportEmails({
 		await resend.emails.send({
 			from: "mangosqueezy <amit@tapasom.com>",
 			to: [ownerEmail],
-			subject: "Your CSV links have been imported!",
+			subject: "Your CSV campaigns have been imported!",
 			react: LinksImported({
 				email: ownerEmail,
 				provider: "CSV",
@@ -77,7 +77,7 @@ export async function sendCsvImportEmails({
 		await resend.emails.send({
 			from: "mangosqueezy <amit@tapasom.com>",
 			to: [ownerEmail],
-			subject: "Some CSV links failed to import",
+			subject: "Some CSV campaigns failed to import",
 			react: LinksImportErrors({
 				email: ownerEmail,
 				provider: "CSV",

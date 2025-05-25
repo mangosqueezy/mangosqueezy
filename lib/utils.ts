@@ -1,4 +1,3 @@
-import { tiers } from "@/app/pricing/page";
 import type { Tables } from "@/typings/types_db";
 import * as chrono from "chrono-node";
 import { type ClassValue, clsx } from "clsx";
@@ -217,7 +216,7 @@ export function hasFeatureAccess(
 	section: string,
 	featureName: string,
 ): boolean | string | number {
-	const tier = tiers.find((t) => t.slug === plan);
+	const tier = TIERS.find((t) => t.slug === plan);
 	if (!tier) return false;
 	const feature = tier.features.find(
 		(f) => f.section === section && f.name === featureName,
@@ -291,3 +290,96 @@ export const pluralize = (
 	// Use custom plural form if provided, otherwise add 's'
 	return options.plural || `${word}s`;
 };
+
+export const TIERS = [
+	{
+		name: "Starter" as const,
+		slug: "Starter",
+		description: "Everything you need to start.",
+		priceMonthly: 19,
+		stripePriceId: PRICE_IDS.Starter,
+		href: "/login",
+		highlights: [
+			{ description: "Up to 5 referral accounts" },
+			{ description: "Up to 5 affiliate programs" },
+			{ description: "Up to 5 products created" },
+			{ description: "Up to 2 third party apps integrations" },
+			{ description: "Automated outreach", disabled: true },
+		],
+		features: [
+			{ section: "Features", name: "Referrals", value: 5 },
+			{ section: "Features", name: "Programs", value: 5 },
+			{ section: "Features", name: "Products", value: 5 },
+			{ section: "Features", name: "Integrations", value: 2 },
+			{ section: "Features", name: "Outreach", value: false },
+			{ section: "Features", name: "AI assisted outreach", value: false },
+			{ section: "Analysis", name: "Competitor analysis", value: false },
+			{ section: "Analysis", name: "Dashboard reporting", value: false },
+			{ section: "Analysis", name: "Community insights", value: false },
+			{ section: "Analysis", name: "Performance analysis", value: false },
+			{ section: "Support", name: "Email support", value: true },
+			{ section: "Support", name: "24 / 7 call center support", value: false },
+			{ section: "Support", name: "Dedicated account manager", value: false },
+		],
+	},
+	{
+		name: "Growth" as const,
+		slug: "Growth",
+		description: "All the extras for your growing team.",
+		priceMonthly: 39,
+		stripePriceId: PRICE_IDS.Growth,
+		href: "/login",
+		highlights: [
+			{ description: "Up to 30 referral accounts" },
+			{ description: "Up to 30 affiliate programs" },
+			{ description: "Up to 30 products created" },
+			{ description: "Up to 5 third party apps integrations" },
+			{ description: "Automated outreach" },
+		],
+		features: [
+			{ section: "Features", name: "Referrals", value: 30 },
+			{ section: "Features", name: "Programs", value: 30 },
+			{ section: "Features", name: "Products", value: 30 },
+			{ section: "Features", name: "Integrations", value: 5 },
+			{ section: "Features", name: "Outreach", value: true },
+			{ section: "Analysis", name: "Competitor analysis", value: "5 / month" },
+			{ section: "Analysis", name: "Dashboard reporting", value: true },
+			{ section: "Analysis", name: "Community insights", value: true },
+			{ section: "Analysis", name: "Performance analysis", value: true },
+			{ section: "Support", name: "Email support", value: true },
+			{ section: "Support", name: "24 / 7 call center support", value: true },
+			{ section: "Support", name: "Dedicated account manager", value: false },
+		],
+	},
+	{
+		name: "Enterprise" as const,
+		slug: "Enterprise",
+		description: "Added flexibility to close deals at scale.",
+		priceMonthly: 75,
+		stripePriceId: PRICE_IDS.Enterprise,
+		href: "/login",
+		highlights: [
+			{ description: "Unlimited referral accounts" },
+			{ description: "Unlimited affiliate programs" },
+			{ description: "Unlimited products created" },
+			{ description: "Unlimited third party apps integrations" },
+			{ description: "Automated outreach" },
+			{ description: "Priority support" },
+			{ description: "Competitor analysis" },
+		],
+		features: [
+			{ section: "Features", name: "Referrals", value: "Unlimited" },
+			{ section: "Features", name: "Programs", value: "Unlimited" },
+			{ section: "Features", name: "Products", value: "Unlimited" },
+			{ section: "Features", name: "Integrations", value: "Unlimited" },
+			{ section: "Features", name: "Outreach", value: true },
+			{ section: "Analysis", name: "Competitor analysis", value: "Unlimited" },
+			{ section: "Analysis", name: "Dashboard reporting", value: true },
+			{ section: "Analysis", name: "Community insights", value: true },
+			{ section: "Analysis", name: "Performance analysis", value: true },
+			{ section: "Support", name: "Email support", value: true },
+			{ section: "Support", name: "24 / 7 call center support", value: true },
+			{ section: "Support", name: "Dedicated account manager", value: true },
+		],
+	},
+];

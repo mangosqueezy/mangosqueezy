@@ -84,5 +84,7 @@ export async function POST(req: Request) {
 		},
 	});
 
-	return NextResponse.json({});
+	return NextResponse.json({
+		message: "Campaigns added to import queue",
+	});
 }

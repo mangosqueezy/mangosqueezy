@@ -1,10 +1,10 @@
 "use client";
-import { tiers } from "@/app/pricing/page";
 import { Button } from "@/components/mango-ui/button";
 import { Container } from "@/components/mango-ui/container";
 import { Subheading } from "@/components/mango-ui/text";
 import { PRICE_IDS } from "@/lib/stripe/config";
 import { createStripePortal } from "@/lib/stripe/server";
+import { TIERS } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import type { PricePlan } from "@prisma/client";
 import { Loader } from "lucide-react";
@@ -27,7 +27,7 @@ function PricingCards({
 		<div className="relative py-24">
 			<Container className="relative">
 				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-					{tiers.map((tier, tierIndex) => (
+					{TIERS.map((tier, tierIndex) => (
 						<PricingCard
 							key={`tier-${tierIndex}-${tier.name}`}
 							tier={tier}
@@ -51,7 +51,7 @@ function PricingCard({
 	plan,
 }: {
 	stripeCustomerId: string;
-	tier: (typeof tiers)[number];
+	tier: (typeof TIERS)[number];
 	plan: PricePlan | null | undefined;
 	stripeSubscriptionId: string;
 	subscriptionItemId: string;
