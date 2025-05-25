@@ -81,7 +81,7 @@ export default function CampaignForm({
 	plan,
 }: CampaignSheetFormProps) {
 	const router = useRouter();
-	const { setShowImportCsvModal, ImportCsvModal, setPlan } =
+	const { setShowImportCsvModal, ImportCsvModal, setPlan, setUserId } =
 		useImportCsvModal();
 	const [isLoading, setIsLoading] = useState(false);
 	const [open, setOpen] = useState(false);
@@ -100,6 +100,7 @@ export default function CampaignForm({
 		if (type === "import_csv") {
 			setShowImportCsvModal(open);
 			setPlan(plan);
+			setUserId(business_id as string);
 		} else {
 			setOpen(open);
 		}

@@ -82,6 +82,8 @@ const ImportCsvContext = createContext<{
 	setValue: UseFormSetValue<ImportCsvFormData>;
 	plan: string | null;
 	setPlan: Dispatch<SetStateAction<string | null>>;
+	userId: string | null;
+	setUserId: Dispatch<SetStateAction<string | null>>;
 } | null>(null);
 
 export function useCsvContext() {
@@ -101,11 +103,15 @@ function ImportCsvModal({
 	setShowImportCsvModal,
 	plan,
 	setPlan,
+	userId,
+	setUserId,
 }: {
 	showImportCsvModal: boolean;
 	setShowImportCsvModal: Dispatch<SetStateAction<boolean>>;
 	plan: string | null;
 	setPlan: Dispatch<SetStateAction<string | null>>;
+	userId: string | null;
+	setUserId: Dispatch<SetStateAction<string | null>>;
 }) {
 	const {
 		control,
@@ -187,6 +193,8 @@ function ImportCsvModal({
 							setValue,
 							plan,
 							setPlan,
+							userId,
+							setUserId,
 						}}
 					>
 						<div className="flex flex-col gap-y-6 bg-neutral-50 px-4 py-8 text-left sm:px-12">
@@ -199,6 +207,7 @@ function ImportCsvModal({
 									try {
 										const formData = new FormData();
 										formData.append("file", data.file!);
+										formData.append("userId", userId!);
 										for (const key in data) {
 											if (key !== "file" && data[key] !== null) {
 												formData.append(key, data[key]);
@@ -260,7 +269,7 @@ function ImportCsvModal({
 export function useImportCsvModal() {
 	const [showImportCsvModal, setShowImportCsvModal] = useState(false);
 	const [plan, setPlan] = useState<string | null>(null);
-
+	const [userId, setUserId] = useState<string | null>(null);
 	const ImportCsvModalCallback = useCallback(() => {
 		return (
 			<ImportCsvModal
@@ -268,15 +277,18 @@ export function useImportCsvModal() {
 				setShowImportCsvModal={setShowImportCsvModal}
 				plan={plan}
 				setPlan={setPlan}
+				userId={userId}
+				setUserId={setUserId}
 			/>
 		);
-	}, [showImportCsvModal, plan]);
+	}, [showImportCsvModal, plan, userId]);
 
 	return useMemo(
 		() => ({
 			setShowImportCsvModal,
 			ImportCsvModal: ImportCsvModalCallback,
 			setPlan,
+			setUserId,
 		}),
 		[ImportCsvModalCallback],
 	);
