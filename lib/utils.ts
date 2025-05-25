@@ -1,10 +1,10 @@
-// biome-ignore lint: style useNodejsImportProtocol
-import crypto from "crypto";
+import { tiers } from "@/app/pricing/page";
+import type { Tables } from "@/typings/types_db";
+import * as chrono from "chrono-node";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import type { Tables } from "@/typings/types_db";
+import { z } from "zod";
 import { PRICE_IDS } from "./stripe/config";
-import { tiers } from "@/app/pricing/page";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -226,3 +226,68 @@ export function hasFeatureAccess(
 
 	return feature.value;
 }
+
+export const truncate = (
+	str: string | null | undefined,
+	length: number,
+): string | null => {
+	if (!str || str.length <= length) return str ?? null;
+	return `${str.slice(0, length - 3)}...`;
+};
+
+export const formatDate = (
+	datetime: Date | string,
+	options?: Intl.DateTimeFormatOptions,
+) => {
+	if (datetime.toString() === "Invalid Date") return "";
+	return new Date(datetime).toLocaleDateString("en-US", {
+		day: "numeric",
+		month: "long",
+		year: "numeric",
+		...options,
+	});
+};
+
+export const getPrettyUrl = (url?: string | null) => {
+	if (!url) return "";
+	// remove protocol (http/https) and www.
+	// also remove trailing slash
+	return url
+		.replace(/(^\w+:|^)\/\//, "")
+		.replace("www.", "")
+		.replace(/\/$/, "");
+};
+
+// Function to parse a date string into a Date object
+export const parseDateTime = (str: Date | string) => {
+	if (str instanceof Date) return str;
+	return chrono.parseDate(str);
+};
+
+export const linkMappingSchema = z.object({
+	campaign_name: z.string(),
+	product_name: z.string(),
+	product_description: z.string(),
+	product_price: z.string(),
+	product_price_type: z.string().optional(),
+	affiliate_count: z.number().optional(),
+	location: z.string().optional(),
+	lead: z.string().optional(),
+	click: z.string().optional(),
+	sale: z.string().optional(),
+});
+
+export const pluralize = (
+	word: string,
+	count: number,
+	options: {
+		plural?: string;
+	} = {},
+) => {
+	if (count === 1) {
+		return word;
+	}
+
+	// Use custom plural form if provided, otherwise add 's'
+	return options.plural || `${word}s`;
+};

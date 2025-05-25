@@ -179,6 +179,9 @@ model Pipelines {
   ig_post_url     String?
   run_mode        RunMode? @default(Manual)
   workflow        String?
+  lead            Int?     @default(0)
+  click           Int?     @default(0)
+  sale            Int?     @default(0)
   created_at      DateTime @default(now())
 
   business           Business?            @relation(fields: [business_id], references: [id])

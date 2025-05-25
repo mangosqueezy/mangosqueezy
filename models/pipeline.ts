@@ -8,6 +8,9 @@ export async function createPipeline({
 	location,
 	business_id,
 	workflow,
+	lead = 0,
+	click = 0,
+	sale = 0,
 }: {
 	product_id: number;
 	prompt: string;
@@ -15,6 +18,9 @@ export async function createPipeline({
 	location: string;
 	business_id: string;
 	workflow: string;
+	lead?: number;
+	click?: number;
+	sale?: number;
 }) {
 	try {
 		return await prisma.pipelines.create({
@@ -26,6 +32,9 @@ export async function createPipeline({
 				location,
 				remark: "mangosqueezy is working on this",
 				workflow,
+				lead,
+				click,
+				sale,
 			},
 		});
 	} catch (err) {

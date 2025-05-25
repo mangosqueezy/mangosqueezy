@@ -1,4 +1,5 @@
 "use client";
+import { useImportCsvModal } from "@/components/mango-ui/import-csv-modal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -11,6 +12,7 @@ import {
 import {
 	Form,
 	FormControl,
+	FormDescription,
 	FormField,
 	FormItem,
 	FormLabel,
@@ -25,7 +27,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { cn, hasFeatureAccess } from "@/lib/utils";
-import { CreditCard, Handshake, Loader } from "lucide-react";
+import { CreditCard, File, Handshake, Loader } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -39,7 +41,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { createCampaignAction, getGooglePlacesAction } from "./actions";
 
-const TYPE_OPTIONS = ["social_media", "stripe"] as const;
+const TYPE_OPTIONS = ["social_media", "stripe", "import_csv"] as const;
 
 type CampaignSheetFormProps = {
 	products: Array<{ id: string; name: string }>;
@@ -58,6 +60,9 @@ const platforms = [
 type FormValues = {
 	product: string;
 	count: string;
+	lead: string;
+	click: string;
+	sale: string;
 	platform?: string;
 };
 
@@ -76,6 +81,8 @@ export default function CampaignForm({
 	plan,
 }: CampaignSheetFormProps) {
 	const router = useRouter();
+	const { setShowImportCsvModal, ImportCsvModal, setPlan } =
+		useImportCsvModal();
 	const [isLoading, setIsLoading] = useState(false);
 	const [open, setOpen] = useState(false);
 	const [location, setLocation] = useState("");
@@ -89,10 +96,22 @@ export default function CampaignForm({
 	const [placeId, setPlaceId] = useState<string | null>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
 
+	const handleImportCsvModalOpenChange = (open: boolean) => {
+		if (type === "import_csv") {
+			setShowImportCsvModal(open);
+			setPlan(plan);
+		} else {
+			setOpen(open);
+		}
+	};
+
 	const form = useForm<FormValues>({
 		defaultValues: {
 			product: "",
 			count: "",
+			lead: "",
+			click: "",
+			sale: "",
 			platform: "",
 		},
 		mode: "onBlur",
@@ -129,9 +148,11 @@ export default function CampaignForm({
 
 		let platform: string | undefined;
 		if (type === "social_media") {
-			platform = values.platform;
+			platform = values.platform || "youtube";
 		} else if (type === "stripe") {
 			platform = "stripe";
+		} else if (type === "import_csv") {
+			platform = "import_csv";
 		} else {
 			platform = undefined;
 		}
@@ -140,6 +161,9 @@ export default function CampaignForm({
 			product_id: Number.parseInt(values.product),
 			business_id: business_id as string,
 			count: Number.parseInt(values.count),
+			lead: Number.parseInt(values.lead || "0"),
+			click: Number.parseInt(values.click || "0"),
+			sale: Number.parseInt(values.sale || "0"),
 			platform,
 			connected_account_id: stripeConnectedAccountId as string,
 			placeId:
@@ -188,118 +212,80 @@ export default function CampaignForm({
 	};
 
 	return (
-		<Dialog open={open} onOpenChange={setOpen}>
-			<DialogTrigger asChild>
-				<Card className="w-full sm:flex-1 min-w-0 max-w-[250px] hover:shadow-md transition-shadow cursor-pointer">
-					<CardHeader className="flex flex-row items-center gap-3">
-						<span className="text-lg">
-							{type === "social_media" ? (
-								<Handshake className="size-10 text-white bg-yellow-400 rounded-full p-2" />
-							) : (
-								<CreditCard className="size-10 text-white bg-lime-300 rounded-full p-2" />
-							)}
-						</span>
-						<CardTitle className="text-sm text-neutral-800">
+		<>
+			<Dialog open={open} onOpenChange={handleImportCsvModalOpenChange}>
+				<DialogTrigger asChild>
+					<Card className="w-full sm:flex-1 min-w-0 max-w-[250px] hover:shadow-md transition-shadow cursor-pointer">
+						<CardHeader className="flex flex-row items-center gap-3">
+							<span className="text-lg">
+								{type === "social_media" ? (
+									<Handshake className="size-10 text-white bg-yellow-500 rounded-full p-2" />
+								) : type === "stripe" ? (
+									<CreditCard className="size-10 text-white bg-lime-500 rounded-full p-2" />
+								) : (
+									<File className="size-10 text-white bg-sky-500 rounded-full p-2" />
+								)}
+							</span>
+							<CardTitle className="text-sm text-neutral-800">
+								{type === "social_media"
+									? "Find and enrich affiliates"
+									: type === "stripe"
+										? "Enrich Stripe customer"
+										: "Import CSV"}
+							</CardTitle>
+						</CardHeader>
+						<CardContent className="pt-0 text-gray-600 text-sm">
 							{type === "social_media"
-								? "Find and enrich affiliates"
-								: "Enrich Stripe customer"}
-						</CardTitle>
-					</CardHeader>
-					<CardContent className="pt-0 text-gray-600 text-sm">
-						{type === "social_media"
-							? "Discover and enhance affiliate profiles to grow your network and boost your campaigns."
-							: "Enhance your Stripe customer data for better insights and personalized engagement."}
-					</CardContent>
-				</Card>
-			</DialogTrigger>
-			<DialogContent className="sm:max-w-2xl">
-				<DialogHeader>
-					<DialogTitle>
-						{type === "social_media"
-							? "Find and Enrich Affiliates"
-							: "Enrich your Stripe Customer"}
-					</DialogTitle>
-				</DialogHeader>
-				{type === "stripe" && !stripeConnectedAccountId ? (
-					<Link
-						className="border bg-blue-500 text-white px-4 py-2 rounded-md text-center"
-						href="/settings"
-					>
-						Go to Settings page to connect your Stripe account
-					</Link>
-				) : (
-					<Form {...form}>
-						<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-							<FormField
-								control={form.control}
-								name="product"
-								rules={{ required: "Product is required" }}
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Product</FormLabel>
-										<FormControl>
-											<Select
-												value={field.value}
-												onValueChange={field.onChange}
-												defaultValue=""
-											>
-												<SelectTrigger className="w-full">
-													<SelectValue placeholder="Select a product" />
-												</SelectTrigger>
-												<SelectContent>
-													{products?.map((p) => (
-														<SelectItem key={p.id} value={p.id}>
-															{p.name}
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name="count"
-								rules={{
-									required: "Affiliates count is required",
-									min: { value: 1, message: "Must be at least 1" },
-								}}
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Number of Affiliates</FormLabel>
-										<FormControl>
-											<Input type="number" min={1} {...field} />
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							{type === "social_media" && (
+								? "Discover and enhance affiliate profiles to grow your network and boost your campaigns."
+								: type === "stripe"
+									? "Enhance your Stripe customer data for better insights and personalized engagement."
+									: "Easily import your campaigns into mangosqueezy with just a few clicks."}
+						</CardContent>
+					</Card>
+				</DialogTrigger>
+				<DialogContent className="sm:max-w-2xl">
+					<DialogHeader>
+						<DialogTitle>
+							{type === "social_media"
+								? "Find and Enrich Affiliates"
+								: type === "stripe"
+									? "Enrich your Stripe Customer"
+									: "Import CSV to create campaigns"}
+						</DialogTitle>
+					</DialogHeader>
+					{type === "stripe" && !stripeConnectedAccountId ? (
+						<Link
+							className="border bg-blue-500 text-white px-4 py-2 rounded-md text-center"
+							href="/settings"
+						>
+							Go to Settings page to connect your Stripe account
+						</Link>
+					) : (
+						<Form {...form}>
+							<form
+								onSubmit={form.handleSubmit(onSubmit)}
+								className="space-y-4"
+							>
 								<FormField
 									control={form.control}
-									name="platform"
-									rules={{}}
+									name="product"
+									rules={{ required: "Product is required" }}
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>Social Media Platform</FormLabel>
+											<FormLabel>Product</FormLabel>
 											<FormControl>
 												<Select
 													value={field.value}
-													onValueChange={(val) => {
-														field.onChange(val);
-														setSelectedPlatform(val);
-													}}
+													onValueChange={field.onChange}
 													defaultValue=""
 												>
 													<SelectTrigger className="w-full">
-														<SelectValue placeholder="Select a platform" />
+														<SelectValue placeholder="Select a product" />
 													</SelectTrigger>
 													<SelectContent>
-														{platforms.map((p) => (
-															<SelectItem key={p.value} value={p.value}>
-																{p.label}
+														{products?.map((p) => (
+															<SelectItem key={p.id} value={p.id}>
+																{p.name}
 															</SelectItem>
 														))}
 													</SelectContent>
@@ -309,82 +295,194 @@ export default function CampaignForm({
 										</FormItem>
 									)}
 								/>
-							)}
-							{type === "social_media" && selectedPlatform === "youtube" && (
-								<FormItem className="relative">
-									<FormLabel>Location</FormLabel>
-									<FormControl>
-										<div>
-											<Input
-												ref={inputRef}
-												placeholder="Enter a location (city, address, etc.)"
-												value={location}
-												onChange={(e) => {
-													const value = e.target.value;
-													setLocation(value);
-													setLocationError("");
-												}}
-												autoComplete="off"
-											/>
-											{showSuggestions && suggestions.length > 0 && (
-												<ul className="absolute z-10 bg-white border border-gray-200 w-full mt-1 rounded shadow max-h-48 overflow-auto">
-													{suggestions.map((s, idx) => (
-														<li
-															key={s.place_id || idx}
-															className="px-0 py-0 text-sm text-neutral-800"
-														>
-															<button
-																type="button"
-																className="w-full text-left px-3 py-2 cursor-pointer hover:bg-gray-100"
-																onClick={() => handleSelectSuggestion(s)}
-																onKeyDown={(e) => {
-																	if (e.key === "Enter" || e.key === " ") {
-																		e.preventDefault();
-																		handleSelectSuggestion(s);
-																	}
-																}}
+								<FormField
+									control={form.control}
+									name="count"
+									rules={{
+										required: "Affiliates count is required",
+										min: { value: 1, message: "Must be at least 1" },
+									}}
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>Number of Affiliates</FormLabel>
+											<FormControl>
+												<Input type="number" min={1} {...field} />
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+								<FormField
+									control={form.control}
+									name="lead"
+									rules={{
+										min: { value: 0, message: "Must be at least 0" },
+									}}
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>Lead reward in USD</FormLabel>
+											<FormDescription className="text-xs text-muted-foreground">
+												Optional: This is the reward for each lead.
+											</FormDescription>
+											<FormControl>
+												<Input type="number" min={0} {...field} />
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+								<FormField
+									control={form.control}
+									name="click"
+									rules={{
+										min: { value: 0, message: "Must be at least 0" },
+									}}
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>Click reward in USD</FormLabel>
+											<FormDescription className="text-xs text-muted-foreground">
+												Optional: This is the reward for each click.
+											</FormDescription>
+											<FormControl>
+												<Input type="number" min={0} {...field} />
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+								<FormField
+									control={form.control}
+									name="sale"
+									rules={{
+										min: { value: 0, message: "Must be at least 0" },
+									}}
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>Sale reward in USD</FormLabel>
+											<FormDescription className="text-xs text-muted-foreground">
+												Optional: This is the reward for each sale.
+											</FormDescription>
+											<FormControl>
+												<Input type="number" min={0} {...field} />
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+								{type === "social_media" && (
+									<FormField
+										control={form.control}
+										name="platform"
+										rules={{}}
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>Social Media Platform</FormLabel>
+												<FormControl>
+													<Select
+														value={field.value}
+														onValueChange={(val) => {
+															field.onChange(val);
+															setSelectedPlatform(val);
+														}}
+														defaultValue=""
+													>
+														<SelectTrigger className="w-full">
+															<SelectValue placeholder="Select a platform" />
+														</SelectTrigger>
+														<SelectContent>
+															{platforms.map((p) => (
+																<SelectItem key={p.value} value={p.value}>
+																	{p.label}
+																</SelectItem>
+															))}
+														</SelectContent>
+													</Select>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+								)}
+								{type === "social_media" && selectedPlatform === "youtube" && (
+									<FormItem className="relative">
+										<FormLabel>Location</FormLabel>
+										<FormControl>
+											<div>
+												<Input
+													ref={inputRef}
+													placeholder="Enter a location (city, address, etc.)"
+													value={location}
+													onChange={(e) => {
+														const value = e.target.value;
+														setLocation(value);
+														setLocationError("");
+													}}
+													autoComplete="off"
+												/>
+												{showSuggestions && suggestions.length > 0 && (
+													<ul className="absolute z-10 bg-white border border-gray-200 w-full mt-1 rounded shadow max-h-48 overflow-auto">
+														{suggestions.map((s, idx) => (
+															<li
+																key={s.place_id || idx}
+																className="px-0 py-0 text-sm text-neutral-800"
 															>
-																{s.description}
-															</button>
-														</li>
-													))}
-												</ul>
-											)}
-										</div>
-									</FormControl>
-									{(locationLoading || isPending) && (
-										<div className="text-xs text-gray-500">
-											Fetching suggestions...
-										</div>
-									)}
-									{locationError && (
-										<div className="text-xs text-red-500">{locationError}</div>
-									)}
-								</FormItem>
-							)}
-							<Button
-								type="submit"
-								className={cn(
-									type === "social_media"
-										? "bg-yellow-400 hover:bg-yellow-600"
-										: "bg-lime-300 hover:bg-lime-600",
-									"w-full font-bold text-muted-foreground hover:text-white",
+																<button
+																	type="button"
+																	className="w-full text-left px-3 py-2 cursor-pointer hover:bg-gray-100"
+																	onClick={() => handleSelectSuggestion(s)}
+																	onKeyDown={(e) => {
+																		if (e.key === "Enter" || e.key === " ") {
+																			e.preventDefault();
+																			handleSelectSuggestion(s);
+																		}
+																	}}
+																>
+																	{s.description}
+																</button>
+															</li>
+														))}
+													</ul>
+												)}
+											</div>
+										</FormControl>
+										{(locationLoading || isPending) && (
+											<div className="text-xs text-gray-500">
+												Fetching suggestions...
+											</div>
+										)}
+										{locationError && (
+											<div className="text-xs text-red-500">
+												{locationError}
+											</div>
+										)}
+									</FormItem>
 								)}
-								disabled={isLoading}
-							>
-								{isLoading ? (
-									<span className="flex items-center justify-center text-muted-foreground">
-										<Loader className="size-4 mr-2 animate-spin" />
-										Submitting...
-									</span>
-								) : (
-									"Submit"
-								)}
-							</Button>
-						</form>
-					</Form>
-				)}
-			</DialogContent>
-		</Dialog>
+								<Button
+									type="submit"
+									className={cn(
+										type === "social_media"
+											? "bg-yellow-400 hover:bg-yellow-600"
+											: "bg-lime-300 hover:bg-lime-600",
+										"w-full font-bold text-muted-foreground hover:text-white",
+									)}
+									disabled={isLoading}
+								>
+									{isLoading ? (
+										<span className="flex items-center justify-center text-muted-foreground">
+											<Loader className="size-4 mr-2 animate-spin" />
+											Submitting...
+										</span>
+									) : (
+										"Submit"
+									)}
+								</Button>
+							</form>
+						</Form>
+					)}
+				</DialogContent>
+			</Dialog>
+
+			{type === "import_csv" && <ImportCsvModal />}
+		</>
 	);
 }

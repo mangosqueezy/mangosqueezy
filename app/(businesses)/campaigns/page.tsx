@@ -51,6 +51,16 @@ export default async function CampaignsPage() {
 					pipelineCount={pipelineCount}
 					plan={plan}
 				/>
+				<CampaignForm
+					products={(products ?? []).map((p) => ({
+						id: String(p.id),
+						name: p.name,
+					}))}
+					business_id={user?.id}
+					type="import_csv"
+					pipelineCount={pipelineCount}
+					plan={plan}
+				/>
 			</div>
 
 			<h1 className="text-2xl font-bold mb-4">Campaigns</h1>

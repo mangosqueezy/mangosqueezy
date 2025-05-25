@@ -36,6 +36,9 @@ export async function createCampaignAction(data: {
 	product_id: number;
 	connected_account_id: string;
 	placeId?: string;
+	lead?: number;
+	click?: number;
+	sale?: number;
 }) {
 	const pipeline = await createPipeline({
 		product_id: data.product_id,
@@ -44,6 +47,9 @@ export async function createCampaignAction(data: {
 		location: data.placeId ? data.placeId : "EARTH",
 		business_id: data.business_id,
 		workflow: data.platform || "Social Media",
+		lead: data.lead,
+		click: data.click,
+		sale: data.sale,
 	});
 
 	const product = await getProductById(data.product_id);
