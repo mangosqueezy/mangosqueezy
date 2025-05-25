@@ -46,11 +46,9 @@ export function LinksImported({
 						<Text className="text-sm leading-6 text-black">
 							We have successfully{" "}
 							<strong>
-								imported {Intl.NumberFormat("en-us").format(count)} campaigns
+								imported {Intl.NumberFormat("en-us").format(count)} campaign(s)
 							</strong>{" "}
-							into your mangosqueezy workspace, , for the{" "}
-							{pluralize("campaign", campaignNames.length)}{" "}
-							<strong>{campaignNames.join(", ")}</strong>.
+							into your mangosqueezy workspace.
 						</Text>
 						{campaignNames.length > 0 && (
 							<Section>
