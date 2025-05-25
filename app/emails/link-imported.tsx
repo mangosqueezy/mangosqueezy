@@ -1,4 +1,4 @@
-import { formatDate, pluralize, truncate } from "@/lib/utils";
+import { formatDate, truncate } from "@/lib/utils";
 import {
 	Body,
 	Column,
@@ -46,7 +46,7 @@ export function LinksImported({
 						<Text className="text-sm leading-6 text-black">
 							We have successfully{" "}
 							<strong>
-								imported {Intl.NumberFormat("en-us").format(count)} campaign(s)
+								imported {Intl.NumberFormat("en-us").format(count)} campaigns
 							</strong>{" "}
 							into your mangosqueezy workspace.
 						</Text>

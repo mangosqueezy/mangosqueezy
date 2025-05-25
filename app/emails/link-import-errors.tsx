@@ -51,7 +51,7 @@ export function LinksImportErrors({
 						</Heading>
 						<Text className="text-sm leading-6 text-black">
 							The following{" "}
-							{Intl.NumberFormat("en-us").format(errorLinks.length)} campaign(s)
+							{Intl.NumberFormat("en-us").format(errorLinks.length)} campaigns
 							failed to import into your mangosqueezy workspace.
 						</Text>
 						<Section>
