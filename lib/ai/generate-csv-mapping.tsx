@@ -22,15 +22,15 @@ export async function generateCsvMapping(
 					.optional()
 					.describe("The product description"),
 				product_price: z.string().optional().describe("The product price"),
-				affiliate_count: z.number().optional().describe("The affiliate count"),
+				affiliate_count: z.string().optional().describe("The affiliate count"),
 				location: z.string().optional().describe("The location"),
 				product_price_type: z
 					.string()
 					.optional()
 					.describe("The product price type"),
-				lead: z.number().optional().describe("The lead commission in %"),
-				click: z.number().optional().describe("The click commission in %"),
-				sale: z.number().optional().describe("The sale commission in %"),
+				lead: z.string().optional().describe("The lead commission in %"),
+				click: z.string().optional().describe("The click commission in %"),
+				sale: z.string().optional().describe("The sale commission in %"),
 			}),
 			prompt: `
 The following columns are the headings from a CSV import file for importing a company's products.

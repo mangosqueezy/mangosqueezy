@@ -39,7 +39,7 @@ interface MapperResult {
 		product_name: string;
 		product_description: string;
 		product_price: string;
-		affiliate_count?: number;
+		affiliate_count?: string;
 		location?: string;
 		product_price_type?: string;
 		lead?: string;
@@ -207,7 +207,7 @@ const mapCsvRowToLink = (
 		}
 
 		if (mapping.affiliate_count) {
-			const affiliateCount = mapping.affiliate_count;
+			const affiliateCount = Number(mapping.affiliate_count);
 
 			const referralLimit = hasFeatureAccess(
 				plan,
@@ -223,7 +223,7 @@ const mapCsvRowToLink = (
 			}
 
 			if (affiliateCount) {
-				productMap.affiliate_count = Number(affiliateCount);
+				productMap.affiliate_count = affiliateCount.toString();
 			}
 		}
 
@@ -332,7 +332,7 @@ const processMappedProducts = async ({
 				await callYoutubeApi({
 					productId: data[0]?.id,
 					pipelineId: campaign[0]?.id,
-					affiliateCount: mappedProduct.data?.affiliate_count ?? 1,
+					affiliateCount: Number(mappedProduct.data?.affiliate_count) ?? 1,
 					place: mappedProduct.data?.location ?? "US",
 				});
 			}

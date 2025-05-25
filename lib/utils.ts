@@ -270,7 +270,7 @@ export const linkMappingSchema = z.object({
 	product_description: z.string(),
 	product_price: z.string(),
 	product_price_type: z.string().optional(),
-	affiliate_count: z.number().optional(),
+	affiliate_count: z.string().optional(),
 	location: z.string().optional(),
 	lead: z.string().optional(),
 	click: z.string().optional(),
