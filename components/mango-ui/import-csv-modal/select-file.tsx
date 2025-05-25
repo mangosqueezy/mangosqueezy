@@ -56,7 +56,7 @@ export function SelectFile({ plan }: { plan: string }) {
 						header: true,
 					});
 
-					if (!data || data.length < 2) {
+					if (!data || data.length < 1) {
 						setError("CSV file must have at least 1 row.");
 						setFileColumns(null);
 						setFirstRows(null);
