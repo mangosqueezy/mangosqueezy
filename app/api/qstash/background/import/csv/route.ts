@@ -57,10 +57,14 @@ interface ErrorLink {
 // POST /api/cron/import/csv
 export async function POST(req: Request) {
 	try {
-		const rawBody = await req.text();
+		const body = await req.json();
+		const { userId, id, mapping } = body;
+		const payload = {
+			userId,
+			id,
+			mapping,
+		};
 
-		const payload = payloadSchema.parse(JSON.parse(rawBody));
-		const { userId, id } = payload;
 		const redisKey = `import:csv:${userId}:${id}`;
 		const BATCH_SIZE = 100; // Process 500 links at a time
 
@@ -69,7 +73,7 @@ export async function POST(req: Request) {
 			process.env.SUPABASE_KEY as string,
 		);
 
-		const { data: businessData, error: BusinessError } = await supabase
+		const { data: businessData } = await supabase
 			.from("Business")
 			.select("stripe_subscription_id")
 			.eq("id", userId);
