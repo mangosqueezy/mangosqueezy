@@ -147,7 +147,9 @@ function ImportCsvModal({
 						<TableIcon className="size-5" />
 					</div>
 				</div>
-				<h3 className="text-lg font-medium">Import Links From a CSV File</h3>
+				<h3 className="text-lg font-medium">
+					Import Campaigns From a CSV File
+				</h3>
 				<p className="text-balance text-center text-sm text-neutral-500">
 					Easily import your campaigns into mangosqueezy with just a few clicks.
 					<br />
@@ -192,7 +194,7 @@ function ImportCsvModal({
 								// biome-ignore lint/suspicious/noExplicitAny:
 								onSubmit={handleSubmit(async (data: any) => {
 									const loadingId = toast.loading(
-										"Adding links to import queue...",
+										"Adding campaigns to import queue...",
 									);
 									try {
 										const formData = new FormData();
@@ -214,10 +216,10 @@ function ImportCsvModal({
 										if (!res.ok) throw new Error();
 
 										toast.success(
-											"Successfully added links to import queue! You can now safely navigate from this tab – we will send you an email when your links have been fully imported.",
+											"Successfully added campaigns to import queue! You can now safely navigate from this tab – we will send you an email when your campaigns have been fully imported.",
 										);
 									} catch (error) {
-										toast.error("Error adding links to import queue");
+										toast.error("Error adding campaigns to import queue");
 									} finally {
 										toast.dismiss(loadingId);
 									}

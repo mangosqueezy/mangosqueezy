@@ -49,7 +49,7 @@ export function SelectFile({ plan }: { plan: string }) {
 					return;
 				}
 
-				return readLines(file, programLimit).then((lines) => {
+				return readLines(file, 2).then((lines) => {
 					const { data, meta } = Papa.parse(lines, {
 						worker: false,
 						skipEmptyLines: true,
@@ -159,7 +159,7 @@ const countCsvRows = async (file: File): Promise<number> => {
 	});
 };
 
-const readLines = async (file: File, count = 4): Promise<string> => {
+const readLines = async (file: File, count = 2): Promise<string> => {
 	const reader = file.stream().getReader();
 	const decoder = new TextDecoder("utf-8");
 	let { value: chunk, done: readerDone } = await reader.read();
