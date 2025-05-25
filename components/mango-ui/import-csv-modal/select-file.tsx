@@ -57,7 +57,7 @@ export function SelectFile({ plan }: { plan: string }) {
 					});
 
 					if (!data || data.length < 2) {
-						setError("CSV file must have at least 2 rows.");
+						setError("CSV file must have at least 1 row.");
 						setFileColumns(null);
 						setFirstRows(null);
 						return;
