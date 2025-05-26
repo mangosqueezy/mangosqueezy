@@ -197,7 +197,7 @@ model ChatMessage {
   receiver    String
   text        String
   pipeline_id Int
-  chat_message_status String? @default("warm_up")
+  chat_message_status ChatMessageStatus? @default(warm_up)
   created_at  DateTime  @default(now())
   updated_at  DateTime  @updatedAt
   pipeline    Pipelines @relation(fields: [pipeline_id], references: [id])
@@ -311,6 +311,16 @@ enum PaymentPreference {
 enum PriceType {
   Subscription
   OneTime
+
+  @@schema("public")
+}
+
+enum ChatMessageStatus {
+  warm_up
+  engaged
+  negotiating
+  ready
+  inactive
 
   @@schema("public")
 }

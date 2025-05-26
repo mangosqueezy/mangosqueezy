@@ -4,6 +4,7 @@ import { EmailTemplate } from "@/components/mango-ui/email-template";
 import { createChatMessage } from "@/models/chat_message";
 import { getProductById } from "@/models/products";
 import { openai } from "@ai-sdk/openai";
+import type { ChatMessageStatus } from "@prisma/client";
 import { Client } from "@upstash/qstash";
 import { Redis } from "@upstash/redis";
 import { generateText } from "ai";
@@ -164,7 +165,7 @@ export async function createChatMessageAction(
 	pipeline_id: number,
 	message: string,
 	receiver: string,
-	chat_message_status: string,
+	chat_message_status: ChatMessageStatus,
 	videoId?: string,
 ) {
 	const chatMessage = await createChatMessage({
