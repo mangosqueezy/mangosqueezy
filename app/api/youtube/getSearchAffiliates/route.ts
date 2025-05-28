@@ -121,7 +121,7 @@ export async function GET(request: Request) {
 			(affiliate) => affiliate.status === "active",
 		);
 
-		foundCount = activePotentialAffiliates.length || 0;
+		foundCount = activePotentialAffiliates?.length || 0;
 
 		for (const keyword of searchKeywords) {
 			if (foundCount >= affiliate_count) break;
