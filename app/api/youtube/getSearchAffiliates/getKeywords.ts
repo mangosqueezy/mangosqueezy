@@ -21,6 +21,12 @@ ${description}
 			schema: z.object({
 				keywords: z.array(z.string()),
 			}),
+			experimental_telemetry: {
+				isEnabled: true,
+				metadata: {
+					query: description,
+				},
+			},
 		});
 
 		return {
