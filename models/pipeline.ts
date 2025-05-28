@@ -122,10 +122,22 @@ export async function getLatestPipeline() {
 
 export async function deletePipelineById(id: number) {
 	try {
-		return await prisma.pipelines.delete({
+		await prisma.pipelines.delete({
 			where: { id },
 		});
+		return { success: true, error: "" };
 	} catch (err) {
-		console.error(err);
+		const message = err instanceof Error ? err.message : "Unknown error";
+		if (
+			message.includes(
+				"Foreign key constraint violated on the constraint: `ChatMessage_pipeline_id_fkey`",
+			)
+		) {
+			return {
+				success: false,
+				error: "you can't delete this pipeline because it has chat messages",
+			};
+		}
+		return { success: false, error: message };
 	}
 }

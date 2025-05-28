@@ -20,12 +20,16 @@ const redis = new Redis({
 
 export async function deletePipelineAction(id: number) {
 	try {
-		await deletePipelineById(id);
-		revalidatePath("/campaigns");
-		return { success: true };
+		const result = await deletePipelineById(id);
+		if (result?.success) {
+			revalidatePath("/campaigns");
+			return { success: true };
+		}
+		return { success: false, error: result.error };
 	} catch (error) {
-		console.error("Error deleting pipeline:", error);
-		return { success: false, error: "Failed to delete pipeline" };
+		const message = error instanceof Error ? error.message : "Unknown error";
+		console.error("Error deleting pipeline:", message);
+		return { success: false, error: message };
 	}
 }
 

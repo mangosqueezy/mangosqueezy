@@ -1,6 +1,5 @@
 "use client";
 
-import { CustomToast } from "@/components/mango-ui/custom-toast";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -15,7 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { useTransition } from "react";
-import toast, { type Toast } from "react-hot-toast";
+import { toast } from "sonner";
 import { deletePipelineAction } from "./actions";
 
 interface DeletePipelineButtonProps {
@@ -31,31 +30,14 @@ export function DeletePipelineButton({
 		startTransition(async () => {
 			try {
 				const result = await deletePipelineAction(pipelineId);
+
 				if (result.success) {
-					toast.custom((t: Toast) => (
-						<CustomToast
-							t={t}
-							message="Pipeline deleted successfully"
-							variant="success"
-						/>
-					));
+					toast.success("Pipeline deleted successfully");
 				} else {
-					toast.custom((t: Toast) => (
-						<CustomToast
-							t={t}
-							message={result.error || "Failed to delete pipeline"}
-							variant="error"
-						/>
-					));
+					toast.error(result.error || "Failed to delete pipeline");
 				}
 			} catch (error) {
-				toast.custom((t: Toast) => (
-					<CustomToast
-						t={t}
-						message="An error occurred while deleting the pipeline"
-						variant="error"
-					/>
-				));
+				toast.error("An error occurred while deleting the pipeline");
 			}
 		});
 	};

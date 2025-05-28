@@ -139,10 +139,16 @@ export async function GET(request: Request) {
 			for (const channel of channels) {
 				if (foundCount >= affiliate_count) break;
 
+				const handle = channel.snippet.channelTitle;
 				const channelId = location
 					? channel.snippet.channelId
 					: channel.id.channelId;
 				if (!channelId) continue;
+
+				// Skip if already evaluated
+				if (validResults.some((a) => a.handle === handle)) {
+					continue;
+				}
 
 				const detailsUrl = `https://youtube.googleapis.com/youtube/v3/channels?part=statistics,snippet&key=${YOUTUBE_API_KEY}&id=${channelId}`;
 				const detailsResponse = await fetch(detailsUrl);
@@ -160,7 +166,7 @@ export async function GET(request: Request) {
 				};
 
 				const result = await evalAi({
-					handle: channel.snippet.channelTitle,
+					handle,
 					postMetrics: metrics,
 					difficulty: difficulty as Difficulty,
 				});
@@ -178,7 +184,7 @@ export async function GET(request: Request) {
 					}
 
 					validResults.push({
-						handle: channel.snippet.channelTitle,
+						handle,
 						displayName: channelDetails.snippet.title,
 						avatar: channelDetails.snippet.thumbnails.default.url,
 						channelId,
