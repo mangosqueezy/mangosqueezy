@@ -110,6 +110,19 @@ export async function GET(request: Request) {
 		const validResults: Affiliate[] = [];
 		let foundCount = 0;
 
+		const affiliatesFromRedis = (await redis.smembers(
+			pipeline_id,
+		)) as potentialAffiliates[];
+		const potentialAffiliates = affiliatesFromRedis[0]?.affiliates
+			? (affiliatesFromRedis[0].affiliates as unknown as Affiliate[])
+			: [];
+
+		const activePotentialAffiliates = potentialAffiliates.filter(
+			(affiliate) => affiliate.status === "active",
+		);
+
+		foundCount = activePotentialAffiliates.length;
+
 		for (const keyword of searchKeywords) {
 			if (foundCount >= affiliate_count) break;
 
@@ -153,6 +166,17 @@ export async function GET(request: Request) {
 				});
 
 				if (result.evaluation === "Yes") {
+					if (potentialAffiliates.length > 0) {
+						if (
+							potentialAffiliates.some(
+								(potentialAffiliate) =>
+									potentialAffiliate.handle === channel.snippet.channelTitle,
+							)
+						) {
+							continue;
+						}
+					}
+
 					validResults.push({
 						handle: channel.snippet.channelTitle,
 						displayName: channelDetails.snippet.title,
@@ -175,12 +199,15 @@ export async function GET(request: Request) {
 			}
 		}
 
+		const mergedResults = [...potentialAffiliates, ...validResults];
+
 		// Remove duplicates by handle before saving
-		const uniqueResults = validResults.filter(
+		const uniqueResults = mergedResults.filter(
 			(affiliate, index, self) =>
 				self.findIndex((a) => a.handle === affiliate.handle) === index,
 		);
 
+		await redis.spop(pipeline_id);
 		const redisResult = await redis.sadd(pipeline_id, {
 			platform: "youtube",
 			difficulty,
@@ -188,10 +215,9 @@ export async function GET(request: Request) {
 		});
 
 		return NextResponse.json(redisResult, { status: 200 });
-	} catch (error) {
-		console.error("Error:", error);
+	} catch (_) {
 		return NextResponse.json(
-			{ error: "Something went wrong" },
+			{ error: "something went wrong" },
 			{ status: 400 },
 		);
 	}
