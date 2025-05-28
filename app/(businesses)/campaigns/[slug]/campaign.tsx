@@ -262,6 +262,7 @@ export default function Campaign({
 	difficulty,
 	platform,
 	plan,
+	location,
 }: {
 	pipeline_id: number;
 	affiliates: Affiliate[];
@@ -272,6 +273,7 @@ export default function Campaign({
 	difficulty: string;
 	platform: Platform;
 	plan: string;
+	location: string;
 }) {
 	const [selectedAffiliate, setSelectedAffiliate] = useState<Affiliate | null>(
 		null,
@@ -337,12 +339,20 @@ export default function Campaign({
 			affiliate_count: affiliate_count.toString(),
 			difficulty: nextDifficulty,
 			platform,
+			location,
 		});
 
 		if (platform !== "instagram") {
 			setIsAddingAffiliate(false);
 		}
-	}, [product?.id, pipeline_id, affiliate_count, difficulty, platform]);
+	}, [
+		product?.id,
+		pipeline_id,
+		affiliate_count,
+		difficulty,
+		platform,
+		location,
+	]);
 
 	const handleDeleteAffiliate = (handle: string) => {
 		const updatedAffiliates = affiliates.map((affiliate) =>

@@ -222,12 +222,14 @@ export async function getAffiliatesAction({
 	affiliate_count,
 	difficulty,
 	platform,
+	location,
 }: {
 	product_id: string;
 	pipeline_id: string;
 	affiliate_count: string;
 	difficulty: string;
 	platform: string;
+	location: string;
 }) {
 	if (platform === "bluesky") {
 		await fetch(
@@ -237,12 +239,36 @@ export async function getAffiliatesAction({
 			},
 		);
 	} else if (platform === "youtube") {
-		await fetch(
-			`https://www.mangosqueezy.com/api/youtube/getSearchAffiliates?product_id=${product_id}&limit=100&pipeline_id=${pipeline_id}&affiliate_count=${affiliate_count}&difficulty=${difficulty}&platform=${platform}`,
-			{
-				method: "GET",
-			},
-		);
+		let url = `https://www.mangosqueezy.com/api/youtube/getSearchAffiliates?product_id=${product_id}&limit=100&pipeline_id=${pipeline_id}&affiliate_count=${affiliate_count}&difficulty=${difficulty}&platform=${platform}`;
+		if (location) {
+			const params = new URLSearchParams({
+				place_id: location,
+				key: process.env.GOOGLE_MAP_API_KEY!,
+				fields: "geometry",
+			});
+
+			const response = await fetch(
+				`https://maps.googleapis.com/maps/api/place/details/json?${params}`,
+			);
+
+			const geometryResponse = await response.json();
+
+			const locationData = geometryResponse.result.geometry.location;
+
+			const coordinates = {
+				lat: locationData.lat,
+				lng: locationData.lng,
+			};
+
+			if (coordinates) {
+				const locationWithCoordinates = `${coordinates.lat},${coordinates.lng}`;
+
+				url += `&location=${locationWithCoordinates}&locationRadius=100km`;
+			}
+		}
+		await fetch(url, {
+			method: "GET",
+		});
 	} else if (platform === "instagram") {
 		const product = await getProductById(Number(product_id));
 

@@ -58,6 +58,7 @@ export default async function CampaignsPage(props: {
 				chatMessages={chatMessages as ChatMessage[]}
 				pipeline_id={pipeline?.id as number}
 				affiliate_count={pipeline?.affiliate_count || 0}
+				location={pipeline?.location || ""}
 				difficulty={difficulty}
 				platform={platform as Platform}
 				plan={plan}

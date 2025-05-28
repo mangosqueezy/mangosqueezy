@@ -175,10 +175,16 @@ export async function GET(request: Request) {
 			}
 		}
 
+		// Remove duplicates by handle before saving
+		const uniqueResults = validResults.filter(
+			(affiliate, index, self) =>
+				self.findIndex((a) => a.handle === affiliate.handle) === index,
+		);
+
 		const redisResult = await redis.sadd(pipeline_id, {
 			platform: "youtube",
 			difficulty,
-			affiliates: validResults,
+			affiliates: uniqueResults,
 		});
 
 		return NextResponse.json(redisResult, { status: 200 });
