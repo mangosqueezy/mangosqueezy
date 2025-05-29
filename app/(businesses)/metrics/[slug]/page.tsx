@@ -34,27 +34,27 @@ import { getAnalytics } from "../actions";
 const chartConfig = {
 	clicks: {
 		label: "Clicks",
-		color: "hsl(var(--chart-7))",
+		color: "var(--chart-3)",
 	},
 } satisfies ChartConfig;
 
 const countryChartConfig = {
 	country: {
 		label: "Country",
-		color: "hsl(var(--chart-5))",
+		color: "var(--chart-5)",
 	},
 	label: {
-		color: "hsl(var(--label))",
+		color: "var(--chart-5)",
 	},
 } satisfies ChartConfig;
 
 const referrerChartConfig = {
 	referrer: {
 		label: "Referrer",
-		color: "hsl(var(--chart-6))",
+		color: "var(--chart-2)",
 	},
 	label: {
-		color: "hsl(var(--label))",
+		color: "var(--chart-2)",
 	},
 } satisfies ChartConfig;
 
