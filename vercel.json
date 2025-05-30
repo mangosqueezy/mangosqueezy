@@ -9,6 +9,9 @@
 		"app/api/bluesky/**/*": {
 			"maxDuration": 300
 		},
+		"app/api/youtube/**/*": {
+			"maxDuration": 300
+		},
 		"app/api/instagram/**/*": {
 			"maxDuration": 300
 		},
