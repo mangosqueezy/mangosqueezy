@@ -73,25 +73,38 @@ export async function createStripePortal(
 	priceId: string,
 	stripeSubscriptionId: string,
 	subscriptionItemId: string,
+	billingFlowType:
+		| "subscription_update_confirm"
+		| "subscription_cancel_confirm",
 ) {
 	try {
 		try {
+			let flowData: Stripe.BillingPortal.SessionCreateParams.FlowData = {
+				type: "subscription_update_confirm",
+				subscription_update_confirm: {
+					subscription: stripeSubscriptionId,
+					items: [
+						{
+							id: subscriptionItemId,
+							quantity: 1,
+							price: priceId,
+						},
+					],
+				},
+			};
+			if (billingFlowType === "subscription_cancel_confirm") {
+				flowData = {
+					type: "subscription_cancel",
+					subscription_cancel: {
+						subscription: stripeSubscriptionId,
+					},
+				};
+			}
+
 			const { url } = await stripe.billingPortal.sessions.create({
 				customer: stripeCustomerId,
 				return_url: "https://mangosqueezy.com/campaigns",
-				flow_data: {
-					type: "subscription_update_confirm",
-					subscription_update_confirm: {
-						subscription: stripeSubscriptionId,
-						items: [
-							{
-								id: subscriptionItemId,
-								quantity: 1,
-								price: priceId,
-							},
-						],
-					},
-				},
+				flow_data: flowData,
 			});
 			if (!url) {
 				throw new Error("Could not create billing portal");

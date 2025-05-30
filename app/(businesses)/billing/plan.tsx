@@ -2,10 +2,17 @@
 import { Button } from "@/components/mango-ui/button";
 import { Container } from "@/components/mango-ui/container";
 import { Subheading } from "@/components/mango-ui/text";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { PRICE_IDS } from "@/lib/stripe/config";
 import { createStripePortal } from "@/lib/stripe/server";
 import { TIERS } from "@/lib/utils";
 import { cn } from "@/lib/utils";
+import { Cog6ToothIcon } from "@heroicons/react/24/outline";
 import type { PricePlan } from "@prisma/client";
 import { Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -69,6 +76,7 @@ function PricingCard({
 				priceId,
 				stripeSubscriptionId,
 				subscriptionItemId,
+				"subscription_update_confirm",
 			);
 			router.push(url);
 		} catch (error) {
@@ -178,9 +186,64 @@ export default function Plan({
 	stripeSubscriptionId: string;
 	subscriptionItemId: string;
 }) {
+	const router = useRouter();
+	const [isLoading, setIsLoading] = useState(false);
+
+	const cancelPricePlanHandler = useCallback(async () => {
+		try {
+			setIsLoading(true);
+			const priceId = PRICE_IDS[plan as keyof typeof PRICE_IDS];
+
+			const url = await createStripePortal(
+				stripeCustomerId,
+				priceId,
+				stripeSubscriptionId,
+				subscriptionItemId,
+				"subscription_cancel_confirm",
+			);
+			router.push(url);
+		} catch (error) {
+			toast.error("Something went wrong");
+		} finally {
+			setIsLoading(false);
+		}
+	}, [
+		stripeCustomerId,
+		router,
+		plan,
+		stripeSubscriptionId,
+		subscriptionItemId,
+	]);
+
 	return (
 		<main className="overflow-hidden">
-			<h1 className="text-2xl font-bold px-6 lg:px-8">Plan</h1>
+			<div className="flex items-center px-6 lg:px-8 gap-5">
+				<h1 className="text-2xl font-bold">Plan</h1>
+				<DropdownMenu>
+					<DropdownMenuTrigger asChild>
+						<Button
+							variant="outline"
+							className="border-none"
+							disabled={isLoading}
+						>
+							{isLoading ? (
+								<Loader className="size-4 animate-spin" />
+							) : (
+								<Cog6ToothIcon className="size-5" />
+							)}
+							<span className="sr-only">Open plan settings</span>
+						</Button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent align="end">
+						<DropdownMenuItem
+							className="text-red-600"
+							onClick={cancelPricePlanHandler}
+						>
+							Cancel subscription
+						</DropdownMenuItem>
+					</DropdownMenuContent>
+				</DropdownMenu>
+			</div>
 			<p className="mt-2 text-sm/6 text-gray-950/75 px-6 lg:px-8">
 				We work with Stripe for payment processing and never keep your payment
 				information in our database.
