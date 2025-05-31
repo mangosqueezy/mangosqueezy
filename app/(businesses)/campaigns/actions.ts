@@ -79,7 +79,6 @@ export async function createCampaignAction(data: {
 			},
 		);
 	} else if (platform_name === "youtube") {
-		const pipeline = await createPipeline(inputParameters);
 		if (data.placeId) {
 			const params = new URLSearchParams({
 				place_id: data.placeId,
@@ -109,7 +108,6 @@ export async function createCampaignAction(data: {
 			url: "https://www.mangosqueezy.com/api/workflow",
 			body: {
 				product_id: data.product_id,
-				pipeline_id: pipeline?.id,
 				affiliate_count: data.count,
 				difficulty: "EASY",
 				platform: "youtube",
