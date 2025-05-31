@@ -39,6 +39,7 @@ export default async function CampaignsPage() {
 					type="social_media"
 					pipelineCount={pipelineCount}
 					plan={plan}
+					email={user?.email as string}
 				/>
 				<CampaignForm
 					products={(products ?? []).map((p) => ({
@@ -50,6 +51,7 @@ export default async function CampaignsPage() {
 					type="stripe"
 					pipelineCount={pipelineCount}
 					plan={plan}
+					email={user?.email as string}
 				/>
 				<CampaignForm
 					products={(products ?? []).map((p) => ({
@@ -60,6 +62,7 @@ export default async function CampaignsPage() {
 					type="import_csv"
 					pipelineCount={pipelineCount}
 					plan={plan}
+					email={user?.email as string}
 				/>
 			</div>
 

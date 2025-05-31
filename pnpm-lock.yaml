@@ -248,6 +248,9 @@ importers:
       '@upstash/redis':
         specifier: ^1.34.3
         version: 1.34.9
+      '@upstash/workflow':
+        specifier: ^0.2.13
+        version: 0.2.13(react@19.1.0)
       '@vercel/edge-config':
         specifier: ^1.4.0
         version: 1.4.0(@opentelemetry/api@1.9.0)
@@ -4762,6 +4765,9 @@ packages:
 
   '@upstash/redis@1.34.9':
     resolution: {integrity: sha512-7qzzF2FQP5VxR2YUNjemWs+hl/8VzJJ6fOkT7O7kt9Ct8olEVzb1g6/ik6B8Pb8W7ZmYv81SdlVV9F6O8bh/gw==}
+
+  '@upstash/workflow@0.2.13':
+    resolution: {integrity: sha512-TX2fOPnAWgW6ky7MoC9OCgVIu7rB1BRqfP+c8ILziR/I5vdpky5mrHvpSJq28Vqsq+rso0pyLW4Dmle1Hk56Rw==}
 
   '@vercel/edge-config-fs@0.1.0':
     resolution: {integrity: sha512-NRIBwfcS0bUoUbRWlNGetqjvLSwgYH/BqKqDN7vK1g32p7dN96k0712COgaz6VFizAm9b0g6IG6hR6+hc0KCPg==}
@@ -14040,6 +14046,15 @@ snapshots:
   '@upstash/redis@1.34.9':
     dependencies:
       crypto-js: 4.2.0
+
+  '@upstash/workflow@0.2.13(react@19.1.0)':
+    dependencies:
+      '@ai-sdk/openai': 1.3.22(zod@3.24.4)
+      '@upstash/qstash': 2.8.1
+      ai: 4.3.15(react@19.1.0)(zod@3.24.4)
+      zod: 3.24.4
+    transitivePeerDependencies:
+      - react
 
   '@vercel/edge-config-fs@0.1.0': {}
 

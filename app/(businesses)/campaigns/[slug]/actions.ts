@@ -7,6 +7,7 @@ import { openai } from "@ai-sdk/openai";
 import type { ChatMessageStatus } from "@prisma/client";
 import { Client } from "@upstash/qstash";
 import { Redis } from "@upstash/redis";
+import { Client as WorkflowClient } from "@upstash/workflow";
 import { generateText } from "ai";
 import { revalidatePath } from "next/cache";
 import { Resend } from "resend";
@@ -24,6 +25,9 @@ const client = new Client({
 	token: process.env.QSTASH_TOKEN as string,
 });
 
+const workflowClient = new WorkflowClient({
+	token: process.env.QSTASH_TOKEN as string,
+});
 interface BlueskyPost {
 	post: {
 		author: {
@@ -223,6 +227,7 @@ export async function getAffiliatesAction({
 	difficulty,
 	platform,
 	location,
+	email,
 }: {
 	product_id: string;
 	pipeline_id: string;
@@ -230,7 +235,9 @@ export async function getAffiliatesAction({
 	difficulty: string;
 	platform: string;
 	location: string;
+	email: string;
 }) {
+	let locationWithCoordinates = "";
 	if (platform === "bluesky") {
 		await fetch(
 			`https://www.mangosqueezy.com/api/bluesky/getSearchAffiliates?product_id=${product_id}&limit=100&pipeline_id=${pipeline_id}&affiliate_count=${affiliate_count}&difficulty=${difficulty}&platform=${platform}`,
@@ -239,7 +246,6 @@ export async function getAffiliatesAction({
 			},
 		);
 	} else if (platform === "youtube") {
-		let url = `https://www.mangosqueezy.com/api/youtube/getSearchAffiliates?product_id=${product_id}&limit=100&pipeline_id=${pipeline_id}&affiliate_count=${affiliate_count}&difficulty=${difficulty}&platform=${platform}`;
 		if (location) {
 			const params = new URLSearchParams({
 				place_id: location,
@@ -261,13 +267,26 @@ export async function getAffiliatesAction({
 			};
 
 			if (coordinates) {
-				const locationWithCoordinates = `${coordinates.lat},${coordinates.lng}`;
-
-				url += `&location=${locationWithCoordinates}&locationRadius=100km`;
+				locationWithCoordinates = `${coordinates.lat},${coordinates.lng}`;
 			}
 		}
-		await fetch(url, {
-			method: "GET",
+
+		await workflowClient.trigger({
+			url: "https://www.mangosqueezy.com/api/workflow",
+			body: {
+				product_id: Number(product_id),
+				pipeline_id: Number(pipeline_id),
+				affiliate_count: Number(affiliate_count),
+				difficulty,
+				platform,
+				location: locationWithCoordinates,
+				locationRadius: "100km",
+				email,
+			},
+			headers: {
+				"Content-Type": "application/json",
+			},
+			retries: 3,
 		});
 	} else if (platform === "instagram") {
 		const product = await getProductById(Number(product_id));

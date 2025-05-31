@@ -263,6 +263,7 @@ export default function Campaign({
 	platform,
 	plan,
 	location,
+	email,
 }: {
 	pipeline_id: number;
 	affiliates: Affiliate[];
@@ -274,6 +275,7 @@ export default function Campaign({
 	platform: Platform;
 	plan: string;
 	location: string;
+	email: string;
 }) {
 	const [selectedAffiliate, setSelectedAffiliate] = useState<Affiliate | null>(
 		null,
@@ -340,6 +342,7 @@ export default function Campaign({
 			difficulty: nextDifficulty,
 			platform,
 			location,
+			email,
 		});
 
 		if (platform !== "instagram") {
@@ -352,6 +355,7 @@ export default function Campaign({
 		difficulty,
 		platform,
 		location,
+		email,
 	]);
 
 	const handleDeleteAffiliate = (handle: string) => {

@@ -62,6 +62,7 @@ export default async function CampaignsPage(props: {
 				difficulty={difficulty}
 				platform={platform as Platform}
 				plan={plan}
+				email={user?.email as string}
 			/>
 		</div>
 	);

@@ -50,6 +50,7 @@ type CampaignSheetFormProps = {
 	business_id: string | null | undefined;
 	pipelineCount: number;
 	plan: string;
+	email: string;
 };
 
 const platforms = [
@@ -79,6 +80,7 @@ export default function CampaignForm({
 	business_id,
 	pipelineCount,
 	plan,
+	email,
 }: CampaignSheetFormProps) {
 	const router = useRouter();
 	const { setShowImportCsvModal, ImportCsvModal, setPlan, setUserId } =
@@ -133,7 +135,7 @@ export default function CampaignForm({
 
 		if (
 			pipelineCount >= programLimit ||
-			Number.parseInt(values.count) >= referralLimit
+			Number.parseInt(values.count) > referralLimit
 		) {
 			toast.info(
 				`You have reached the maximum number of ${
@@ -171,12 +173,18 @@ export default function CampaignForm({
 				type === "social_media" && platform === "youtube" && placeId
 					? placeId
 					: undefined,
+			email,
 		};
-		await createCampaignAction(data);
+		const { upstashWorkflowRunId } = await createCampaignAction(data);
 		router.refresh();
 		setIsLoading(false);
 		setOpen(false);
 		toast.dismiss(toastId);
+		if (upstashWorkflowRunId) {
+			toast.success(
+				"We are processing your request... You will receive an email when it's done.",
+			);
+		}
 	};
 
 	useEffect(() => {

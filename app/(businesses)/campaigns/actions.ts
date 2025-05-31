@@ -7,6 +7,7 @@ import { getProductById } from "@/models/products";
 import { createResource } from "@/services/createResource";
 import type { RunMode } from "@prisma/client";
 import { Redis } from "@upstash/redis";
+import { Client as WorkflowClient } from "@upstash/workflow";
 import { revalidatePath } from "next/cache";
 import { Resend } from "resend";
 
@@ -16,6 +17,10 @@ const UPSTASH_REDIS_REST_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 const redis = new Redis({
 	url: UPSTASH_REDIS_REST_URL!,
 	token: UPSTASH_REDIS_REST_TOKEN!,
+});
+
+const workflowClient = new WorkflowClient({
+	token: process.env.QSTASH_TOKEN as string,
 });
 
 export async function deletePipelineAction(id: number) {
@@ -43,6 +48,7 @@ export async function createCampaignAction(data: {
 	lead?: number;
 	click?: number;
 	sale?: number;
+	email: string;
 }) {
 	const pipeline = await createPipeline({
 		product_id: data.product_id,
@@ -63,6 +69,8 @@ export async function createCampaignAction(data: {
 	});
 
 	const platform_name = data.platform?.toLowerCase();
+	let locationWithCoordinates = "";
+	let upstashWorkflowRunId = "";
 
 	if (platform_name === "bluesky") {
 		await fetch(
@@ -72,7 +80,6 @@ export async function createCampaignAction(data: {
 			},
 		);
 	} else if (platform_name === "youtube") {
-		let url = `https://www.mangosqueezy.com/api/youtube/getSearchAffiliates?product_id=${data.product_id}&limit=100&pipeline_id=${pipeline?.id}&affiliate_count=${data.count}`;
 		if (data.placeId) {
 			const params = new URLSearchParams({
 				place_id: data.placeId,
@@ -94,15 +101,29 @@ export async function createCampaignAction(data: {
 			};
 
 			if (coordinates) {
-				const location = `${coordinates.lat},${coordinates.lng}`;
-
-				url += `&location=${location}&locationRadius=100km`;
+				locationWithCoordinates = `${coordinates.lat},${coordinates.lng}`;
 			}
 		}
 
-		await fetch(url, {
-			method: "GET",
+		const { workflowRunId } = await workflowClient.trigger({
+			url: "https://www.mangosqueezy.com/api/workflow",
+			body: {
+				product_id: data.product_id,
+				pipeline_id: pipeline?.id,
+				affiliate_count: data.count,
+				difficulty: "EASY",
+				platform: "youtube",
+				location: locationWithCoordinates,
+				locationRadius: "100km",
+				email: data.email,
+			},
+			headers: {
+				"Content-Type": "application/json",
+			},
+			retries: 3,
 		});
+
+		upstashWorkflowRunId = workflowRunId;
 	} else if (platform_name === "stripe") {
 		await fetch(
 			`https://www.mangosqueezy.com/api/stripe/customers?product_id=${data.product_id}&limit=100&pipeline_id=${pipeline?.id}&affiliate_count=${data.count}&connected_account_id=${data.connected_account_id}`,
@@ -125,7 +146,7 @@ export async function createCampaignAction(data: {
 
 	revalidatePath("/campaigns");
 
-	return pipeline;
+	return { pipeline, upstashWorkflowRunId };
 }
 
 export async function updateRunModeAction(data: {
