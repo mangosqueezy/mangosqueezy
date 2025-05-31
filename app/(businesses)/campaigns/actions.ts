@@ -1,7 +1,6 @@
 "use server";
 
 import type { Affiliate } from "@/app/(businesses)/campaigns/[slug]/campaign";
-import { EmailTemplate } from "@/components/mango-ui/email-template";
 import { createPipeline, deletePipelineById } from "@/models/pipeline";
 import { getProductById } from "@/models/products";
 import { createResource } from "@/services/createResource";
@@ -9,7 +8,6 @@ import type { RunMode } from "@prisma/client";
 import { Redis } from "@upstash/redis";
 import { Client as WorkflowClient } from "@upstash/workflow";
 import { revalidatePath } from "next/cache";
-import { Resend } from "resend";
 
 const UPSTASH_REDIS_REST_URL = process.env.UPSTASH_REDIS_REST_URL;
 const UPSTASH_REDIS_REST_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
@@ -50,7 +48,7 @@ export async function createCampaignAction(data: {
 	sale?: number;
 	email: string;
 }) {
-	const pipeline = await createPipeline({
+	const inputParameters = {
 		product_id: data.product_id,
 		prompt: "prompt",
 		affiliate_count: data.count,
@@ -60,7 +58,7 @@ export async function createCampaignAction(data: {
 		lead: data.lead,
 		click: data.click,
 		sale: data.sale,
-	});
+	};
 
 	const product = await getProductById(data.product_id);
 	await createResource({
@@ -73,6 +71,7 @@ export async function createCampaignAction(data: {
 	let upstashWorkflowRunId = "";
 
 	if (platform_name === "bluesky") {
+		const pipeline = await createPipeline(inputParameters);
 		await fetch(
 			`https://www.mangosqueezy.com/api/bluesky/getSearchAffiliates?product_id=${data.product_id}&limit=100&pipeline_id=${pipeline?.id}&affiliate_count=${data.count}`,
 			{
@@ -80,6 +79,7 @@ export async function createCampaignAction(data: {
 			},
 		);
 	} else if (platform_name === "youtube") {
+		const pipeline = await createPipeline(inputParameters);
 		if (data.placeId) {
 			const params = new URLSearchParams({
 				place_id: data.placeId,
@@ -116,6 +116,11 @@ export async function createCampaignAction(data: {
 				location: locationWithCoordinates,
 				locationRadius: "100km",
 				email: data.email,
+				business_id: data.business_id,
+				lead: data.lead,
+				click: data.click,
+				sale: data.sale,
+				type: "create-pipeline",
 			},
 			headers: {
 				"Content-Type": "application/json",
@@ -125,6 +130,7 @@ export async function createCampaignAction(data: {
 
 		upstashWorkflowRunId = workflowRunId;
 	} else if (platform_name === "stripe") {
+		const pipeline = await createPipeline(inputParameters);
 		await fetch(
 			`https://www.mangosqueezy.com/api/stripe/customers?product_id=${data.product_id}&limit=100&pipeline_id=${pipeline?.id}&affiliate_count=${data.count}&connected_account_id=${data.connected_account_id}`,
 			{
@@ -133,20 +139,9 @@ export async function createCampaignAction(data: {
 		);
 	}
 
-	const resend = new Resend(process.env.RESEND_API_KEY);
-	await resend.emails.send({
-		from: "mangosqueezy <amit@tapasom.com>",
-		to: ["amit@tapasom.com"],
-		subject: `Pipeline created with id ${pipeline?.id}`,
-		react: EmailTemplate({
-			firstName: "there",
-			text: "The user has created the Pipeline job",
-		}) as React.ReactElement,
-	});
-
 	revalidatePath("/campaigns");
 
-	return { pipeline, upstashWorkflowRunId };
+	return { upstashWorkflowRunId };
 }
 
 export async function updateRunModeAction(data: {

@@ -1,4 +1,5 @@
 import { EmailTemplate } from "@/components/mango-ui/email-template";
+import { createPipeline } from "@/models/pipeline";
 import { getProductById } from "@/models/products";
 import type { RunMode } from "@prisma/client";
 import { Redis } from "@upstash/redis";
@@ -100,16 +101,39 @@ type Input = {
 	location?: string;
 	locationRadius?: string;
 	email: string;
+	business_id: string;
+	lead: number;
+	click: number;
+	sale: number;
+	type: string;
 };
 
 export const { POST } = serve(
 	async (context) => {
 		const input = context.requestPayload as Input;
 
+		const pipeline = await context.run("create-pipeline", async () => {
+			if (input.type === "create-pipeline") {
+				const inputParameters = {
+					product_id: input.product_id,
+					prompt: "prompt",
+					affiliate_count: input.affiliate_count,
+					location: input.location ? input.location : "EARTH",
+					business_id: input.business_id,
+					workflow: input.platform || "Social Media",
+					lead: input.lead,
+					click: input.click,
+					sale: input.sale,
+				};
+				const pipeline = await createPipeline(inputParameters);
+				return pipeline;
+			}
+		});
+
 		const result = await context.run("call-youtube-api", async () => {
 			try {
 				const product_id = input.product_id;
-				const pipeline_id = input.pipeline_id;
+				const pipeline_id = pipeline?.id || input.pipeline_id;
 				const affiliate_count = input.affiliate_count;
 				const difficulty: string = input.difficulty;
 				const location = input.location;
@@ -243,11 +267,12 @@ export const { POST } = serve(
 
 		await context.run("send-email", async () => {
 			const resend = new Resend(process.env.RESEND_API_KEY);
+			const pipeline_id = pipeline?.id || input.pipeline_id;
 			if (result) {
 				await resend.emails.send({
 					from: "mangosqueezy <amit@tapasom.com>",
 					to: [input.email],
-					subject: `[mangoSqueezy] Your campaign with id ${input.pipeline_id} is ready`,
+					subject: `[mangoSqueezy] Your campaign with id ${pipeline_id} is ready`,
 					react: EmailTemplate({
 						firstName: "there",
 						text: "Your campaign is ready",
@@ -257,7 +282,7 @@ export const { POST } = serve(
 				await resend.emails.send({
 					from: "mangosqueezy <amit@tapasom.com>",
 					to: [input.email],
-					subject: `[mangoSqueezy] Your campaign with id ${input.pipeline_id} is failed`,
+					subject: `[mangoSqueezy] Your campaign with id ${pipeline_id} is failed`,
 					react: EmailTemplate({
 						firstName: "there",
 						text: "Your campaign is failed, We are working on it",
