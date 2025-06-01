@@ -7,7 +7,6 @@ import { Gradient, GradientBackground } from "@/components/mango-ui/gradient";
 import { Link } from "@/components/mango-ui/link";
 import { Navbar } from "@/components/mango-ui/navbar";
 import { Heading, Lead, Subheading } from "@/components/mango-ui/text";
-import { PRICE_IDS } from "@/lib/stripe/config";
 import { TIERS, cn, getPlanFromPriceId } from "@/lib/utils";
 import { useStore } from "@/store";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
@@ -38,9 +37,11 @@ function Header() {
 function PricingCards({
 	plan,
 	userId,
+	subscriptionStatus,
 }: {
 	plan: PricePlan | null | undefined;
 	userId: string | null | undefined;
+	subscriptionStatus: string | null;
 }) {
 	return (
 		<div className="relative py-24">
@@ -53,6 +54,7 @@ function PricingCards({
 							tier={tier}
 							plan={plan}
 							userId={userId}
+							subscriptionStatus={subscriptionStatus}
 						/>
 					))}
 				</div>
@@ -65,10 +67,12 @@ function PricingCard({
 	tier,
 	plan,
 	userId,
+	subscriptionStatus,
 }: {
 	tier: (typeof TIERS)[number];
 	plan: PricePlan | null | undefined;
 	userId: string | null | undefined;
+	subscriptionStatus: string | null;
 }) {
 	const setPricePlan = useStore((state) => state.setPricePlan);
 	const router = useRouter();
@@ -93,11 +97,15 @@ function PricingCard({
 							variant={
 								!userId
 									? "primary"
-									: plan === tier.slug
+									: plan === tier.slug && subscriptionStatus === "active"
 										? "secondary"
 										: "primary"
 							}
-							className={cn(plan === tier.slug && "cursor-not-allowed")}
+							className={cn(
+								plan === tier.slug && subscriptionStatus === "active"
+									? "cursor-not-allowed"
+									: "",
+							)}
 							onClick={() => {
 								setPricePlan(tier.slug);
 								if (userId) {
@@ -106,11 +114,15 @@ function PricingCard({
 									router.push(tier.href);
 								}
 							}}
-							disabled={!!userId && plan === tier.slug}
+							disabled={
+								!!userId &&
+								plan === tier.slug &&
+								subscriptionStatus === "active"
+							}
 						>
 							{!userId
 								? "Start 14 day free trial"
-								: plan === tier.slug
+								: plan === tier.slug && subscriptionStatus === "active"
 									? "Current plan"
 									: "Upgrade"}
 						</Button>
@@ -452,6 +464,9 @@ function FrequentlyAskedQuestions() {
 export default function Pricing() {
 	const [userId, setUserId] = useState<string | null>(null);
 	const [plan, setPlan] = useState<PricePlan | null | undefined>(null);
+	const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(
+		null,
+	);
 	useEffect(() => {
 		const fetchUser = async () => {
 			const user = await getUser();
@@ -463,6 +478,7 @@ export default function Pricing() {
 				);
 				const plan = getPlanFromPriceId(subscription.price_id);
 				setPlan(plan);
+				setSubscriptionStatus(subscription.status);
 			}
 		};
 
@@ -476,7 +492,11 @@ export default function Pricing() {
 				<Navbar userId={userId} />
 			</Container>
 			<Header />
-			<PricingCards plan={plan} userId={userId} />
+			<PricingCards
+				plan={plan}
+				userId={userId}
+				subscriptionStatus={subscriptionStatus}
+			/>
 			{/* <PricingTable selectedTier={tiers[0]} /> */}
 			{/* <Testimonial /> */}
 			<FrequentlyAskedQuestions />

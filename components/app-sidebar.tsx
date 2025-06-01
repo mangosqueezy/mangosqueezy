@@ -114,7 +114,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 						{
 							name: user.first_name ?? "",
 							logo: UserRound,
-							plan: plan,
+							plan: subscription.status === "active" ? plan : "",
 						},
 					]);
 				}

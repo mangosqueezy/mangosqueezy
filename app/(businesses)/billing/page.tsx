@@ -12,6 +12,7 @@ export default async function Billing() {
 	);
 	const plan = getPlanFromPriceId(subscription.price_id);
 	const subscriptionItemId = subscription.subscription_item_id;
+	const subscriptionStatus = subscription.status;
 
 	return (
 		<>
@@ -21,6 +22,7 @@ export default async function Billing() {
 				stripeCustomerId={stripeCustomerId}
 				stripeSubscriptionId={user?.stripe_subscription_id as string}
 				subscriptionItemId={subscriptionItemId}
+				subscriptionStatus={subscriptionStatus}
 			/>
 		</>
 	);

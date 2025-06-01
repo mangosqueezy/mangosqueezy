@@ -87,13 +87,17 @@ export async function updateSession(request: NextRequest) {
 		data?.[0]?.stripe_subscription_id,
 	);
 
-	if (subscription.status !== "active" && subscription.status !== "trialing") {
+	const pathname = new URL(request.url).pathname;
+	if (
+		subscription.status !== "active" &&
+		subscription.status !== "trialing" &&
+		pathname !== "/billing"
+	) {
 		return NextResponse.redirect(new URL("/billing", request.url), {
 			headers: request.headers,
 		});
 	}
 
-	const pathname = new URL(request.url).pathname;
 	if (data && data[0]?.commission <= 0 && pathname !== "/onboarding") {
 		return NextResponse.redirect(new URL("/onboarding", request.url), {
 			headers: request.headers,

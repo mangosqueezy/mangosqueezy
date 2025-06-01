@@ -24,11 +24,13 @@ function PricingCards({
 	stripeCustomerId,
 	stripeSubscriptionId,
 	subscriptionItemId,
+	subscriptionStatus,
 }: {
 	plan: PricePlan | null | undefined;
 	stripeCustomerId: string;
 	stripeSubscriptionId: string;
 	subscriptionItemId: string;
+	subscriptionStatus: string;
 }) {
 	return (
 		<div className="relative py-24">
@@ -42,6 +44,7 @@ function PricingCards({
 							stripeCustomerId={stripeCustomerId}
 							stripeSubscriptionId={stripeSubscriptionId}
 							subscriptionItemId={subscriptionItemId}
+							subscriptionStatus={subscriptionStatus}
 						/>
 					))}
 				</div>
@@ -56,12 +59,14 @@ function PricingCard({
 	subscriptionItemId,
 	tier,
 	plan,
+	subscriptionStatus,
 }: {
 	stripeCustomerId: string;
 	tier: (typeof TIERS)[number];
 	plan: PricePlan | null | undefined;
 	stripeSubscriptionId: string;
 	subscriptionItemId: string;
+	subscriptionStatus: string;
 }) {
 	const router = useRouter();
 	const [isLoading, setIsLoading] = useState(false);
@@ -109,18 +114,22 @@ function PricingCard({
 					</div>
 					<div className="mt-8">
 						<Button
-							variant={plan === tier.slug ? "secondary" : "primary"}
+							variant={
+								plan === tier.slug && subscriptionStatus === "active"
+									? "secondary"
+									: "primary"
+							}
 							className={cn(
-								plan === tier.slug
+								plan === tier.slug && subscriptionStatus === "active"
 									? "bg-gray-50 text-gray-950 cursor-not-allowed"
 									: "",
 							)}
 							onClick={updatePricePlanHandler}
-							disabled={plan === tier.slug}
+							disabled={plan === tier.slug && subscriptionStatus === "active"}
 						>
 							{isLoading ? (
 								<Loader className="size-4 animate-spin" />
-							) : plan === tier.slug ? (
+							) : plan === tier.slug && subscriptionStatus === "active" ? (
 								"Current plan"
 							) : (
 								"Upgrade"
@@ -180,11 +189,13 @@ export default function Plan({
 	stripeCustomerId,
 	stripeSubscriptionId,
 	subscriptionItemId,
+	subscriptionStatus,
 }: {
 	plan: PricePlan | null | undefined;
 	stripeCustomerId: string;
 	stripeSubscriptionId: string;
 	subscriptionItemId: string;
+	subscriptionStatus: string;
 }) {
 	const router = useRouter();
 	const [isLoading, setIsLoading] = useState(false);
@@ -248,11 +259,16 @@ export default function Plan({
 				We work with Stripe for payment processing and never keep your payment
 				information in our database.
 			</p>
+			<p className="mt-2 text-sm/6 text-gray-950/75 px-6 lg:px-8">
+				Your subscription status is{" "}
+				<span className="font-bold">{subscriptionStatus}</span>.
+			</p>
 			<PricingCards
 				plan={plan}
 				stripeCustomerId={stripeCustomerId}
 				stripeSubscriptionId={stripeSubscriptionId}
 				subscriptionItemId={subscriptionItemId}
+				subscriptionStatus={subscriptionStatus}
 			/>
 		</main>
 	);
