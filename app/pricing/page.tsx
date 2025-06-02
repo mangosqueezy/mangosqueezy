@@ -97,12 +97,16 @@ function PricingCard({
 							variant={
 								!userId
 									? "primary"
-									: plan === tier.slug && subscriptionStatus === "active"
+									: plan === tier.slug &&
+											(subscriptionStatus === "active" ||
+												subscriptionStatus === "trialing")
 										? "secondary"
 										: "primary"
 							}
 							className={cn(
-								plan === tier.slug && subscriptionStatus === "active"
+								plan === tier.slug &&
+									(subscriptionStatus === "active" ||
+										subscriptionStatus === "trialing")
 									? "cursor-not-allowed"
 									: "",
 							)}
@@ -117,12 +121,15 @@ function PricingCard({
 							disabled={
 								!!userId &&
 								plan === tier.slug &&
-								subscriptionStatus === "active"
+								(subscriptionStatus === "active" ||
+									subscriptionStatus === "trialing")
 							}
 						>
 							{!userId
 								? "Start 14 day free trial"
-								: plan === tier.slug && subscriptionStatus === "active"
+								: plan === tier.slug &&
+										(subscriptionStatus === "active" ||
+											subscriptionStatus === "trialing")
 									? "Current plan"
 									: "Upgrade"}
 						</Button>

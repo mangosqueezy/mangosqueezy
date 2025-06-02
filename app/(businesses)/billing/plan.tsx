@@ -115,21 +115,27 @@ function PricingCard({
 					<div className="mt-8">
 						<Button
 							variant={
-								plan === tier.slug && subscriptionStatus === "active"
+								(plan === tier.slug && subscriptionStatus === "active") ||
+								subscriptionStatus === "trialing"
 									? "secondary"
 									: "primary"
 							}
 							className={cn(
-								plan === tier.slug && subscriptionStatus === "active"
+								(plan === tier.slug && subscriptionStatus === "active") ||
+									subscriptionStatus === "trialing"
 									? "bg-gray-50 text-gray-950 cursor-not-allowed"
 									: "",
 							)}
 							onClick={updatePricePlanHandler}
-							disabled={plan === tier.slug && subscriptionStatus === "active"}
+							disabled={
+								(plan === tier.slug && subscriptionStatus === "active") ||
+								subscriptionStatus === "trialing"
+							}
 						>
 							{isLoading ? (
 								<Loader className="size-4 animate-spin" />
-							) : plan === tier.slug && subscriptionStatus === "active" ? (
+							) : (plan === tier.slug && subscriptionStatus === "active") ||
+								subscriptionStatus === "trialing" ? (
 								"Current plan"
 							) : (
 								"Upgrade"
