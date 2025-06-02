@@ -119,6 +119,7 @@ export const { POST } = serve(
 					prompt: "prompt",
 					affiliate_count: input.affiliate_count,
 					location: input.location ? input.location : "EARTH",
+					locationRadius: input.locationRadius ? input.locationRadius : "100km",
 					business_id: input.business_id,
 					workflow: input.platform || "Social Media",
 					lead: input.lead,

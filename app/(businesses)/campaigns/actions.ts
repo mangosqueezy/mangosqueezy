@@ -47,6 +47,7 @@ export async function createCampaignAction(data: {
 	click?: number;
 	sale?: number;
 	email: string;
+	locationRadius?: string;
 }) {
 	const inputParameters = {
 		product_id: data.product_id,
@@ -112,7 +113,7 @@ export async function createCampaignAction(data: {
 				difficulty: "EASY",
 				platform: "youtube",
 				location: locationWithCoordinates,
-				locationRadius: "100km",
+				locationRadius: data.locationRadius || "100km",
 				email: data.email,
 				business_id: data.business_id,
 				lead: data.lead,

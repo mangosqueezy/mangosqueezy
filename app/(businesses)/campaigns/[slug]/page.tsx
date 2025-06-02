@@ -59,6 +59,7 @@ export default async function CampaignsPage(props: {
 				pipeline_id={pipeline?.id as number}
 				affiliate_count={pipeline?.affiliate_count || 0}
 				location={pipeline?.location || ""}
+				locationRadius={pipeline?.location_radius || "100km"}
 				difficulty={difficulty}
 				platform={platform as Platform}
 				plan={plan}

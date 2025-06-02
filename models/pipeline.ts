@@ -11,6 +11,7 @@ export async function createPipeline({
 	lead = 0,
 	click = 0,
 	sale = 0,
+	locationRadius = "100km",
 }: {
 	product_id: number;
 	prompt: string;
@@ -21,6 +22,7 @@ export async function createPipeline({
 	lead?: number;
 	click?: number;
 	sale?: number;
+	locationRadius?: string;
 }) {
 	try {
 		return await prisma.pipelines.create({
@@ -35,6 +37,7 @@ export async function createPipeline({
 				lead,
 				click,
 				sale,
+				location_radius: locationRadius,
 			},
 		});
 	} catch (err) {

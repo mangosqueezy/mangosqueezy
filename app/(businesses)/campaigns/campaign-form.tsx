@@ -65,6 +65,7 @@ type FormValues = {
 	click: string;
 	sale: string;
 	platform?: string;
+	locationRadius?: string;
 };
 
 interface GooglePlaceSuggestion {
@@ -116,6 +117,7 @@ export default function CampaignForm({
 			click: "",
 			sale: "",
 			platform: "",
+			locationRadius: "100",
 		},
 		mode: "onBlur",
 	});
@@ -174,6 +176,10 @@ export default function CampaignForm({
 					? placeId
 					: undefined,
 			email,
+			locationRadius:
+				type === "social_media" && platform === "youtube"
+					? `${values.locationRadius || "100"}km`
+					: undefined,
 		};
 		const { upstashWorkflowRunId } = await createCampaignAction(data);
 		router.refresh();
@@ -413,58 +419,85 @@ export default function CampaignForm({
 									/>
 								)}
 								{type === "social_media" && selectedPlatform === "youtube" && (
-									<FormItem className="relative">
-										<FormLabel>Location</FormLabel>
-										<FormControl>
-											<div>
-												<Input
-													ref={inputRef}
-													placeholder="Enter a location (city, address, etc.)"
-													value={location}
-													onChange={(e) => {
-														const value = e.target.value;
-														setLocation(value);
-														setLocationError("");
-													}}
-													autoComplete="off"
-												/>
-												{showSuggestions && suggestions.length > 0 && (
-													<ul className="absolute z-10 bg-white border border-gray-200 w-full mt-1 rounded shadow max-h-48 overflow-auto">
-														{suggestions.map((s, idx) => (
-															<li
-																key={s.place_id || idx}
-																className="px-0 py-0 text-sm text-neutral-800"
-															>
-																<button
-																	type="button"
-																	className="w-full text-left px-3 py-2 cursor-pointer hover:bg-gray-100"
-																	onClick={() => handleSelectSuggestion(s)}
-																	onKeyDown={(e) => {
-																		if (e.key === "Enter" || e.key === " ") {
-																			e.preventDefault();
-																			handleSelectSuggestion(s);
-																		}
-																	}}
+									<>
+										<FormItem className="relative">
+											<FormLabel>Location</FormLabel>
+											<FormControl>
+												<div>
+													<Input
+														ref={inputRef}
+														placeholder="Enter a location (city, address, etc.)"
+														value={location}
+														onChange={(e) => {
+															const value = e.target.value;
+															setLocation(value);
+															setLocationError("");
+														}}
+														autoComplete="off"
+													/>
+													{showSuggestions && suggestions.length > 0 && (
+														<ul className="absolute z-10 bg-white border border-gray-200 w-full mt-1 rounded shadow max-h-48 overflow-auto">
+															{suggestions.map((s, idx) => (
+																<li
+																	key={s.place_id || idx}
+																	className="px-0 py-0 text-sm text-neutral-800"
 																>
-																	{s.description}
-																</button>
-															</li>
-														))}
-													</ul>
-												)}
-											</div>
-										</FormControl>
-										{(locationLoading || isPending) && (
-											<div className="text-xs text-gray-500">
-												Fetching suggestions...
-											</div>
-										)}
-										{locationError && (
-											<div className="text-xs text-red-500">
-												{locationError}
-											</div>
-										)}
-									</FormItem>
+																	<button
+																		type="button"
+																		className="w-full text-left px-3 py-2 cursor-pointer hover:bg-gray-100"
+																		onClick={() => handleSelectSuggestion(s)}
+																		onKeyDown={(e) => {
+																			if (e.key === "Enter" || e.key === " ") {
+																				e.preventDefault();
+																				handleSelectSuggestion(s);
+																			}
+																		}}
+																	>
+																		{s.description}
+																	</button>
+																</li>
+															))}
+														</ul>
+													)}
+												</div>
+											</FormControl>
+											{(locationLoading || isPending) && (
+												<div className="text-xs text-gray-500">
+													Fetching suggestions...
+												</div>
+											)}
+											{locationError && (
+												<div className="text-xs text-red-500">
+													{locationError}
+												</div>
+											)}
+										</FormItem>
+										<FormField
+											control={form.control}
+											name="locationRadius"
+											rules={{
+												min: { value: 1, message: "Must be at least 1km" },
+											}}
+											render={({ field }) => (
+												<FormItem>
+													<FormLabel>Location Radius (km)</FormLabel>
+													<FormControl>
+														<Input
+															type="number"
+															min={1}
+															{...field}
+															placeholder="Enter radius in kilometers"
+														/>
+													</FormControl>
+													<FormDescription className="text-xs text-muted-foreground">
+														Specify the radius (in kilometers) around the
+														selected location to capture affiliates.
+													</FormDescription>
+													<FormMessage />
+												</FormItem>
+											)}
+										/>
+									</>
 								)}
 								<Button
 									type="submit"

@@ -228,6 +228,7 @@ export async function getAffiliatesAction({
 	platform,
 	location,
 	email,
+	locationRadius,
 }: {
 	product_id: string;
 	pipeline_id: string;
@@ -236,6 +237,7 @@ export async function getAffiliatesAction({
 	platform: string;
 	location: string;
 	email: string;
+	locationRadius: string;
 }) {
 	let locationWithCoordinates = "";
 	if (platform === "bluesky") {
@@ -280,7 +282,7 @@ export async function getAffiliatesAction({
 				difficulty,
 				platform,
 				location: locationWithCoordinates,
-				locationRadius: "100km",
+				locationRadius,
 				email,
 			},
 			headers: {
