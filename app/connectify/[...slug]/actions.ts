@@ -63,7 +63,7 @@ export async function checkAndCreateAffiliate(formData: FormData) {
 			const squzyResponse = await response.json();
 
 			const affiliate_link = squzyResponse.shortLink;
-			const affiliate_link_key = squzyResponse.key;
+			const affiliate_link_key = squzyResponse.id;
 
 			await createAffiliateBusiness({
 				business_id,
@@ -115,7 +115,7 @@ export async function checkAndCreateAffiliate(formData: FormData) {
 		const squzyResponse = await response.json();
 
 		const affiliate_link = squzyResponse.shortLink;
-		const affiliate_link_key = squzyResponse.key;
+		const affiliate_link_key = squzyResponse.id;
 
 		await createAffiliateBusiness({
 			business_id,
