@@ -1,7 +1,7 @@
 "use server";
 
 import AffiliateEmailTemplate from "@/components/mango-ui/affiliate-email-template";
-import { getAffiliateBusinessInfoById } from "@/models/affiliate_business";
+import { getAffiliateBusinessInfoByProductId } from "@/models/affiliate_business";
 import {
 	createAffiliate,
 	createAffiliateBusiness,
@@ -30,16 +30,16 @@ export async function checkAndCreateAffiliate(formData: FormData) {
 		const affiliateInformation = await getAffiliateByEmail(email);
 
 		if (affiliateInformation) {
-			const affiliateBusinessInformation = await getAffiliateBusinessInfoById(
-				business_id,
-				affiliateInformation.id,
-			);
+			const affiliateBusinessInformation =
+				await getAffiliateBusinessInfoByProductId(
+					business_id,
+					affiliateInformation.id,
+					Number(product_id),
+				);
 
 			const isAffiliateAlreadyPartner =
 				affiliateBusinessInformation?.affiliate.email === email &&
-				affiliateBusinessInformation?.business.products.some(
-					(product) => product.id === Number(product_id),
-				);
+				affiliateBusinessInformation?.product_id === Number(product_id);
 
 			if (isAffiliateAlreadyPartner) {
 				return "You are already a partner for this product with this business";

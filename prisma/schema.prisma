@@ -108,7 +108,7 @@ model Affiliate_Business {
   products  Products?  @relation(fields: [product_id], references: [id])
   pipelines Pipelines? @relation(fields: [pipeline_id], references: [id])
 
-  @@unique([business_id, affiliate_id])
+  @@unique([business_id, affiliate_id, product_id])
   @@index([business_id], map: "business_id")
   @@index([affiliate_id], map: "affiliate_id")
   @@schema("public")
