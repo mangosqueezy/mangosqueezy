@@ -7,7 +7,6 @@ import {
 	createAffiliateBusiness,
 	getAffiliateByEmail,
 } from "@/models/affiliates";
-import { Dub } from "dub";
 import { Resend } from "resend";
 
 const defaultSocialMediaProfiles = {
@@ -16,7 +15,7 @@ const defaultSocialMediaProfiles = {
 	instagram: "",
 };
 
-const DUB_API_KEY = process.env.DUB_API_KEY;
+const SQUZY_API_KEY = process.env.SQUZY_API_KEY;
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function checkAndCreateAffiliate(formData: FormData) {
@@ -46,16 +45,25 @@ export async function checkAndCreateAffiliate(formData: FormData) {
 				return "You are already a partner for this product with this business";
 			}
 
-			const dub = new Dub({
-				token: DUB_API_KEY as string,
-			});
 			const affiliateLink = `https://www.mangosqueezy.com/buy/${affiliateInformation.id}/${product_id}`;
-			const dubResponse = await dub.links.upsert({
-				url: affiliateLink,
-			});
+			const options = {
+				method: "PUT",
+				headers: {
+					Authorization: `Bearer ${SQUZY_API_KEY}`,
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					url: affiliateLink,
+				}),
+			};
+			const response = await fetch(
+				"https://api.squzy.link/links/upsert",
+				options,
+			);
+			const squzyResponse = await response.json();
 
-			const affiliate_link = dubResponse.shortLink;
-			const affiliate_link_key = dubResponse.key;
+			const affiliate_link = squzyResponse.shortLink;
+			const affiliate_link_key = squzyResponse.key;
 
 			await createAffiliateBusiness({
 				business_id,
@@ -89,16 +97,25 @@ export async function checkAndCreateAffiliate(formData: FormData) {
 			wallet_address: "",
 		});
 
-		const dub = new Dub({
-			token: DUB_API_KEY as string,
-		});
 		const affiliateLink = `https://www.mangosqueezy.com/buy/${affiliate?.[0]?.id}/${product_id}`;
-		const dubResponse = await dub.links.upsert({
-			url: affiliateLink,
-		});
+		const options = {
+			method: "PUT",
+			headers: {
+				Authorization: `Bearer ${SQUZY_API_KEY}`,
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				url: affiliateLink,
+			}),
+		};
+		const response = await fetch(
+			"https://api.squzy.link/links/upsert",
+			options,
+		);
+		const squzyResponse = await response.json();
 
-		const affiliate_link = dubResponse.shortLink;
-		const affiliate_link_key = dubResponse.key;
+		const affiliate_link = squzyResponse.shortLink;
+		const affiliate_link_key = squzyResponse.key;
 
 		await createAffiliateBusiness({
 			business_id,
