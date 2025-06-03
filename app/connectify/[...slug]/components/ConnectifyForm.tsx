@@ -2,6 +2,22 @@
 
 import { CustomToast } from "@/components/mango-ui/custom-toast";
 import { Badge } from "@/components/ui/badge";
+import {
+	Form,
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Products } from "@prisma/client";
 import { motion } from "framer-motion";
@@ -107,75 +123,67 @@ export function ConnectifyForm({
 	const renderNewUserProductSelect = (
 		form: UseFormReturn<NewUserFormInputs>,
 	) => (
-		<div>
-			<label
-				htmlFor="productId"
-				className="block text-sm font-medium text-gray-700"
-			>
-				Select Product
-			</label>
-			<select
-				{...form.register("productId", {
-					required: "Please select a product",
-				})}
-				className="mt-1 block w-full rounded-lg border-gray-300 bg-white shadow-sm 
-					 focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50
-					 transition duration-200"
-			>
-				<option value="">Select a product</option>
-				{products.map((product) => (
-					<option key={product.id} value={product.id}>
-						{product.name}
-					</option>
-				))}
-			</select>
-			{form.formState.errors.productId && (
-				<motion.p
-					initial={{ opacity: 0, y: -10 }}
-					animate={{ opacity: 1, y: 0 }}
-					className="mt-2 text-sm text-red-600"
-				>
-					{String(form.formState.errors.productId.message)}
-				</motion.p>
+		<FormField
+			control={form.control}
+			name="productId"
+			render={({ field }) => (
+				<FormItem>
+					<FormLabel>Select Product</FormLabel>
+					<Select
+						onValueChange={field.onChange}
+						value={field.value}
+						defaultValue={field.value}
+					>
+						<FormControl>
+							<SelectTrigger>
+								<SelectValue placeholder="Select a product" />
+							</SelectTrigger>
+						</FormControl>
+						<SelectContent>
+							{products.map((product) => (
+								<SelectItem key={product.id} value={product.id.toString()}>
+									{product.name}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+					<FormMessage />
+				</FormItem>
 			)}
-		</div>
+		/>
 	);
 
 	const renderExistingUserProductSelect = (
 		form: UseFormReturn<ExistingUserFormInputs>,
 	) => (
-		<div>
-			<label
-				htmlFor="productId"
-				className="block text-sm font-medium text-gray-700"
-			>
-				Select Product
-			</label>
-			<select
-				{...form.register("productId", {
-					required: "Please select a product",
-				})}
-				className="mt-1 block w-full rounded-lg border-gray-300 bg-white shadow-sm 
-					 focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50
-					 transition duration-200"
-			>
-				<option value="">Select a product</option>
-				{products.map((product) => (
-					<option key={product.id} value={product.id}>
-						{product.name}
-					</option>
-				))}
-			</select>
-			{form.formState.errors.productId && (
-				<motion.p
-					initial={{ opacity: 0, y: -10 }}
-					animate={{ opacity: 1, y: 0 }}
-					className="mt-2 text-sm text-red-600"
-				>
-					{String(form.formState.errors.productId.message)}
-				</motion.p>
+		<FormField
+			control={form.control}
+			name="productId"
+			render={({ field }) => (
+				<FormItem>
+					<FormLabel>Select Product</FormLabel>
+					<Select
+						onValueChange={field.onChange}
+						value={field.value}
+						defaultValue={field.value}
+					>
+						<FormControl>
+							<SelectTrigger>
+								<SelectValue placeholder="Select a product" />
+							</SelectTrigger>
+						</FormControl>
+						<SelectContent>
+							{products.map((product) => (
+								<SelectItem key={product.id} value={product.id.toString()}>
+									{product.name}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+					<FormMessage />
+				</FormItem>
 			)}
-		</div>
+		/>
 	);
 
 	return (
@@ -209,12 +217,9 @@ export function ConnectifyForm({
 				{/* Form Section */}
 				<div className="bg-gray-50 p-8 md:p-12 min-h-screen">
 					<div className="max-w-md mx-auto">
-						<Badge className="text-sm font-semibold mb-3 text-center bg-orange-300 text-orange-800">
+						<Badge className="text-sm font-semibold mb-3 text-center bg-orange-300 text-orange-800 mb-5">
 							Connectify
 						</Badge>
-						<h2 className="text-2xl font-semibold mb-6 text-gray-800">
-							Personal Information
-						</h2>
 
 						<Tabs
 							defaultValue="new"
@@ -229,171 +234,113 @@ export function ConnectifyForm({
 							</TabsList>
 
 							<TabsContent value="new">
-								<form
-									onSubmit={newUserForm.handleSubmit(onSubmit)}
-									className="space-y-6"
-								>
-									<div className="space-y-4">
-										<div>
-											<label
-												htmlFor="firstName"
-												className="block text-sm font-medium text-gray-700"
-											>
-												First Name
-											</label>
-											<input
-												{...newUserForm.register("firstName", {
-													required: "First name is required",
-												})}
-												type="text"
-												className="mt-1 block w-full rounded-lg border-gray-300 bg-white shadow-sm 
-													focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50
-													transition duration-200"
-												placeholder="John"
-											/>
-											{newUserForm.formState.errors.firstName && (
-												<motion.p
-													initial={{ opacity: 0, y: -10 }}
-													animate={{ opacity: 1, y: 0 }}
-													className="mt-2 text-sm text-red-600"
-												>
-													{newUserForm.formState.errors.firstName.message}
-												</motion.p>
-											)}
-										</div>
-
-										<div>
-											<label
-												htmlFor="lastName"
-												className="block text-sm font-medium text-gray-700"
-											>
-												Last Name
-											</label>
-											<input
-												{...newUserForm.register("lastName", {
-													required: "Last name is required",
-												})}
-												type="text"
-												className="mt-1 block w-full rounded-lg border-gray-300 bg-white shadow-sm 
-													focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50
-													transition duration-200"
-												placeholder="Doe"
-											/>
-											{newUserForm.formState.errors.lastName && (
-												<motion.p
-													initial={{ opacity: 0, y: -10 }}
-													animate={{ opacity: 1, y: 0 }}
-													className="mt-2 text-sm text-red-600"
-												>
-													{newUserForm.formState.errors.lastName.message}
-												</motion.p>
-											)}
-										</div>
-
-										<div>
-											<label
-												htmlFor="email"
-												className="block text-sm font-medium text-gray-700"
-											>
-												Email Address
-											</label>
-											<input
-												{...newUserForm.register("email", {
-													required: "Email is required",
-													pattern: {
-														value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-														message: "Invalid email address",
-													},
-												})}
-												type="email"
-												className="mt-1 block w-full rounded-lg border-gray-300 bg-white shadow-sm 
-													focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50
-													transition duration-200"
-												placeholder="john.doe@example.com"
-											/>
-											{newUserForm.formState.errors.email && (
-												<motion.p
-													initial={{ opacity: 0, y: -10 }}
-													animate={{ opacity: 1, y: 0 }}
-													className="mt-2 text-sm text-red-600"
-												>
-													{newUserForm.formState.errors.email.message}
-												</motion.p>
-											)}
-										</div>
-
-										{renderNewUserProductSelect(newUserForm)}
-									</div>
-
-									<motion.button
-										whileHover={{ scale: 1.02 }}
-										whileTap={{ scale: 0.98 }}
-										type="submit"
-										disabled={submitting}
-										className={`w-full bg-linear-to-r from-orange-500 to-orange-600 text-white py-3 px-4 
-											rounded-lg font-medium hover:from-orange-600 hover:to-orange-700 
-											focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 
-											transition duration-200 ${submitting ? "opacity-50 cursor-not-allowed" : ""}`}
+								<Form {...newUserForm}>
+									<form
+										onSubmit={newUserForm.handleSubmit(onSubmit)}
+										className="space-y-6"
 									>
-										{submitting ? "Submitting..." : "Submit"}
-									</motion.button>
-								</form>
+										<div className="space-y-4">
+											<FormField
+												control={newUserForm.control}
+												name="firstName"
+												render={({ field }) => (
+													<FormItem>
+														<FormLabel>First Name</FormLabel>
+														<FormControl>
+															<Input placeholder="John" {...field} />
+														</FormControl>
+														<FormMessage />
+													</FormItem>
+												)}
+											/>
+											<FormField
+												control={newUserForm.control}
+												name="lastName"
+												render={({ field }) => (
+													<FormItem>
+														<FormLabel>Last Name</FormLabel>
+														<FormControl>
+															<Input placeholder="Doe" {...field} />
+														</FormControl>
+														<FormMessage />
+													</FormItem>
+												)}
+											/>
+											<FormField
+												control={newUserForm.control}
+												name="email"
+												render={({ field }) => (
+													<FormItem>
+														<FormLabel>Email Address</FormLabel>
+														<FormControl>
+															<Input
+																type="email"
+																placeholder="john.doe@example.com"
+																{...field}
+															/>
+														</FormControl>
+														<FormMessage />
+													</FormItem>
+												)}
+											/>
+											{renderNewUserProductSelect(newUserForm)}
+										</div>
+										<motion.button
+											whileHover={{ scale: 1.02 }}
+											whileTap={{ scale: 0.98 }}
+											type="submit"
+											disabled={submitting}
+											className={`w-full bg-linear-to-r from-orange-500 to-orange-600 text-white py-3 px-4 
+												rounded-lg font-medium hover:from-orange-600 hover:to-orange-700 
+												focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 
+												transition duration-200 ${submitting ? "opacity-50 cursor-not-allowed" : ""}`}
+										>
+											{submitting ? "Submitting..." : "Submit"}
+										</motion.button>
+									</form>
+								</Form>
 							</TabsContent>
 
 							<TabsContent value="existing">
-								<form
-									onSubmit={existingUserForm.handleSubmit(onSubmit)}
-									className="space-y-6"
-								>
-									<div className="space-y-4">
-										<div>
-											<label
-												htmlFor="email"
-												className="block text-sm font-medium text-gray-700"
-											>
-												Email Address
-											</label>
-											<input
-												{...existingUserForm.register("email", {
-													required: "Email is required",
-													pattern: {
-														value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-														message: "Invalid email address",
-													},
-												})}
-												type="email"
-												className="mt-1 block w-full rounded-lg border-gray-300 bg-white shadow-sm 
-													focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50
-													transition duration-200"
-												placeholder="john.doe@example.com"
-											/>
-											{existingUserForm.formState.errors.email && (
-												<motion.p
-													initial={{ opacity: 0, y: -10 }}
-													animate={{ opacity: 1, y: 0 }}
-													className="mt-2 text-sm text-red-600"
-												>
-													{existingUserForm.formState.errors.email.message}
-												</motion.p>
-											)}
-										</div>
-
-										{renderExistingUserProductSelect(existingUserForm)}
-									</div>
-
-									<motion.button
-										whileHover={{ scale: 1.02 }}
-										whileTap={{ scale: 0.98 }}
-										type="submit"
-										disabled={submitting}
-										className={`w-full bg-linear-to-r from-orange-500 to-orange-600 text-white py-3 px-4 
-											rounded-lg font-medium hover:from-orange-600 hover:to-orange-700 
-											focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 
-											transition duration-200 ${submitting ? "opacity-50 cursor-not-allowed" : ""}`}
+								<Form {...existingUserForm}>
+									<form
+										onSubmit={existingUserForm.handleSubmit(onSubmit)}
+										className="space-y-6"
 									>
-										{submitting ? "Submitting..." : "Submit"}
-									</motion.button>
-								</form>
+										<div className="space-y-4">
+											<FormField
+												control={existingUserForm.control}
+												name="email"
+												render={({ field }) => (
+													<FormItem>
+														<FormLabel>Email Address</FormLabel>
+														<FormControl>
+															<Input
+																type="email"
+																placeholder="john.doe@example.com"
+																{...field}
+															/>
+														</FormControl>
+														<FormMessage />
+													</FormItem>
+												)}
+											/>
+											{renderExistingUserProductSelect(existingUserForm)}
+										</div>
+										<motion.button
+											whileHover={{ scale: 1.02 }}
+											whileTap={{ scale: 0.98 }}
+											type="submit"
+											disabled={submitting}
+											className={`w-full bg-linear-to-r from-orange-500 to-orange-600 text-white py-3 px-4 
+												rounded-lg font-medium hover:from-orange-600 hover:to-orange-700 
+												focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 
+												transition duration-200 ${submitting ? "opacity-50 cursor-not-allowed" : ""}`}
+										>
+											{submitting ? "Submitting..." : "Submit"}
+										</motion.button>
+									</form>
+								</Form>
 							</TabsContent>
 						</Tabs>
 					</div>
