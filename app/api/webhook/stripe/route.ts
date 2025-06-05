@@ -27,6 +27,16 @@ export async function POST(request: Request) {
 			const stripeEventResult: Stripe.Invoice = event.data.object;
 			const customer_email = stripeEventResult?.customer_email;
 
+			const subscriptionId = stripeEventResult?.id;
+			const subscription = await stripe.subscriptions.retrieve(
+				subscriptionId || "",
+			);
+
+			const emailText =
+				subscription.status === "trialing"
+					? "We are delighted to inform you that your trial period has started. You will have access to all features for starter plan during this time"
+					: "We are delighted to inform you that your payment has been successfully processed";
+
 			if (!isEmpty(customer_email)) {
 				await resend.emails.send({
 					from: "amit@tapasom.com",
@@ -35,7 +45,7 @@ export async function POST(request: Request) {
 					html: `
             <div class="container">
               <p>Dear Customer,</p>
-              <p>We are delighted to inform you that your payment has been successfully processed. Thank you for choosing mangosqueezy.</p>
+              <p>${emailText}. Thank you for choosing mangosqueezy.</p>
               <p>If you have any questions regarding your payment, or if you encounter any issues, please do not hesitate to contact our customer support team at amit@tapasom.com. We are here to assist you and ensure you have a seamless experience.</p>
               <p>Once again, thank you for being a part of mangosqueezy. We look forward to serving you and providing you with an exceptional experience.</p>
               <p>Best regards,</p>

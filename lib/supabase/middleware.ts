@@ -54,6 +54,7 @@ export async function updateSession(request: NextRequest) {
 
 	const business = data?.[0];
 	const hasNoStripeCustomer = !business?.stripe_customer_id;
+	let stripeSubscriptionId = data?.[0]?.stripe_subscription_id;
 
 	if (business && hasNoStripeCustomer) {
 		// create a new subscription
@@ -68,6 +69,9 @@ export async function updateSession(request: NextRequest) {
 					price: PRICE_IDS.Starter,
 				},
 			],
+			metadata: {
+				plan: "trial_period",
+			},
 			trial_period_days: 14,
 		});
 
@@ -81,11 +85,12 @@ export async function updateSession(request: NextRequest) {
 				stripe_subscription_id: subscription.id,
 			})
 			.eq("id", result.data.user?.id);
+
+		stripeSubscriptionId = subscription.id;
 	}
 
-	const subscription = await stripe.subscriptions.retrieve(
-		data?.[0]?.stripe_subscription_id,
-	);
+	const subscription =
+		await stripe.subscriptions.retrieve(stripeSubscriptionId);
 
 	const pathname = new URL(request.url).pathname;
 	if (
