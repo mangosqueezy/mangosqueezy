@@ -64,6 +64,7 @@ type TCheckout = {
 	affiliateId: number | undefined;
 	moonpayEnabled: boolean;
 	realTimePaymentsEnabled: boolean;
+	stripeConnectedAccount: string;
 };
 
 export default function Checkout({
@@ -72,6 +73,7 @@ export default function Checkout({
 	affiliateId,
 	moonpayEnabled,
 	realTimePaymentsEnabled,
+	stripeConnectedAccount,
 }: TCheckout) {
 	const [isExpanded, setIsExpanded] = useState(false);
 	const analytics = useJune(process.env.NEXT_PUBLIC_JUNE_API_KEY!);
@@ -210,6 +212,7 @@ export default function Checkout({
 			formData.append("product_id", productId.toString());
 			formData.append("affiliate_id", parsedAffiliateId.toString());
 			formData.append("price_type", product?.price_type as string);
+			formData.append("stripe_connected_account", stripeConnectedAccount);
 
 			const quantity = form.getValues("quantity");
 			if (quantity !== undefined) {

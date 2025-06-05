@@ -19,7 +19,7 @@ const AffiliateEmailTemplate = (props: { affiliateLink: string }) => {
 		<Html>
 			<Head />
 			<Preview>
-				Thank you for promoting our products! Here's your affiliate link.
+				Thank you for promoting our product! Here's your affiliate link.
 			</Preview>
 			<Tailwind>
 				<Body className="bg-gray-100 font-sans">
@@ -40,7 +40,7 @@ const AffiliateEmailTemplate = (props: { affiliateLink: string }) => {
 
 								<Text className="text-[16px] leading-[24px] text-gray-700">
 									We wanted to take a moment to express our sincere gratitude
-									for promoting our products. Your support has been instrumental
+									for promoting our product. Your support has been instrumental
 									in helping us grow our business and reach new customers.
 								</Text>
 

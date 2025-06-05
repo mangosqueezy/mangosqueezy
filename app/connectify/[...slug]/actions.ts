@@ -79,7 +79,7 @@ export async function checkAndCreateAffiliate(formData: FormData) {
 				to: [email],
 				replyTo: "amit@tapasom.com",
 				subject:
-					"Thank you for promoting our products! Here's your affiliate link.",
+					"Thank you for promoting our product! Here's your affiliate link.",
 				react: AffiliateEmailTemplate({
 					affiliateLink: affiliate_link,
 				}) as React.ReactElement,
@@ -131,7 +131,7 @@ export async function checkAndCreateAffiliate(formData: FormData) {
 			to: [email],
 			replyTo: "amit@tapasom.com",
 			subject:
-				"Thank you for promoting our products! Here's your affiliate link.",
+				"Thank you for promoting our product! Here's your affiliate link.",
 			react: AffiliateEmailTemplate({
 				affiliateLink: affiliate_link,
 			}) as React.ReactElement,

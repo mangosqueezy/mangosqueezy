@@ -1,5 +1,6 @@
 import { isMoonpayEnabled, isRealTimePaymentsEnabled } from "@/config/flags";
 import { getAffiliateById } from "@/models/affiliates";
+import { getUserById } from "@/models/business";
 import { getProductById } from "@/models/products";
 import Checkout from "./components/checkout";
 
@@ -18,6 +19,7 @@ export default async function Page(props: {
 	const moonpayEnabled = (await isMoonpayEnabled()) as boolean;
 	const realTimePaymentsEnabled =
 		(await isRealTimePaymentsEnabled()) as boolean;
+	const business = await getUserById(product?.business_id as string);
 
 	return (
 		<Checkout
@@ -26,6 +28,7 @@ export default async function Page(props: {
 			affiliateId={user?.id}
 			moonpayEnabled={moonpayEnabled}
 			realTimePaymentsEnabled={realTimePaymentsEnabled}
+			stripeConnectedAccount={business?.stripe_connected_account ?? ""}
 		/>
 	);
 }

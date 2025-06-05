@@ -1,3 +1,4 @@
+import prisma from "@/lib/prisma";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SK!);
@@ -13,6 +14,9 @@ export async function POST(request: Request) {
 	const quantity: string = body.get("quantity") as string;
 	const customer_address: string = body.get("customer_address") as string;
 	const price_type: string = body.get("price_type") as string;
+	const stripeConnectedAccount: string = body.get(
+		"stripe_connected_account",
+	) as string;
 
 	let priceObject: Stripe.PriceCreateParams = {
 		currency: "usd",
@@ -25,6 +29,26 @@ export async function POST(request: Request) {
 	const paymentMode =
 		price_type === "Subscription" ? "subscription" : "payment";
 
+	const productData = await prisma.products.findUnique({
+		where: {
+			id: Number(productId),
+		},
+	});
+
+	let retrievedPrice: Stripe.Price;
+	if (stripeConnectedAccount) {
+		retrievedPrice = await stripe.prices.retrieve(
+			productData?.stripe_price_id as string,
+			{
+				stripeAccount: stripeConnectedAccount,
+			},
+		);
+	} else {
+		retrievedPrice = await stripe.prices.retrieve(
+			productData?.stripe_price_id as string,
+		);
+	}
+
 	if (price_type === "Subscription") {
 		priceObject = {
 			...priceObject,
@@ -34,13 +58,36 @@ export async function POST(request: Request) {
 		} as Stripe.PriceCreateParams;
 	}
 
-	const price = await stripe.prices.create(priceObject);
+	let price: Stripe.Price;
+	if (
+		retrievedPrice?.id &&
+		retrievedPrice?.unit_amount !== Number.parseFloat(amount) * 100
+	) {
+		if (stripeConnectedAccount) {
+			price = await stripe.prices.create(priceObject, {
+				stripeAccount: stripeConnectedAccount,
+			});
+		} else {
+			price = await stripe.prices.create(priceObject);
+		}
+		await prisma.products.update({
+			where: {
+				id: Number(productId),
+			},
+			data: {
+				stripe_price_id: price.id,
+			},
+		});
+	} else {
+		price = retrievedPrice;
+	}
 
+	const parsedPriceId = price.id;
 	let sessionParams: Stripe.Checkout.SessionCreateParams = {
 		customer_email: email,
 		line_items: [
 			{
-				price: price.id,
+				price: parsedPriceId,
 				quantity: quantity ? Number(quantity) : 1,
 			},
 		],
@@ -73,7 +120,14 @@ export async function POST(request: Request) {
 		};
 	}
 
-	const session = await stripe.checkout.sessions.create(sessionParams);
+	let session: Stripe.Checkout.Session;
+	if (stripeConnectedAccount) {
+		session = await stripe.checkout.sessions.create(sessionParams, {
+			stripeAccount: stripeConnectedAccount,
+		});
+	} else {
+		session = await stripe.checkout.sessions.create(sessionParams);
+	}
 
 	return Response.json(session.url);
 }

@@ -148,6 +148,7 @@ model Products {
   status             String                 @default("Published")
   business_id        String?                @db.Uuid
   metadata           Json?
+  stripe_price_id    String?
   id                 Int                    @id @default(autoincrement())
   embedding          Unsupported("vector")?
   affiliate_business Affiliate_Business[]
