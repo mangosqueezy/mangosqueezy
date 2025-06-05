@@ -190,7 +190,7 @@ export default function ElegantOnboarding({
 						</ul>
 					</div>
 					<div className="p-8 lg:w-2/3 bg-white/80 backdrop-blur-sm">
-						<div className="space-y-6 h-48">
+						<div className="space-y-6 h-64">
 							<div className="mb-8">
 								<h3 className="text-2xl font-semibold mb-2 text-gray-900">
 									{steps[currentStep]}
