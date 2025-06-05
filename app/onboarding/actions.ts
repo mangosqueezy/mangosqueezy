@@ -12,15 +12,23 @@ type FormData = {
 	description: string;
 	commission: number;
 	email: string;
+	url: string;
 };
 
 export async function updateOnboardingAction(
 	user_id: string,
 	formData: FormData,
 ) {
-	const { first_name, last_name, description, commission, email } = formData;
+	const { first_name, last_name, description, commission, email, url } =
+		formData;
 
-	if (!first_name || !last_name || !description || commission === undefined) {
+	if (
+		!first_name ||
+		!last_name ||
+		!description ||
+		commission === undefined ||
+		!url
+	) {
 		return { error: "All fields are required." };
 	}
 
@@ -39,6 +47,7 @@ export async function updateOnboardingAction(
 		description,
 		commission,
 		svix_consumer_app_id: applicationOut.id,
+		url,
 	});
 
 	return user;

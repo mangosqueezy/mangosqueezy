@@ -25,6 +25,7 @@ export default function ElegantOnboarding({
 		lastName: "",
 		commission: "",
 		description: "",
+		url: "",
 	});
 
 	const handleInputChange = (
@@ -47,6 +48,7 @@ export default function ElegantOnboarding({
 			description: formData.description,
 			commission: Number(formData.commission),
 			email: email as string,
+			url: formData.url,
 		});
 
 		if (!user) {
@@ -84,6 +86,15 @@ export default function ElegantOnboarding({
 								value={formData.lastName}
 								onChange={handleInputChange}
 								placeholder="Last Name"
+							/>
+						</div>
+						<div className="relative">
+							<Input
+								id="url"
+								name="url"
+								value={formData.url}
+								onChange={handleInputChange}
+								placeholder="your-website.com"
 							/>
 						</div>
 					</div>

@@ -59,6 +59,7 @@ export async function updateBusinessInfoById({
 	description,
 	commission,
 	svix_consumer_app_id,
+	url,
 }: Pick<
 	Business,
 	| "id"
@@ -67,6 +68,7 @@ export async function updateBusinessInfoById({
 	| "description"
 	| "commission"
 	| "svix_consumer_app_id"
+	| "url"
 >) {
 	try {
 		return prisma.business.update({
@@ -77,6 +79,7 @@ export async function updateBusinessInfoById({
 				description,
 				commission,
 				svix_consumer_app_id,
+				url,
 			},
 		});
 	} catch (err) {
