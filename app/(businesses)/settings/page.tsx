@@ -36,19 +36,22 @@ export default function Settings() {
 		getLoggedInUser();
 	}, [getLoggedInUser]);
 
-	const createShortLinkHandler = useCallback(async () => {
-		if (loggedInUser?.id && loggedInUser?.connectify_short_link === null) {
-			const shortLink = await createShortLink(
-				loggedInUser.id,
-				`https://www.mangosqueezy.com/connectify/${loggedInUser.id}`,
-			);
-			setShortLink(shortLink);
-		}
-	}, [loggedInUser]);
+	const createShortLinkHandler = useCallback(async (userId: string) => {
+		const shortLink = await createShortLink(
+			userId,
+			`https://www.mangosqueezy.com/connectify/${userId}`,
+		);
+		setShortLink(shortLink);
+	}, []);
 
 	useEffect(() => {
-		if (loggedInUser?.id && loggedInUser?.connectify_short_link === null) {
-			createShortLinkHandler();
+		if (
+			loggedInUser?.id &&
+			loggedInUser?.products &&
+			loggedInUser.products.length > 0 &&
+			loggedInUser?.connectify_short_link === null
+		) {
+			createShortLinkHandler(loggedInUser?.id as string);
 		}
 	}, [loggedInUser, createShortLinkHandler]);
 
