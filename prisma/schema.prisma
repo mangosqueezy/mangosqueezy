@@ -38,6 +38,7 @@ model Business {
   stripe_connected_account  String?
   price_plan                PricePlan?           @default(Trial)
   trial_ends_at             DateTime?
+  connectify_short_link     String?
   stripe_customer_id        String?
   stripe_subscription_id    String?
   payment_preference        PaymentPreference    @default(FullFiat)

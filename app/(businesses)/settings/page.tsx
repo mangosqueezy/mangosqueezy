@@ -17,6 +17,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { getUser } from "../actions";
+import { createShortLink } from "./actions";
 
 export default function Settings() {
 	const router = useRouter();
@@ -24,6 +25,7 @@ export default function Settings() {
 		(Business & { products: Products[] }) | undefined | null
 	>(null);
 	const [copyStatus, setCopyStatus] = useState<string>("");
+	const [shortLink, setShortLink] = useState<string>("");
 
 	const getLoggedInUser = useCallback(async () => {
 		const user = await getUser();
@@ -33,6 +35,22 @@ export default function Settings() {
 	useEffect(() => {
 		getLoggedInUser();
 	}, [getLoggedInUser]);
+
+	const createShortLinkHandler = useCallback(async () => {
+		if (loggedInUser?.id && loggedInUser?.connectify_short_link === null) {
+			const shortLink = await createShortLink(
+				loggedInUser.id,
+				`https://www.mangosqueezy.com/connectify/${loggedInUser.id}`,
+			);
+			setShortLink(shortLink);
+		}
+	}, [loggedInUser]);
+
+	useEffect(() => {
+		if (loggedInUser?.id && loggedInUser?.connectify_short_link === null) {
+			createShortLinkHandler();
+		}
+	}, [loggedInUser, createShortLinkHandler]);
 
 	const copyToClipboard = async (text: string) => {
 		try {
@@ -111,7 +129,9 @@ export default function Settings() {
 											<div className="relative flex-1">
 												<Input
 													readOnly
-													value={`https://www.mangosqueezy.com/connectify/${loggedInUser.id}`}
+													value={
+														loggedInUser?.connectify_short_link || shortLink
+													}
 													className="pr-24 font-mono text-sm bg-muted"
 												/>
 											</div>
@@ -120,7 +140,7 @@ export default function Settings() {
 												size="default"
 												onClick={() =>
 													copyToClipboard(
-														`https://www.mangosqueezy.com/connectify/${loggedInUser.id}`,
+														loggedInUser?.connectify_short_link || shortLink,
 													)
 												}
 												className="shrink-0 flex items-center gap-2"
